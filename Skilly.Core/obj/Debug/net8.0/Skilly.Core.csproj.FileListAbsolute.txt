@@ -1,0 +1,13 @@
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\bin\Debug\net8.0\Skilly.Core.deps.json
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\bin\Debug\net8.0\Skilly.Core.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\bin\Debug\net8.0\Skilly.Core.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.csproj.AssemblyReference.cache
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.AssemblyInfoInputs.cache
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.AssemblyInfo.cs
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.csproj.CoreCompileInputs.cache
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.sourcelink.json
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\refint\Skilly.Core.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\Skilly.Core.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.Core\obj\Debug\net8.0\ref\Skilly.Core.dll

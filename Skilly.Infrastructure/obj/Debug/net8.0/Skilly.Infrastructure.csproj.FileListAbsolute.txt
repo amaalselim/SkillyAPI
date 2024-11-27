@@ -1,0 +1,12 @@
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\bin\Debug\net8.0\Skilly.Infrastructure.deps.json
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\bin\Debug\net8.0\Skilly.Infrastructure.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\bin\Debug\net8.0\Skilly.Infrastructure.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.AssemblyInfo.cs
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.sourcelink.json
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\refint\Skilly.Infrastructure.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\Skilly.Infrastructure.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.Infrastructure\obj\Debug\net8.0\ref\Skilly.Infrastructure.dll
