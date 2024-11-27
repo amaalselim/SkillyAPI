@@ -1,7 +1,16 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Skilly.Application.Middlewares;
+using Skilly.Core.Entities;
+using Skilly.Persistence.Abstract;
+using Skilly.Persistence.DataContext;
+using Skilly.Persistence.Implementation;
 using System.Globalization;
+using System.Text;
 
 namespace Skilly.API
 {
@@ -10,7 +19,17 @@ namespace Skilly.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+            //builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
+
+            builder.Services.AddIdentity<User, IdentityRole>()
+                           .AddEntityFrameworkStores<ApplicationDbContext>()
+                           .AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
 
             // Add services to the container.
             builder.Services.AddCors(corsOptions =>
@@ -21,6 +40,24 @@ namespace Skilly.API
                       .AllowAnyMethod()
                       .AllowAnyHeader();
                 });
+            });
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options => {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+                };
             });
 
             builder.Services.AddControllers();
@@ -63,7 +100,7 @@ namespace Skilly.API
 
             var app = builder.Build();
 
-           app.UseMiddleware<LocalizationMiddleware>();    
+            //app.UseMiddleware<LocalizationMiddleware>();    
             app.UseRequestLocalization(options =>
             {
                 options.SetDefaultCulture("ar-EG")
