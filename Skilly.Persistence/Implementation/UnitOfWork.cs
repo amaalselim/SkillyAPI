@@ -1,0 +1,33 @@
+﻿using Skilly.Core.Entities;
+using Skilly.Persistence.Abstract;
+using Skilly.Persistence.DataContext;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Skilly.Persistence.Implementation
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly ApplicationDbContext _context;
+
+        public IGenericRepository<User> Users { get; private set; }
+        public UnitOfWork(IGenericRepository<User> User, ApplicationDbContext context)
+        {
+            Users = User;
+            _context = context;
+        }
+
+        public async Task<int> CompleteAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+    }
+}
