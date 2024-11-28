@@ -1,29 +1,35 @@
 [
   {
-    "ContainingType": "Skilly.API.Controllers.UserController",
-    "Method": "AddUser",
-    "RelativePath": "api/User/Add-User",
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/Login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "user",
-        "Type": "Skilly.Core.Entities.User",
+        "Name": "loginDTO",
+        "Type": "Skilly.Application.DTOs.LoginDTO",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/Auth/Register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
       {
-        "Type": "Skilly.Core.Entities.User",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
+        "Name": "registerDTO",
+        "Type": "Skilly.Application.DTOs.RegisterDTO",
+        "IsRequired": true
       }
-    ]
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "Skilly.API.Controllers.UserController",

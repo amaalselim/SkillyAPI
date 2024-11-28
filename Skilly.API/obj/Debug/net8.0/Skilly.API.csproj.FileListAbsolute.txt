@@ -154,3 +154,6 @@ C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\Skilly.Core.dll
 C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\Skilly.Persistence.dll
 C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\Skilly.Persistence.pdb
 C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\Skilly.Core.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\Skilly.Infrastructure.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.API\bin\Debug\net8.0\Skilly.Infrastructure.pdb
