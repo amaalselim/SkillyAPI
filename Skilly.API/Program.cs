@@ -4,8 +4,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Skilly.Application.Abstract;
+using Skilly.Application.Implementation;
+using Skilly.Application.Mapping;
 using Skilly.Application.Middlewares;
 using Skilly.Core.Entities;
+using Skilly.Infrastructure.Abstract;
+using Skilly.Infrastructure.Implementation;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Implementation;
@@ -30,6 +35,10 @@ namespace Skilly.API
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IClaimsService,ClaimsService>();
+            builder.Services.AddScoped<IAuthService,AuthService>();
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             // Add services to the container.
             builder.Services.AddCors(corsOptions =>
