@@ -33,12 +33,6 @@ namespace Skilly.API.Controllers
             }
             return Ok(user);
         }
-        [HttpPost("Add-User")]
-        public async Task<ActionResult<User>> AddUser(User user)
-        {
-            await _unitOfWork.Users.AddAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
-        }
         [HttpPut("EditUserBy/{id}")]
         public async Task<IActionResult> PutUser(string id, User user)
         {
