@@ -9,7 +9,7 @@ namespace Skilly.Application.DTOs
 {
     public class LoginDTO
     {
-        [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "يرجى إدخال رقم هاتف مصري صحيح.")]
+        [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "Please enter a valid Egyptian phone number.")]
         public string PhoneNumber { get; set; }
         public string Password { get; set; }
         public bool RememberMe { get; set; }
