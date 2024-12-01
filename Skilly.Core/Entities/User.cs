@@ -13,9 +13,10 @@ namespace Skilly.Core.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "يرجى إدخال رقم هاتف مصري صحيح.")]
+        [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "Please enter a valid Egyptian phone number.")]
         public string PhoneNumber {  get; set; }
         public UserType UserType { get; set; }
+        public int? verificationCode { get; set; }
 
     }
 }
