@@ -32,6 +32,86 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Auth/reset-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "forgetPasswordDTO",
+        "Type": "Skilly.Application.DTOs.ForgetPasswordDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "SelectUserType",
+    "RelativePath": "api/Auth/Select-UserType",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userTypeRequestDTO",
+        "Type": "Skilly.Application.DTOs.UserTypeRequestDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "UpdatePassword",
+    "RelativePath": "api/Auth/update-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updatePasswordDTO",
+        "Type": "Skilly.Application.DTOs.UpdatePasswordDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "VerifyCode",
+    "RelativePath": "api/Auth/verify-code",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verficationCodeDTO",
+        "Type": "Skilly.Application.DTOs.VerficationCodeDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "VerifyEmail",
+    "RelativePath": "api/Auth/verify-email",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verificationDTO",
+        "Type": "Skilly.Application.DTOs.VerficationCodeDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Skilly.API.Controllers.UserController",
     "Method": "DeleteUser",
     "RelativePath": "api/User/DeleteUserBy/{id}",
