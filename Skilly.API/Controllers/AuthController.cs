@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
+using Skilly.Core.Enums;
 
 namespace Skilly.API.Controllers
 {
@@ -15,6 +16,17 @@ namespace Skilly.API.Controllers
         {
             _authService = authService;
         }
+        [HttpPost("Select-UserType")]
+        public IActionResult SelectUserType([FromBody] UserTypeRequestDTO userTypeRequestDTO)
+        {
+            if (!Enum.TryParse(userTypeRequestDTO.UserType.ToString(), out UserType userType) || !Enum.IsDefined(typeof(UserType), userType))
+            {
+                return BadRequest(new { Success = false, Message = "Invalid UserType." });
+            }
+
+            return Ok(new { Success = true, UserType = userType });
+        }
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
@@ -25,6 +37,19 @@ namespace Skilly.API.Controllers
             }
             return BadRequest(new { Success = false, Message = "Registration failed.", Errors = result.Errors });
         }
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
+        {
+            var isVerified = await _authService.VerifyEmailCodeAsync(verificationDTO);
+
+            if (isVerified)
+            {
+                return Ok(new { Success = true, Message = "Email confirmed successfully." });
+            }
+
+            return BadRequest(new { Success = false, Message = "Invalid verification code." });
+        }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
@@ -37,6 +62,98 @@ namespace Skilly.API.Controllers
 
             return Ok(new { Success = true, Message = "Login successful.", User = user });
         }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ForgetPasswordDTO forgetPasswordDTO)
+        {
+            var token = await _authService.GeneratePasswordResetTokenAsync(forgetPasswordDTO);
+            if (token == null)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Failed to generate reset token."
+                });
+            }
+            try
+            {
+                await _authService.SendResetPasswordEmailAsync(forgetPasswordDTO.Email);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Reset password email sent successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = $"Failed to send email: {ex.Message}"
+                });
+            }
+        }
+        [HttpPost("verify-code")]
+        public async Task<IActionResult> VerifyCode([FromBody] VerficationCodeDTO verficationCodeDTO)
+        {
+            var user = await _authService.FindByEmailAsync(verficationCodeDTO.email);
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "User not found."
+                });
+            }
+
+            if (user.verificationCode.ToString() != verficationCodeDTO.code)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Invalid verification code."
+                });
+            }
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Verification successful."
+            });
+        }
+        [HttpPost("update-password")]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordDTO updatePasswordDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Invalid data provided.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+
+            var result = await _authService.UpdatePasswordAsync(updatePasswordDTO);
+            if (result.Succeeded)
+            {
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Password updated successfully."
+                });
+            }
+            else
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Password update failed.",
+                    Errors = result.Errors
+                });
+            }
+        }
+
+
 
     }
 }
