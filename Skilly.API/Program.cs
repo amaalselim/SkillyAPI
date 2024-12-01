@@ -32,6 +32,20 @@ namespace Skilly.API
             builder.Services.AddIdentity<User, IdentityRole>()
                            .AddEntityFrameworkStores<ApplicationDbContext>()
                            .AddDefaultTokenProviders();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
+            builder.Services.AddDistributedMemoryCache();
+
+
+            var smtpSettings = builder.Configuration.GetSection("SMTP");
+            builder.Services.AddSingleton<IEmailService>(new EmailService(
+                smtpSettings["Server"],
+                int.Parse(smtpSettings["Port"]),
+                smtpSettings["User"],
+                smtpSettings["Password"]
+            ));
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
@@ -126,6 +140,7 @@ namespace Skilly.API
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseRouting();
             app.UseCors("MyPolicy");
