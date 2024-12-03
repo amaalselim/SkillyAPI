@@ -46,11 +46,16 @@ namespace Skilly.Application.Implementation
         public async Task<object> LoginAsync(LoginDTO loginDTO)
         {
             var user = await _usermanager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == loginDTO.PhoneNumber);
+
             if (user != null)
             {
-                if (!user.EmailConfirmed) 
+                if (!user.EmailConfirmed)
                 {
-                    return new { Success = false, Message = "Email not confirmed. Please verify your email first." };
+                    return new
+                    {
+                        Success = false,
+                        Message = "Email not confirmed. Please verify your email first."
+                    };
                 }
                 var result = await _manager.PasswordSignInAsync(user.Email, loginDTO.Password, loginDTO.RememberMe, false);
                 if (result.Succeeded)
@@ -61,17 +66,29 @@ namespace Skilly.Application.Implementation
 
                     return new
                     {
+                        Success = true,
+                        Message = "Login successful.",
                         Token = token,
                         Expire = loginDTO.RememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddHours(20)
                     };
                 }
+                return new { Success = false, Message = "Invalid login credentials." };
             }
-            return null;
+            return new { Success = false, Message = "User not found." };
         }
-
 
         public async Task<IdentityResult> RegisterAsync(RegisterDTO registerDTO)
         {
+            var existingUser = await _usermanager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == registerDTO.PhoneNumber);
+            if (existingUser != null)
+            {
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Code = "DuplicatePhoneNumber",
+                    Description = "This phone number is already registered."
+                });
+            }
+
             var user = _mapper.Map<User>(registerDTO);
             user.UserType = registerDTO.UserType;
             user.EmailConfirmed = false;
@@ -79,20 +96,35 @@ namespace Skilly.Application.Implementation
             var result = await _usermanager.CreateAsync(user, registerDTO.Password);
             if (result.Succeeded)
             {
-               _httpContextAccessor. HttpContext.Session.SetString("RegistrationTime", DateTime.UtcNow.ToString());
+                _httpContextAccessor.HttpContext.Session.SetString("RegistrationTime", DateTime.UtcNow.ToString());
 
                 Random random = new Random();
                 int verificationCode = random.Next(1000, 9999);
-
                 user.verificationCode = verificationCode;
-                await _usermanager.UpdateAsync(user);
-
-                await _emailService.SendEmailAsync(user.Email, user.FirstName, "Email Confirmation",
-                    $"Your email verification code is:<br/><code style='font-size: 18px; color: #3498db;'>{verificationCode}</code>");
+                var updateResult = await _usermanager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    return updateResult;
+                }
+                try
+                {
+                    await _emailService.SendEmailAsync(
+                        user.Email,
+                        user.FirstName,
+                        "Email Confirmation",
+                        $"Your email verification code is:<br/><code style='font-size: 18px; color: #3498db;'>{verificationCode}</code>"
+                    );
+                }
+                catch (Exception ex)
+                {
+                    return IdentityResult.Failed(new IdentityError
+                    {
+                        Description = $"Failed to send email: {ex.Message}"
+                    });
+                }
             }
             return result;
         }
-
         public async Task<string> GeneratePasswordResetTokenAsync(ForgetPasswordDTO forgetPasswordDTO)
         {
             var user = await _usermanager.FindByEmailAsync(forgetPasswordDTO.Email);

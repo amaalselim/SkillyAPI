@@ -31,12 +31,20 @@ namespace Skilly.API.Controllers
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
             var result = await _authService.RegisterAsync(registerDTO);
+
             if (result.Succeeded)
             {
-                return Ok(new { Success = true, Message = "User Registered Successfully." });
+                return Ok(new { Success = true, Message = "User Registered Successfully. Please verify your email." });
             }
-            return BadRequest(new { Success = false, Message = "Registration failed.", Errors = result.Errors });
+
+            return BadRequest(new
+            {
+                Success = false,
+                Message = "Registration failed.",
+                Errors = result.Errors.Select(e => e.Description)
+            });
         }
+
         [HttpPost("verify-email")]
         public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
         {
@@ -53,14 +61,11 @@ namespace Skilly.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            var user = await _authService.LoginAsync(loginDTO);
+            var response = await _authService.LoginAsync(loginDTO);
 
-            if (user == null)
-            {
-                return BadRequest(new { Success = false, Message = "Invalid Login Attempt." });
-            }
-
-            return Ok(new { Success = true, Message = "Login successful.", User = user });
+            return response != null
+                ? Ok(response)
+                : BadRequest(new { Success = false, Message = "Invalid login attempt." });
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ForgetPasswordDTO forgetPasswordDTO)
