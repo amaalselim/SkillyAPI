@@ -13,3 +13,4 @@ obj/
 *.suo
 
 /Skilly.Application/obj/Debug/net8.0/Skilly.Application.AssemblyInfoInputs.cache
+/Skilly.API/.config
