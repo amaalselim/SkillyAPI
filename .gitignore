@@ -5,3 +5,11 @@
 /.vs/Skilly.API
 /Skilly.API/bin/Debug/net8.0
 /.vs/ProjectEvaluation
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+
+/Skilly.Application/obj/Debug/net8.0/Skilly.Application.AssemblyInfoInputs.cache
