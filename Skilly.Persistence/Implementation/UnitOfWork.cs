@@ -14,10 +14,22 @@ namespace Skilly.Persistence.Implementation
         private readonly ApplicationDbContext _context;
 
         public IGenericRepository<User> Users { get; private set; }
-        public UnitOfWork(IGenericRepository<User> User, ApplicationDbContext context)
+
+        public IUserProfileRepository ProfileRepository { get; private set; }
+
+        public IServiceProviderRepository ServiceProviderRepository { get; private set; }
+
+        public UnitOfWork(IGenericRepository<User> User,
+            ApplicationDbContext context,
+            IUserProfileRepository userProfileRepository,
+           IServiceProviderRepository serviceProviderRepository
+           )
         {
-            Users = User;
             _context = context;
+            Users = User;
+            ProfileRepository = userProfileRepository;
+            ServiceProviderRepository = serviceProviderRepository;
+
         }
 
         public async Task<int> CompleteAsync()
