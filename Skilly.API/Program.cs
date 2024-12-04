@@ -49,10 +49,15 @@ namespace Skilly.API
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
+            builder.Services.AddScoped<IUserProfileRepository,UserProfileRepository>();
+            builder.Services.AddScoped<IServiceProviderRepository,ServiceProviderRepository>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IClaimsService,ClaimsService>();
+            builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<IAuthService,AuthService>();
+
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+           // builder.Services.AddTransient<ExceptionMiddleware>();
 
             // Add services to the container.
             builder.Services.AddCors(corsOptions =>
@@ -82,6 +87,7 @@ namespace Skilly.API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
                 };
             });
+            builder.Services.AddLogging();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -121,6 +127,7 @@ namespace Skilly.API
 
             #endregion
 
+            builder.Services.AddLogging();
             var app = builder.Build();
 
             //app.UseMiddleware<LocalizationMiddleware>();    
@@ -131,8 +138,10 @@ namespace Skilly.API
                        .AddSupportedUICultures("ar-EG", "en-US");
             });
 
+            
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
