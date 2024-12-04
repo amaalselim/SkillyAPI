@@ -10,6 +10,8 @@ namespace Skilly.Persistence.Abstract
     public interface IUnitOfWork : IDisposable
     {
         IGenericRepository<User> Users { get; }
+        IUserProfileRepository ProfileRepository { get; }
+        IServiceProviderRepository ServiceProviderRepository { get; }
         Task<int> CompleteAsync();
     }
 }
