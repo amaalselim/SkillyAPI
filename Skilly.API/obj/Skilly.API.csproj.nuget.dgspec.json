@@ -154,10 +154,6 @@
               "target": "Package",
               "version": "[13.0.1, )"
             },
-            "Microsoft.AspNetCore.Http.Abstractions": {
-              "target": "Package",
-              "version": "[2.2.0, )"
-            },
             "Microsoft.AspNetCore.Identity": {
               "target": "Package",
               "version": "[2.2.0, )"
@@ -169,6 +165,10 @@
             "Microsoft.Extensions.Identity.Core": {
               "target": "Package",
               "version": "[8.0.11, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
@@ -187,6 +187,9 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
@@ -362,6 +365,9 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+              "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.Application\\Skilly.Application.csproj": {
+                "projectPath": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.Application\\Skilly.Application.csproj"
+              },
               "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.Core\\Skilly.Core.csproj": {
                 "projectPath": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.Core\\Skilly.Core.csproj"
               }

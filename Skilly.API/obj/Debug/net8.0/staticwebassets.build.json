@@ -1,11 +1,58 @@
 {
   "Version": 1,
-  "Hash": "+LDoVPK3zRUvveBqf09XDqZmMA/BnoFhotkS44/LIiU=",
+  "Hash": "8ZgWW4Hf0p4gG5r8XQ1SnIOhA8aCazp/cMGZi0e63KI=",
   "Source": "Skilly.API",
   "BasePath": "_content/Skilly.API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "Skilly.API\\wwwroot",
+      "Source": "Skilly.API",
+      "ContentRoot": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\",
+      "BasePath": "_content/Skilly.API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\Images\\UserProfile\\1.png",
+      "SourceId": "Skilly.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\",
+      "BasePath": "_content/Skilly.API",
+      "RelativePath": "Images/UserProfile/1.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\UserProfile\\1.png"
+    },
+    {
+      "Identity": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\Images\\UserProfile\\5870628791192242024.jpg",
+      "SourceId": "Skilly.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\",
+      "BasePath": "_content/Skilly.API",
+      "RelativePath": "Images/UserProfile/5870628791192242024.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\UserProfile\\5870628791192242024.jpg"
+    }
+  ]
 }

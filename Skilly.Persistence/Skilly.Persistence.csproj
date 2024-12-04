@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Skilly.Application\Skilly.Application.csproj" />
     <ProjectReference Include="..\Skilly.Core\Skilly.Core.csproj" />
   </ItemGroup>
 

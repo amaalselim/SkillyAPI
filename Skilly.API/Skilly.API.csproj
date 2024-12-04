@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Skilly.Persistence\Skilly.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
