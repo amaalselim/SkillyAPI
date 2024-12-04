@@ -34,7 +34,7 @@ namespace Skilly.API.Controllers
             return Ok(user);
         }
         [HttpPut("EditUserBy/{id}")]
-        public async Task<IActionResult> PutUser(string id, User user)
+        public async Task<IActionResult> EditUser(string id, User user)
         {
             if (id != user.Id)
             {
