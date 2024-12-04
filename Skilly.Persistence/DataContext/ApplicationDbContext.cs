@@ -18,6 +18,8 @@ namespace Skilly.Persistence.DataContext
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<User> users { get; set; }
+        public DbSet<UserProfile> userProfiles { get; set; }
+        public DbSet<ServiceProvider> serviceProviders { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=GraduationProject-Skilly;Integrated Security=True;Encrypt=True;TrustServerCertificate=True");
