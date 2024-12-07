@@ -1,12 +1,13 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Skilly.Application.Abstract;
 using Skilly.Application.Implementation;
-using Skilly.Application.Mapping;
 using Skilly.Application.Middlewares;
 using Skilly.Core.Entities;
 using Skilly.Infrastructure.Abstract;
@@ -51,6 +52,8 @@ namespace Skilly.API
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
             builder.Services.AddScoped<IUserProfileRepository,UserProfileRepository>();
             builder.Services.AddScoped<IServiceProviderRepository,ServiceProviderRepository>();
+            builder.Services.AddScoped<IServicegalleryRepository,servicegalleryRepository>();
+
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IClaimsService,ClaimsService>();
             builder.Services.AddScoped<IImageService,ImageService>();
@@ -86,6 +89,15 @@ namespace Skilly.API
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
                 };
+            });
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = long.MaxValue;
+            });
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = null; 
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
             });
             builder.Services.AddLogging();
 
@@ -146,6 +158,19 @@ namespace Skilly.API
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSession();
+            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+            app.Use(async (context, next) =>
+            {
+                try
+                {
+                    await next.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An error occurred while processing the request.");
+                    throw; 
+                }
+            });
 
             app.UseRouting();
             app.UseCors("MyPolicy");
