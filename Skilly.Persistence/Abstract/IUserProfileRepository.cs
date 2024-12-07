@@ -10,7 +10,7 @@ namespace Skilly.Persistence.Abstract
 {
     public interface IUserProfileRepository 
     {
-        Task<List<UserProfile>> GetAllUserProfileAsync();
+        Task<IEnumerable<UserProfile>> GetAllUserProfileAsync();
         Task<UserProfile> GetByIdAsync(string id);
         Task AddUserProfileAsync(UserProfileDTO userProfileDTO, string userId);
         Task EditUserProfileAsync(UserProfileDTO userProfileDTO, string userId);
