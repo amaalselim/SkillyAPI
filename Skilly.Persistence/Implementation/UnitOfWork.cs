@@ -19,16 +19,20 @@ namespace Skilly.Persistence.Implementation
 
         public IServiceProviderRepository ServiceProviderRepository { get; private set; }
 
+        public IServicegalleryRepository servicegalleryRepository { get; private set; }
+
         public UnitOfWork(IGenericRepository<User> User,
             ApplicationDbContext context,
             IUserProfileRepository userProfileRepository,
-           IServiceProviderRepository serviceProviderRepository
+           IServiceProviderRepository serviceProviderRepository,
+           IServicegalleryRepository ServicegalleryRepository
            )
         {
             _context = context;
             Users = User;
             ProfileRepository = userProfileRepository;
             ServiceProviderRepository = serviceProviderRepository;
+            servicegalleryRepository = ServicegalleryRepository;
 
         }
 

@@ -89,7 +89,7 @@ namespace Skilly.Persistence.Implementation
             return await _context.userProfiles.FindAsync(id);
         }
 
-        public async Task<List<UserProfile>> GetAllUserProfileAsync()
+        public async Task<IEnumerable<UserProfile>> GetAllUserProfileAsync()
         {
             var users = await _context.userProfiles
                 .ToListAsync();
