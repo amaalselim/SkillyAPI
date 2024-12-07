@@ -112,6 +112,145 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "Method": "AddServiceGallery",
+    "RelativePath": "api/Servicegallery/AddGallery",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "galleryName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Deliverytime",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Img",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "Images",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "Method": "DeleteServiceGallery",
+    "RelativePath": "api/Servicegallery/DeleteGalleryBy/{galleryId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "galleryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "Method": "EditServiceGallery",
+    "RelativePath": "api/Servicegallery/EditgalleryBy/{galleryId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "galleryName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Deliverytime",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Img",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "Images",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "galleryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "Method": "GetAllServiceGallery",
+    "RelativePath": "api/Servicegallery/getAllGallery",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "Method": "GetServiceGalleryById",
+    "RelativePath": "api/Servicegallery/GeyGalleryBy/{galleryId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "galleryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Skilly.API.Controllers.ServiceProviderController",
     "Method": "AddServiceProvider",
     "RelativePath": "api/ServiceProvider/addServiceProvider",
