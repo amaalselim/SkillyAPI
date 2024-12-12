@@ -21,11 +21,14 @@ namespace Skilly.Persistence.Implementation
 
         public IServicegalleryRepository servicegalleryRepository { get; private set; }
 
+        public IProviderServicesRepository providerServiceRepository {  get; private set; }
+
         public UnitOfWork(IGenericRepository<User> User,
             ApplicationDbContext context,
             IUserProfileRepository userProfileRepository,
            IServiceProviderRepository serviceProviderRepository,
-           IServicegalleryRepository ServicegalleryRepository
+           IServicegalleryRepository ServicegalleryRepository,
+           IProviderServicesRepository providerServicesRepository
            )
         {
             _context = context;
@@ -33,6 +36,7 @@ namespace Skilly.Persistence.Implementation
             ProfileRepository = userProfileRepository;
             ServiceProviderRepository = serviceProviderRepository;
             servicegalleryRepository = ServicegalleryRepository;
+            providerServiceRepository= providerServicesRepository;
 
         }
 

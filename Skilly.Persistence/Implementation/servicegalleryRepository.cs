@@ -171,6 +171,7 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new ServiceGalleryNotFoundException("Gallery not found.");
             }
+            gallery.serviceProviderName = gallery.serviceProvider != null ? gallery.serviceProvider.FirstName + " " + gallery.serviceProvider.LastName : "NUll";
             gallery.Images = gallery.Images.Where(img => img.Img.StartsWith("Images/ServiceProvider/Servicegallery/")).ToList();
             return gallery;
         }
