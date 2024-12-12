@@ -35,6 +35,16 @@ public class MappingProfile : Profile
                 Img = img.Img
             }).ToList()));
 
+        CreateMap<ProviderservicesDTO,ProviderServices>()
+            .ForMember(dest => dest.ServicesImages, opt => opt.MapFrom(src => Map(src.Images)));
+
+        CreateMap<ProviderServices, ProviderservicesDTO>()
+            .ForMember(dest => dest.serviceProviderName, opt => opt.MapFrom(src => src.serviceProvider != null ? src.serviceProvider.FirstName + " " + src.serviceProvider.LastName : "NUll"))
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.ServicesImages.Select(img => new servicegalleryImageDTO
+            {
+                Img = img.Img
+            }).ToList()));
+
     }
 
     private List<ServicesgalleryImage> MapImages(IEnumerable<IFormFile> images)
@@ -45,6 +55,16 @@ public class MappingProfile : Profile
         return images.Select(img => new ServicesgalleryImage
         {
             Img = img.FileName 
+        }).ToList();
+    }
+    private List<ProviderServicesImage> Map(IEnumerable<IFormFile> image)
+    {
+        if (image == null || !image.Any())
+            return new List<ProviderServicesImage>();
+
+        return image.Select(img => new ProviderServicesImage
+        {
+            Img = img.FileName
         }).ToList();
     }
 }
