@@ -10,15 +10,15 @@ using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
 
-namespace Skilly.API.Controllers
+namespace Skilly.API.Areas.Provider
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ServiceProviderController : ControllerBase
+    public class ProviderController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public ServiceProviderController(IUnitOfWork unitOfWork)
+        public ProviderController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

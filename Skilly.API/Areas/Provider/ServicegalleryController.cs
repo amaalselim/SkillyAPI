@@ -6,7 +6,7 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Security.Claims;
 
-namespace Skilly.API.Controllers
+namespace Skilly.API.Areas.Provider
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +20,7 @@ namespace Skilly.API.Controllers
         }
         private string GetUserIdFromClaims()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
             {
                 throw new UnauthorizedAccessException("User not authorized.");
