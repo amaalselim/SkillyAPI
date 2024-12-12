@@ -112,7 +112,340 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "Method": "AddServiceProvider",
+    "RelativePath": "api/Provider/addServiceProvider",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Governorate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "City",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "StreetName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Age",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Gender",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Img",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "profession",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "NumberOfYearExperience",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "BriefSummary",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "NationalNumberPDF",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "Method": "DeleteServiceProvider",
+    "RelativePath": "api/Provider/deleteProviderBy/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "Method": "EditServiceProvider",
+    "RelativePath": "api/Provider/editServiceProvider",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Governorate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "City",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "StreetName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Age",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Gender",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Img",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "profession",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "NumberOfYearExperience",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "BriefSummary",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "NationalNumberPDF",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "Method": "GetAllServiceProvider",
+    "RelativePath": "api/Provider/GetAllServiceProvider",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Skilly.Core.Entities.ServiceProvider, Skilly.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "Method": "GetUserById",
+    "RelativePath": "api/Provider/GetServiceProviderBy/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Skilly.Core.Entities.ServiceProvider",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "Method": "AddService",
+    "RelativePath": "api/ProviderServices/AddService",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Deliverytime",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Notes",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Price",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      },
+      {
+        "Name": "Images",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "Method": "DeleteService",
+    "RelativePath": "api/ProviderServices/DeleteServiceBy/{serviceId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "Method": "EditService",
+    "RelativePath": "api/ProviderServices/EditServiceBy/{serviceId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Deliverytime",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Notes",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Price",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      },
+      {
+        "Name": "Images",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceProviderName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "Method": "GetAllServices",
+    "RelativePath": "api/ProviderServices/getAllServices",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "Method": "GetServiceById",
+    "RelativePath": "api/ProviderServices/GeyServiceBy/{serviceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
     "Method": "AddServiceGallery",
     "RelativePath": "api/Servicegallery/AddGallery",
     "HttpMethod": "POST",
@@ -158,7 +491,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
     "Method": "DeleteServiceGallery",
     "RelativePath": "api/Servicegallery/DeleteGalleryBy/{galleryId}",
     "HttpMethod": "DELETE",
@@ -174,7 +507,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
     "Method": "EditServiceGallery",
     "RelativePath": "api/Servicegallery/EditgalleryBy/{galleryId}",
     "HttpMethod": "PUT",
@@ -225,7 +558,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
     "Method": "GetAllServiceGallery",
     "RelativePath": "api/Servicegallery/getAllGallery",
     "HttpMethod": "GET",
@@ -235,7 +568,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.ServicegalleryController",
+    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
     "Method": "GetServiceGalleryById",
     "RelativePath": "api/Servicegallery/GeyGalleryBy/{galleryId}",
     "HttpMethod": "GET",
@@ -249,190 +582,6 @@
       }
     ],
     "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Skilly.API.Controllers.ServiceProviderController",
-    "Method": "AddServiceProvider",
-    "RelativePath": "api/ServiceProvider/addServiceProvider",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "Governorate",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "City",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "StreetName",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Age",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Gender",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Img",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      },
-      {
-        "Name": "profession",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "NumberOfYearExperience",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "BriefSummary",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "NationalNumberPDF",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Skilly.API.Controllers.ServiceProviderController",
-    "Method": "DeleteServiceProvider",
-    "RelativePath": "api/ServiceProvider/deleteProviderBy/{id}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Skilly.API.Controllers.ServiceProviderController",
-    "Method": "EditServiceProvider",
-    "RelativePath": "api/ServiceProvider/editServiceProvider",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "Governorate",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "City",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "StreetName",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Age",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Gender",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Img",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      },
-      {
-        "Name": "profession",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "NumberOfYearExperience",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "BriefSummary",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "NationalNumberPDF",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Skilly.API.Controllers.ServiceProviderController",
-    "Method": "GetAllServiceProvider",
-    "RelativePath": "api/ServiceProvider/GetAllServiceProvider",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Skilly.Core.Entities.ServiceProvider, Skilly.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Skilly.API.Controllers.ServiceProviderController",
-    "Method": "GetUserById",
-    "RelativePath": "api/ServiceProvider/GetServiceProviderBy/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Skilly.Core.Entities.ServiceProvider",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
   },
   {
     "ContainingType": "Skilly.API.Controllers.UserController",
