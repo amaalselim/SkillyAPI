@@ -22,6 +22,9 @@ namespace Skilly.Persistence.DataContext
         public DbSet<ServiceProvider> serviceProviders { get; set; }
         public DbSet<Servicesgallery> servicesgalleries { get; set; }
         public DbSet<ServicesgalleryImage>galleryImages { get; set; }
+        public DbSet<ProviderServices> providerServices{ get; set; }
+        public DbSet<ProviderServicesImage> providerServicesImages{ get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=GraduationProject-Skilly;Integrated Security=True;Encrypt=True;TrustServerCertificate=True");
