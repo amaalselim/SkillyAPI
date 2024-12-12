@@ -96,8 +96,6 @@ namespace Skilly.Application.Implementation
             var result = await _usermanager.CreateAsync(user, registerDTO.Password);
             if (result.Succeeded)
             {
-                _httpContextAccessor.HttpContext.Session.SetString("RegistrationTime", DateTime.UtcNow.ToString());
-
                 Random random = new Random();
                 int verificationCode = random.Next(1000, 9999);
                 user.verificationCode = verificationCode;
@@ -177,21 +175,7 @@ namespace Skilly.Application.Implementation
             {
                 return false;
             }
-            string registrationTimeString = _httpContextAccessor.HttpContext.Session.GetString("RegistrationTime");
-            if (string.IsNullOrEmpty(registrationTimeString))
-            {
-                return false; 
-            }
-
-            DateTime registrationTime = DateTime.Parse(registrationTimeString);
-
-            if ((DateTime.UtcNow - registrationTime).TotalMinutes > 30)
-            {
-                await _usermanager.DeleteAsync(user);
-               _httpContextAccessor.HttpContext.Session.Remove("RegistrationTime");
-                return false;
-            }
-
+          
             if (user.verificationCode.ToString() == verficationCodeDTO.code)
             {
                 user.EmailConfirmed = true;
