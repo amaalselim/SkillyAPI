@@ -13,6 +13,7 @@ namespace Skilly.Persistence.Abstract
         IUserProfileRepository ProfileRepository { get; }
         IServiceProviderRepository ServiceProviderRepository { get; }
         IServicegalleryRepository servicegalleryRepository { get; }
+        IProviderServicesRepository providerServiceRepository { get; }
         Task<int> CompleteAsync();
     }
 }
