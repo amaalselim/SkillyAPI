@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Skilly.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a6bdb330d2c5fc046d6a6f0b2871bdee05251d3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3077ceac59878bb4a96207e4cfee782c07dfb09f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Skilly.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Skilly.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

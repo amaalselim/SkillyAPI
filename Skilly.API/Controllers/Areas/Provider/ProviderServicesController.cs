@@ -5,9 +5,9 @@ using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 
-namespace Skilly.API.Areas.Provider
+namespace Skilly.API.Controllers.Areas.Provider
 {
-    [Route("api/[controller]")]
+    [Route("api/Provider/[controller]")]
     [ApiController]
     public class ProviderServicesController : ControllerBase
     {
@@ -51,7 +51,7 @@ namespace Skilly.API.Areas.Provider
             try
             {
                 string userId = GetUserIdFromClaims();
-                var service= await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId, userId);
+                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId, userId);
 
                 return Ok(new { service });
             }

@@ -6,9 +6,9 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Security.Claims;
 
-namespace Skilly.API.Areas.Provider
+namespace Skilly.API.Controllers.Areas.Provider
 {
-    [Route("api/[controller]")]
+    [Route("api/Provider/[controller]")]
     [ApiController]
     public class ServicegalleryController : ControllerBase
     {

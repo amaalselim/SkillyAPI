@@ -112,7 +112,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "AddServiceProvider",
     "RelativePath": "api/Provider/addServiceProvider",
     "HttpMethod": "POST",
@@ -173,7 +173,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "DeleteServiceProvider",
     "RelativePath": "api/Provider/deleteProviderBy/{id}",
     "HttpMethod": "DELETE",
@@ -189,7 +189,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "EditServiceProvider",
     "RelativePath": "api/Provider/editServiceProvider",
     "HttpMethod": "PUT",
@@ -250,7 +250,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "GetAllServiceProvider",
     "RelativePath": "api/Provider/GetAllServiceProvider",
     "HttpMethod": "GET",
@@ -270,7 +270,7 @@
     ]
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "GetUserById",
     "RelativePath": "api/Provider/GetServiceProviderBy/{id}",
     "HttpMethod": "GET",
@@ -296,9 +296,9 @@
     ]
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
     "Method": "AddService",
-    "RelativePath": "api/ProviderServices/AddService",
+    "RelativePath": "api/Provider/ProviderServices/AddService",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -347,9 +347,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
     "Method": "DeleteService",
-    "RelativePath": "api/ProviderServices/DeleteServiceBy/{serviceId}",
+    "RelativePath": "api/Provider/ProviderServices/DeleteServiceBy/{serviceId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -363,9 +363,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
     "Method": "EditService",
-    "RelativePath": "api/ProviderServices/EditServiceBy/{serviceId}",
+    "RelativePath": "api/Provider/ProviderServices/EditServiceBy/{serviceId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -419,9 +419,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
     "Method": "GetAllServices",
-    "RelativePath": "api/ProviderServices/getAllServices",
+    "RelativePath": "api/Provider/ProviderServices/getAllServices",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -429,9 +429,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ProviderServicesController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
     "Method": "GetServiceById",
-    "RelativePath": "api/ProviderServices/GeyServiceBy/{serviceId}",
+    "RelativePath": "api/Provider/ProviderServices/GeyServiceBy/{serviceId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -445,9 +445,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "AddServiceGallery",
-    "RelativePath": "api/Servicegallery/AddGallery",
+    "RelativePath": "api/Provider/Servicegallery/AddGallery",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -491,9 +491,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "DeleteServiceGallery",
-    "RelativePath": "api/Servicegallery/DeleteGalleryBy/{galleryId}",
+    "RelativePath": "api/Provider/Servicegallery/DeleteGalleryBy/{galleryId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -507,9 +507,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "EditServiceGallery",
-    "RelativePath": "api/Servicegallery/EditgalleryBy/{galleryId}",
+    "RelativePath": "api/Provider/Servicegallery/EditgalleryBy/{galleryId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -558,9 +558,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "GetAllServiceGallery",
-    "RelativePath": "api/Servicegallery/getAllGallery",
+    "RelativePath": "api/Provider/Servicegallery/getAllGallery",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -568,9 +568,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Areas.Provider.ServicegalleryController",
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "GetServiceGalleryById",
-    "RelativePath": "api/Servicegallery/GeyGalleryBy/{galleryId}",
+    "RelativePath": "api/Provider/Servicegallery/GeyGalleryBy/{galleryId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -667,7 +667,7 @@
     ]
   },
   {
-    "ContainingType": "Skilly.API.Controllers.userProfileController",
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "AddUserProfile",
     "RelativePath": "api/userProfile/addUserProfile",
     "HttpMethod": "POST",
@@ -708,7 +708,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.userProfileController",
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "DeleteUserProfile",
     "RelativePath": "api/userProfile/deleteProfileBy/{id}",
     "HttpMethod": "DELETE",
@@ -724,7 +724,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.userProfileController",
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "EditUserProfile",
     "RelativePath": "api/userProfile/editUserProfile",
     "HttpMethod": "PUT",
@@ -765,7 +765,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Skilly.API.Controllers.userProfileController",
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "GetAllUserProfile",
     "RelativePath": "api/userProfile/GetAllUsersProfile",
     "HttpMethod": "GET",
@@ -785,7 +785,7 @@
     ]
   },
   {
-    "ContainingType": "Skilly.API.Controllers.userProfileController",
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "GetUserById",
     "RelativePath": "api/userProfile/GetUserProfileBy/{id}",
     "HttpMethod": "GET",

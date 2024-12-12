@@ -10,7 +10,7 @@ using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
 
-namespace Skilly.API.Areas.Provider
+namespace Skilly.API.Controllers.Areas.Provider
 {
     [Route("api/[controller]")]
     [ApiController]

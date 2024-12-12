@@ -11,7 +11,7 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Security.Claims;
 
-namespace Skilly.API.Controllers
+namespace Skilly.API.Controllers.Areas.userProfile
 {
     [Route("api/[controller]")]
     [ApiController]
