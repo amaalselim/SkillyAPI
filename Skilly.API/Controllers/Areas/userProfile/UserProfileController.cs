@@ -27,7 +27,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         public async Task<ActionResult<IEnumerable<UserProfile>>> GetAllUserProfile()
         {
             var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
-            return Ok(users);
+            return Ok(new { users });
         }
         [HttpGet("GetUserProfileBy/{id}")]
         public async Task<ActionResult<UserProfile>> GetUserById(string id)

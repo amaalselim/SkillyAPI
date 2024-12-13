@@ -21,7 +21,7 @@ namespace Skilly.API.Controllers
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
             var users = await _unitOfWork.Users.GetAllAsync();
-            return Ok(users);
+            return Ok(new { users });
         }
         [HttpGet("GetUserBy/{id}")]
         public async Task<ActionResult<User>> GetUserById(string id)

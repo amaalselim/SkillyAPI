@@ -7,6 +7,7 @@ using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
+using Skilly.Persistence.Migrations;
 using System.Security.Claims;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
 
@@ -26,7 +27,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         public async Task<ActionResult<IEnumerable<ServiceProvider>>> GetAllServiceProvider()
         {
             var users = await _unitOfWork.ServiceProviderRepository.GetAllServiceProviderAsync();
-            return Ok(users);
+            return Ok(new { users });
         }
         [HttpGet("GetServiceProviderBy/{id}")]
         public async Task<ActionResult<ServiceProvider>> GetUserById(string id)
