@@ -54,6 +54,7 @@ namespace Skilly.API
             builder.Services.AddScoped<IServiceProviderRepository,ServiceProviderRepository>();
             builder.Services.AddScoped<IServicegalleryRepository,servicegalleryRepository>();
             builder.Services.AddScoped<IProviderServicesRepository,ProviderServiceRepository>();
+            builder.Services.AddScoped<IReviewRepository,ReviewRepository>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IClaimsService,ClaimsService>();

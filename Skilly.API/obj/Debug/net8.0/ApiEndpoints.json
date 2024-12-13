@@ -445,6 +445,38 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ReviewController",
+    "Method": "AddReview",
+    "RelativePath": "api/Provider/Review/AddReview",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "reviewDTO",
+        "Type": "Skilly.Application.DTOs.ReviewDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ReviewController",
+    "Method": "GetAllReviewsByProvider",
+    "RelativePath": "api/Provider/Review/GetReviewsBy/{providerId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "providerId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "AddServiceGallery",
     "RelativePath": "api/Provider/Servicegallery/AddGallery",
