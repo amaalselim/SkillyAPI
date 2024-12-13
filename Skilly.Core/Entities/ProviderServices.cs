@@ -18,14 +18,10 @@ namespace Skilly.Core.Entities
         public string Deliverytime { get; set; }
         public string Notes { get; set; }
         public ICollection<ProviderServicesImage> ServicesImages { get; set; } = new List<ProviderServicesImage>();
+        [ForeignKey("serviceProvider")]
         public string serviceProviderId { get; set; }
         [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
-        [NotMapped]
-        public string serviceProviderName { get; set; }
-
-
-
 
 
     }

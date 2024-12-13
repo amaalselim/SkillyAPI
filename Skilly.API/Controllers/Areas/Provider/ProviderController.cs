@@ -26,9 +26,21 @@ namespace Skilly.API.Controllers.Areas.Provider
         [HttpGet("GetAllServiceProvider")]
         public async Task<ActionResult<IEnumerable<ServiceProvider>>> GetAllServiceProvider()
         {
-            var users = await _unitOfWork.ServiceProviderRepository.GetAllServiceProviderAsync();
-            return Ok(new { users });
+            try
+            {
+                var providers = await _unitOfWork.ServiceProviderRepository.GetAllServiceProviderAsync();
+                return Ok(new { providers });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving service providers.",
+                    error = ex.Message
+                });
+            }
         }
+
         [HttpGet("GetServiceProviderBy/{id}")]
         public async Task<ActionResult<ServiceProvider>> GetUserById(string id)
         {

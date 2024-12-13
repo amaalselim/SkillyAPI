@@ -337,11 +337,6 @@
         "Name": "serviceProviderId",
         "Type": "System.String",
         "IsRequired": false
-      },
-      {
-        "Name": "serviceProviderName",
-        "Type": "System.String",
-        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -402,11 +397,6 @@
       },
       {
         "Name": "serviceProviderId",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "serviceProviderName",
         "Type": "System.String",
         "IsRequired": false
       },
@@ -513,11 +503,6 @@
         "Name": "serviceProviderId",
         "Type": "System.String",
         "IsRequired": false
-      },
-      {
-        "Name": "serviceProviderName",
-        "Type": "System.String",
-        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -573,11 +558,6 @@
       },
       {
         "Name": "serviceProviderId",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "serviceProviderName",
         "Type": "System.String",
         "IsRequired": false
       },

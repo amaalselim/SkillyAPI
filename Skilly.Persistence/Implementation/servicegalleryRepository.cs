@@ -38,7 +38,6 @@ namespace Skilly.Persistence.Implementation
             var path = @"Images/ServiceProvider/Servicegallery/";
             var gallery = _mapper.Map<Servicesgallery>(servicegalleryDTO);
             gallery.serviceProviderId = user.Id;
-            gallery.serviceProviderName=user.FirstName+" "+user.LastName;
             if (servicegalleryDTO.Img != null)
             {
                 gallery.Img = await _imageService.SaveFileAsync(servicegalleryDTO.Img, path);
@@ -150,7 +149,6 @@ namespace Skilly.Persistence.Implementation
             }
             foreach (var item in gallery)
             {
-                item.serviceProviderName = item.serviceProvider != null ? item.serviceProvider.FirstName + " " + item.serviceProvider.LastName : "NUll";
                 item.Images = item.Images.Where(img => img.Img.StartsWith("Images/ServiceProvider/Servicegallery/")).ToList();
 
             }
@@ -171,7 +169,6 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new ServiceGalleryNotFoundException("Gallery not found.");
             }
-            gallery.serviceProviderName = gallery.serviceProvider != null ? gallery.serviceProvider.FirstName + " " + gallery.serviceProvider.LastName : "NUll";
             gallery.Images = gallery.Images.Where(img => img.Img.StartsWith("Images/ServiceProvider/Servicegallery/")).ToList();
             return gallery;
         }

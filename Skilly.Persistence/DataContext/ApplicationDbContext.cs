@@ -38,6 +38,11 @@ namespace Skilly.Persistence.DataContext
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.ServiceProvider)
+                .WithMany(sp => sp.Reviews)
+                .HasForeignKey(r => r.ProviderId);
+
         }
     }
 }

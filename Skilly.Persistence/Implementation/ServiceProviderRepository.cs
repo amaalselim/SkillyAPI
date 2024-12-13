@@ -92,12 +92,23 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<ServiceProvider> GetByIdAsync(string id)
         {
-            return await _context.serviceProviders.FindAsync(id);
+            return await _context.serviceProviders
+                .Include(p => p.providerServices)
+                .ThenInclude(p => p.ServicesImages)
+                .Include(p => p.servicesgalleries)
+                .ThenInclude(p => p.Images)
+                .Include(p => p.Reviews)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<List<ServiceProvider>> GetAllServiceProviderAsync()
         {
             var users = await _context.serviceProviders
+                .Include(p=>p.providerServices)
+                .ThenInclude(p=>p.ServicesImages)
+                .Include(p=>p.servicesgalleries)
+                .ThenInclude(p=>p.Images)
+                .Include(p=>p.Reviews)
                 .ToListAsync();
 
             if (users == null || !users.Any())

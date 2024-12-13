@@ -29,7 +29,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => MapImages(src.Images))); 
 
         CreateMap<Servicesgallery, servicegalleryDTO>()
-            .ForMember(dest => dest.serviceProviderName, opt => opt.MapFrom(src => src.serviceProvider != null ? src.serviceProvider.FirstName + " " + src.serviceProvider.LastName : "NUll"))
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(img => new servicegalleryImageDTO
             {
                 Img = img.Img
@@ -39,7 +38,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ServicesImages, opt => opt.MapFrom(src => Map(src.Images)));
 
         CreateMap<ProviderServices, ProviderservicesDTO>()
-            .ForMember(dest => dest.serviceProviderName, opt => opt.MapFrom(src => src.serviceProvider != null ? src.serviceProvider.FirstName + " " + src.serviceProvider.LastName : "NUll"))
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.ServicesImages.Select(img => new servicegalleryImageDTO
             {
                 Img = img.Img

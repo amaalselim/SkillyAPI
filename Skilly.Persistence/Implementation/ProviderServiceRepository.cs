@@ -37,7 +37,6 @@ namespace Skilly.Persistence.Implementation
             var path = @"Images/ServiceProvider/MyServices/";
             var service = _mapper.Map<ProviderServices>(providerservicesDTO);
             service.serviceProviderId = user.Id;
-            service.serviceProviderName = user.FirstName + " " + user.LastName;
             
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
@@ -127,7 +126,6 @@ namespace Skilly.Persistence.Implementation
             }
             foreach (var item in service)
             {
-                item.serviceProviderName = item.serviceProvider != null ? item.serviceProvider.FirstName + " " + item.serviceProvider.LastName : "NUll";
                 item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
 
             }
@@ -147,7 +145,6 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new ProviderServiceNotFoundException("Service not found.");
             }
-            service.serviceProviderName = service.serviceProvider != null ? service.serviceProvider.FirstName + " " + service.serviceProvider.LastName : "NUll";
             service.ServicesImages = service.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
             return service;
         }

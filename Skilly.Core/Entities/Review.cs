@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Skilly.Core.Entities
@@ -18,6 +19,7 @@ namespace Skilly.Core.Entities
         public decimal Rating { get; set; }
         [ForeignKey("ServiceProvider")]
         public string ProviderId { get; set; }
+        [JsonIgnore]
         public virtual ServiceProvider? ServiceProvider { get; set; }
 
     }

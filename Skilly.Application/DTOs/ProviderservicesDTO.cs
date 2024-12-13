@@ -20,7 +20,6 @@ namespace Skilly.Application.DTOs
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
 
         public string? serviceProviderId { get; set; }
-        public string? serviceProviderName { get; set; }
 
     }
 }

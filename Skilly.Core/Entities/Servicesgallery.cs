@@ -20,8 +20,6 @@ namespace Skilly.Core.Entities
         public string serviceProviderId { get; set; }
         [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
-        [NotMapped]
-        public string serviceProviderName { get; set; }
 
     }
 }
