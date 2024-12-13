@@ -45,6 +45,9 @@ public class MappingProfile : Profile
                 Img = img.Img
             }).ToList()));
 
+        CreateMap<ReviewDTO, Review>();
+        CreateMap<Review, ReviewDTO>();
+
     }
 
     private List<ServicesgalleryImage> MapImages(IEnumerable<IFormFile> images)
