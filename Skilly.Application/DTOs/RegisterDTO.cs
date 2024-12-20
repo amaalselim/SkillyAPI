@@ -20,5 +20,6 @@ namespace Skilly.Application.DTOs
         public string Password { get; set; }
 
         public UserType UserType { get; set; }
+        public string FcmToken { get; set; }
     }
 }
