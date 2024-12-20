@@ -15,7 +15,7 @@ namespace Skilly.Application.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public string Deliverytime { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public decimal Price { get; set; }
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
 

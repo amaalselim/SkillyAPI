@@ -16,7 +16,7 @@ namespace Skilly.Core.Entities
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string Deliverytime { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public ICollection<ProviderServicesImage> ServicesImages { get; set; } = new List<ProviderServicesImage>();
         [ForeignKey("serviceProvider")]
         public string serviceProviderId { get; set; }
