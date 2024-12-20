@@ -57,6 +57,14 @@
               "target": "Package",
               "version": "[13.0.1, )"
             },
+            "FirebaseAdmin": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
+            "Google.Apis.Auth": {
+              "target": "Package",
+              "version": "[1.68.0, )"
+            },
             "Microsoft.AspNetCore.Identity": {
               "target": "Package",
               "version": "[2.2.0, )"
