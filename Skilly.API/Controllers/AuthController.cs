@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
+using Skilly.Application.Implementation;
 using Skilly.Core.Enums;
 
 namespace Skilly.API.Controllers
@@ -11,21 +12,23 @@ namespace Skilly.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IFirebaseAuthService _firebaseAuthService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService,IFirebaseAuthService firebaseAuthService)
         {
             _authService = authService;
+            _firebaseAuthService = firebaseAuthService;
         }
-        [HttpPost("Select-UserType")]
-        public IActionResult SelectUserType([FromBody] UserTypeRequestDTO userTypeRequestDTO)
-        {
-            if (!Enum.TryParse(userTypeRequestDTO.UserType.ToString(), out UserType userType) || !Enum.IsDefined(typeof(UserType), userType))
-            {
-                return BadRequest(new { Success = false, Message = "Invalid UserType." });
-            }
+        //[HttpPost("Select-UserType")]
+        //public IActionResult SelectUserType([FromBody] UserTypeRequestDTO userTypeRequestDTO)
+        //{
+        //    if (!Enum.TryParse(userTypeRequestDTO.UserType.ToString(), out UserType userType) || !Enum.IsDefined(typeof(UserType), userType))
+        //    {
+        //        return BadRequest(new { Success = false, Message = "Invalid UserType." });
+        //    }
 
-            return Ok(new { Success = true, UserType = userType });
-        }
+        //    return Ok(new { Success = true, UserType = userType });
+        //}
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
@@ -157,7 +160,40 @@ namespace Skilly.API.Controllers
                 });
             }
         }
+        [HttpPost("Login-Google")]
+        public async Task<IActionResult> LoginGoogle([FromBody] TokenDto tokenDto)
+        {
+            if (string.IsNullOrEmpty(tokenDto.IdToken))
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "ID token cannot be null or empty.",
+                    Errors = new[] { "ID token cannot be null or empty." }
+                });
+            }
 
+            try
+            {
+                var firebaseUserInfo = await _firebaseAuthService.VerifyGoogleTokenAsync(tokenDto.IdToken);
+
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Token verified successfully.",
+                    Data = firebaseUserInfo
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Error verifying token.",
+                    Errors = new[] { ex.Message }
+                });
+            }
+        }
 
 
     }
