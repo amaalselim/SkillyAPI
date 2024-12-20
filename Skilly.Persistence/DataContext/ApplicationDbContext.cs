@@ -25,6 +25,8 @@ namespace Skilly.Persistence.DataContext
         public DbSet<ProviderServices> providerServices{ get; set; }
         public DbSet<ProviderServicesImage> providerServicesImages{ get; set; }
         public DbSet<Review> reviews { get; set; }
+        public DbSet<Notifications> notifications { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
