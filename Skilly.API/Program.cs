@@ -1,5 +1,8 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +44,14 @@ namespace Skilly.API
             builder.Services.AddDistributedMemoryCache();
 
 
+
+            var serviceAccountFilePath =builder.Configuration["FirebaseConfig:ServiceAccountFile"];
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile(serviceAccountFilePath)
+            });
+
+
             var smtpSettings = builder.Configuration.GetSection("SMTP");
             builder.Services.AddSingleton<IEmailService>(new EmailService(
                 smtpSettings["Server"],
@@ -61,6 +72,7 @@ namespace Skilly.API
             builder.Services.AddScoped<IClaimsService,ClaimsService>();
             builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<IAuthService,AuthService>();
+            builder.Services.AddScoped<IFirebaseAuthService,FirebaseAuthService>(); 
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
            // builder.Services.AddTransient<ExceptionMiddleware>();
