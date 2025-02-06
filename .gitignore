@@ -14,3 +14,4 @@ obj/
 
 /Skilly.Application/obj/Debug/net8.0/Skilly.Application.AssemblyInfoInputs.cache
 /Skilly.API/.config
+/Skilly.API/wwwroot/Images/ServiceProvider/MyServices

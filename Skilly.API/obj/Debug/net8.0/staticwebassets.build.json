@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "L7gUUrSNDh8jrW152tsCIVRfRJUAKZ9STQ1ID5Y6Joc=",
+  "Hash": "BDKfrCzZ+yQDyVgfy43x+iNDNXp5+TeAicrxqx45uRs=",
   "Source": "Skilly.API",
   "BasePath": "_content/Skilly.API",
   "Mode": "Default",
@@ -131,6 +131,25 @@
       "OriginalItemSpec": "wwwroot\\Images\\ServiceProvider\\MyServices\\0a09696c001bbf51cca708362f4b76d3.jpg"
     },
     {
+      "Identity": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\Images\\ServiceProvider\\MyServices\\1a795f9b2a64b454cb0be335b6444b03.jpg",
+      "SourceId": "Skilly.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\",
+      "BasePath": "_content/Skilly.API",
+      "RelativePath": "Images/ServiceProvider/MyServices/1a795f9b2a64b454cb0be335b6444b03.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\ServiceProvider\\MyServices\\1a795f9b2a64b454cb0be335b6444b03.jpg"
+    },
+    {
       "Identity": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\Images\\ServiceProvider\\MyServices\\5954192095810011922.jpg",
       "SourceId": "Skilly.API",
       "SourceType": "Discovered",
@@ -186,6 +205,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\Images\\ServiceProvider\\MyServices\\6023793913447433450.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\Images\\ServiceProvider\\MyServices\\8d1abe06ea255fb924ac76dbe365124d.jpg",
+      "SourceId": "Skilly.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\",
+      "BasePath": "_content/Skilly.API",
+      "RelativePath": "Images/ServiceProvider/MyServices/8d1abe06ea255fb924ac76dbe365124d.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\ServiceProvider\\MyServices\\8d1abe06ea255fb924ac76dbe365124d.jpg"
     },
     {
       "Identity": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\wwwroot\\Images\\ServiceProvider\\Servicegallery\\5954192095810011921.jpg",
