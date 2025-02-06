@@ -46,11 +46,6 @@ namespace Skilly.Persistence.DataContext
                 .WithMany(sp => sp.Reviews)
                 .HasForeignKey(r => r.ProviderId);
 
-            modelBuilder.Entity<Category>()
-            .HasMany(c => c.serviceProviders)
-            .WithOne(sp => sp.Category)
-            .HasForeignKey(sp => sp.categoryId);
-
 
         }
     }
