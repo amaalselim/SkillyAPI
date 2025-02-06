@@ -30,6 +30,9 @@ namespace Skilly.Core.Entities
         public string UserId { get; set; }
         [JsonIgnore]
         public User User { get; set; }
+        [ForeignKey("Category")]
+        public string categoryId { get; set; }
+        public virtual Category? Category { get; set; }
         public ICollection<ProviderServices>? providerServices { get; set; } = new List<ProviderServices>();
         public ICollection<Servicesgallery>? servicesgalleries { get; set; } = new List<Servicesgallery>();
         public ICollection<Review>? Reviews { get; set; } = new List<Review>();

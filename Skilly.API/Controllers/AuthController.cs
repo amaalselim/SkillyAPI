@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.Implementation;
 using Skilly.Core.Enums;
+using Vonage.Common;
 
 namespace Skilly.API.Controllers
 {
@@ -14,7 +16,7 @@ namespace Skilly.API.Controllers
         private readonly IAuthService _authService;
         private readonly IFirebaseAuthService _firebaseAuthService;
 
-        public AuthController(IAuthService authService,IFirebaseAuthService firebaseAuthService)
+        public AuthController(IAuthService authService, IFirebaseAuthService firebaseAuthService)
         {
             _authService = authService;
             _firebaseAuthService = firebaseAuthService;
@@ -195,6 +197,36 @@ namespace Skilly.API.Controllers
             }
         }
 
+        
 
+        //[HttpPost("verify-otp")]
+        //public async Task<IActionResult> Verifyotp([FromBody]VerifyOtpDTO verifyOtpDTO)
+        //{
+        //    if (verifyOtpDTO.PhoneNumber == null || verifyOtpDTO.otpCode==null)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Success = false,
+        //            Message = "Phone number and OTP code are required!",
+        //            Errors = new[] { "Both phone number and OTP code are mandatory." }
+        //        });
+        //    }
+        //    var isvalid= await _firebaseAuthService.VerifyOtpAsync(verifyOtpDTO.PhoneNumber,verifyOtpDTO.otpCode);
+        //    if (!isvalid)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Success=false,
+        //            Message="Invalid OTP!",
+        //            Errors= new[] { "The OTP you entered is incorrect." }
+        //        });
+        //    }
+        //    return Ok(new
+        //    {
+        //        Success = true,
+        //        Message = "OTP verified successfully!",
+        //        Data = new { PhoneNumber = verifyOtpDTO.PhoneNumber }
+        //    });
+        //}
     }
 }

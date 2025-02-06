@@ -17,6 +17,22 @@
   },
   {
     "ContainingType": "Skilly.API.Controllers.AuthController",
+    "Method": "LoginGoogle",
+    "RelativePath": "api/Auth/Login-Google",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tokenDto",
+        "Type": "Skilly.Application.DTOs.TokenDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.AuthController",
     "Method": "Register",
     "RelativePath": "api/Auth/Register",
     "HttpMethod": "POST",
@@ -42,22 +58,6 @@
       {
         "Name": "forgetPasswordDTO",
         "Type": "Skilly.Application.DTOs.ForgetPasswordDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Skilly.API.Controllers.AuthController",
-    "Method": "SelectUserType",
-    "RelativePath": "api/Auth/Select-UserType",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "userTypeRequestDTO",
-        "Type": "Skilly.Application.DTOs.UserTypeRequestDTO",
         "IsRequired": true
       }
     ],
@@ -106,6 +106,95 @@
       {
         "Name": "verificationDTO",
         "Type": "Skilly.Application.DTOs.VerficationCodeDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.CategoryController",
+    "Method": "AddCategory",
+    "RelativePath": "api/Category/AddCategory",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Img",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.CategoryController",
+    "Method": "DeleteServiceGallery",
+    "RelativePath": "api/Category/DeleteCategoryBy/{categoryId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.CategoryController",
+    "Method": "EditServiceGallery",
+    "RelativePath": "api/Category/EditCategoryBy/{categoryId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Img",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.CategoryController",
+    "Method": "GetAllCategories",
+    "RelativePath": "api/Category/getAllCategories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.CategoryController",
+    "Method": "GetCategoryById",
+    "RelativePath": "api/Category/GetCategoryBy/{categoryId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
@@ -167,6 +256,11 @@
       {
         "Name": "NationalNumberPDF",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
         "IsRequired": false
       }
     ],
@@ -245,6 +339,11 @@
         "Name": "NationalNumberPDF",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
         "IsRequired": false
+      },
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -260,6 +359,32 @@
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.IEnumerable\u00601[[Skilly.Core.Entities.ServiceProvider, Skilly.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
+    "Method": "GetserviceProviderbycategoryId",
+    "RelativePath": "api/Provider/GetAllServiceProvidersBy/{categoryId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Skilly.Core.Entities.ServiceProvider",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -337,6 +462,11 @@
         "Name": "serviceProviderId",
         "Type": "System.String",
         "IsRequired": false
+      },
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -401,6 +531,11 @@
         "IsRequired": false
       },
       {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "serviceId",
         "Type": "System.String",
         "IsRequired": true
@@ -417,6 +552,32 @@
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
+    "Method": "GetservicesbycategoryId",
+    "RelativePath": "api/Provider/ProviderServices/GetAllServicesBy/{categoryId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Skilly.Core.Entities.ProviderServices",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
@@ -582,7 +743,7 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "GetServiceGalleryById",
-    "RelativePath": "api/Provider/Servicegallery/GeyGalleryBy/{galleryId}",
+    "RelativePath": "api/Provider/Servicegallery/GetGalleryBy/{galleryId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

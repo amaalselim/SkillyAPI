@@ -130,5 +130,9 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<ServiceProvider>> GetAllserviceProvidersbyCategoryId(string categoryId)
+        {
+            return await _context.serviceProviders.Where(c => c.categoryId == categoryId).ToListAsync();
+        }
     }
 }

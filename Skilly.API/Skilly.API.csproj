@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Configs\" />
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\Images\Category\" />
   </ItemGroup>
 
 </Project>

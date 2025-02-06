@@ -7,7 +7,6 @@ using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
-using Skilly.Persistence.Migrations;
 using System.Security.Claims;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
 
@@ -51,6 +50,17 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return Ok(user);
         }
+
+        [HttpGet("GetAllServiceProvidersBy/{categoryId}")]
+        public async Task<ActionResult<ServiceProvider>> GetserviceProviderbycategoryId(string categoryId)
+        {
+            var user = await _unitOfWork.ServiceProviderRepository.GetAllserviceProvidersbyCategoryId(categoryId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        } 
         [HttpPost("addServiceProvider")]
         [Authorize]
         public async Task<IActionResult> AddServiceProvider([FromForm] ServiceProviderDTO ServiceProviderDTO)
@@ -139,6 +149,7 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
             }
         }
+
 
     }
 }

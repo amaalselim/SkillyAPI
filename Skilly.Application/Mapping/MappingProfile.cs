@@ -46,6 +46,12 @@ public class MappingProfile : Profile
         CreateMap<ReviewDTO, Review>();
         CreateMap<Review, ReviewDTO>();
 
+        CreateMap<Category, CategoryDTO>()
+            .ForMember(dest => dest.Img, opt => opt.Ignore());
+        CreateMap<CategoryDTO, Category>()
+            .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img != null ? src.Img.FileName : null));
+
+
     }
 
     private List<ServicesgalleryImage> MapImages(IEnumerable<IFormFile> images)

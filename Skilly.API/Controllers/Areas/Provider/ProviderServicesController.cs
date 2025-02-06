@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
+using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 
@@ -60,6 +61,16 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return NotFound(new { message = ex.Message });
             }
         }
+        [HttpGet("GetAllServicesBy/{categoryId}")]
+        public async Task<ActionResult<ProviderServices>> GetservicesbycategoryId(string categoryId)
+        {
+            var user = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        } 
         [HttpPost("AddService")]
         public async Task<IActionResult> AddService([FromForm] ProviderservicesDTO providerservicesDTO)
         {

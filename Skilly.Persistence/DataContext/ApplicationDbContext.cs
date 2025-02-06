@@ -26,6 +26,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<ProviderServicesImage> providerServicesImages{ get; set; }
         public DbSet<Review> reviews { get; set; }
         public DbSet<Notifications> notifications { get; set; }
+        public DbSet<Category> categories { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -44,6 +45,12 @@ namespace Skilly.Persistence.DataContext
                 .HasOne(r => r.ServiceProvider)
                 .WithMany(sp => sp.Reviews)
                 .HasForeignKey(r => r.ProviderId);
+
+            modelBuilder.Entity<Category>()
+            .HasMany(c => c.serviceProviders)
+            .WithOne(sp => sp.Category)
+            .HasForeignKey(sp => sp.categoryId);
+
 
         }
     }

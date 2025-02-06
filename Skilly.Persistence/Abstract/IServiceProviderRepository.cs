@@ -16,5 +16,6 @@ namespace Skilly.Persistence.Abstract
         Task AddServiceProviderAsync(ServiceProviderDTO serviceProviderDTO, string userId);
         Task EditServiceProviderAsync(ServiceProviderDTO serviceProviderDTO, string userId);
         Task DeleteServiceProviderAsync(string Id);
+        Task<List<ServiceProvider>> GetAllserviceProvidersbyCategoryId(string categoryId);
     }
 }

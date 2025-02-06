@@ -46,7 +46,7 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-        [HttpGet("GeyGalleryBy/{galleryId}")]
+        [HttpGet("GetGalleryBy/{galleryId}")]
         public async Task<IActionResult> GetServiceGalleryById([FromRoute] string galleryId)
         {
             try

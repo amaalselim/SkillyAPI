@@ -23,6 +23,10 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
 
+        [ForeignKey("Category")]
+        public string categoryId { get; set; }
+        public virtual Category? Category { get; set; }
+
 
     }
 }

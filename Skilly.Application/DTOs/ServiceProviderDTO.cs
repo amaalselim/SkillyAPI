@@ -20,5 +20,6 @@ namespace Skilly.Application.DTOs
         public string NumberOfYearExperience { get; set; }
         public string BriefSummary { get; set; }
         public IFormFile NationalNumberPDF { get; set; }
+        public string categoryId { get; set; }
     }
 }

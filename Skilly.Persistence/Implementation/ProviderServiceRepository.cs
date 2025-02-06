@@ -6,7 +6,6 @@ using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
-using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,6 +130,11 @@ namespace Skilly.Persistence.Implementation
             }
 
             return service;
+        }
+
+        public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
+        {
+            return await _context.providerServices.Where(c => c.categoryId == categoryId).ToListAsync();
         }
 
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId, string userId)

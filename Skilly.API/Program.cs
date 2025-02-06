@@ -67,6 +67,8 @@ namespace Skilly.API
             builder.Services.AddScoped<IServicegalleryRepository,servicegalleryRepository>();
             builder.Services.AddScoped<IProviderServicesRepository,ProviderServiceRepository>();
             builder.Services.AddScoped<IReviewRepository,ReviewRepository>();
+            builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
+
 
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IClaimsService,ClaimsService>();
@@ -115,6 +117,14 @@ namespace Skilly.API
                 options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
             });
             builder.Services.AddLogging();
+
+            if(FirebaseApp.DefaultInstance == null)
+{
+                FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = GoogleCredential.GetApplicationDefault(),
+                });
+            }
 
 
             builder.Services.AddControllers();

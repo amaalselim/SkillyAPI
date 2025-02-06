@@ -1,8 +1,8 @@
-﻿using FirebaseAdmin;
+﻿
 using FirebaseAdmin.Auth;
-using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
@@ -23,17 +23,41 @@ namespace Skilly.Application.Implementation
         private readonly FirebaseAuth _firebaseAuth;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _config;
-
-        public FirebaseAuthService(ApplicationDbContext context,IConfiguration config)
+        private readonly ILogger<FirebaseAuthService> _logger;
+        private readonly Random _random;
+        public FirebaseAuthService(ApplicationDbContext context,IConfiguration config, ILogger<FirebaseAuthService> logger)
         {
-            FirebaseApp.Create(new AppOptions()
-            {
-                Credential=GoogleCredential.FromFile("Configs/firebase-service-account.json")
-            });
+            //FirebaseApp.Create(new AppOptions()
+            //{
+            //    Credential=GoogleCredential.FromFile("Configs/firebase-service-account.json")
+            //});
             _firebaseAuth= FirebaseAuth.DefaultInstance;
             _context = context;
             _config = config;
+            _logger = logger;
+            _random = new Random();
         }
+
+
+        //public async Task<bool> VerifyOtpAsync(string phoneNumber, int otpCode)
+        //{
+        //    try
+        //    {
+        //        // Use Firebase's Phone Auth Provider to verify the OTP code
+        //        var phoneAuthProvider = PhoneAuthProvider.GetInstance(FirebaseAuth.DefaultInstance);
+
+        //        // Assuming OTP verification code is valid when sent from Flutter
+        //        var verificationResult = await phoneAuthProvider.VerifyPhoneNumberAsync(phoneNumber, otpCode);
+
+        //        // If successful verification result, return true
+        //        return verificationResult.Success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError($"OTP verification failed for phone {phoneNumber}: {ex.Message}");
+        //        return false;
+        //    }
+        //}
         public async Task<FirebaseUserInfoDTO> VerifyGoogleTokenAsync(string idToken)
         {
             try
@@ -81,7 +105,8 @@ namespace Skilly.Application.Implementation
                     Uid = user.Uid,
                     Email = user.Email,
                     Name = user.DisplayName,
-                    JwtToken = tokenString
+                    JwtToken = tokenString,
+                    Expiration = expiration
                 };
                 return firebaseUserInfo;
             }
@@ -90,8 +115,5 @@ namespace Skilly.Application.Implementation
                 throw new Exception("Failed to verify Google token: " + ex.Message);
             }
         }
-
-
-
     }
 }
