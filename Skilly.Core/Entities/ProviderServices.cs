@@ -25,6 +25,7 @@ namespace Skilly.Core.Entities
 
         [ForeignKey("Category")]
         public string categoryId { get; set; }
+        [JsonIgnore]    
         public virtual Category? Category { get; set; }
 
 
