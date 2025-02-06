@@ -132,7 +132,13 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<List<ServiceProvider>> GetAllserviceProvidersbyCategoryId(string categoryId)
         {
-            return await _context.serviceProviders.Where(c => c.categoryId == categoryId).ToListAsync();
+            return await _context.serviceProviders.Where(c => c.categoryId == categoryId)
+                //.Include(p => p.providerServices)
+                //.ThenInclude(p => p.ServicesImages)
+                //.Include(p => p.servicesgalleries)
+                //.ThenInclude(p => p.Images)
+                //.Include(p => p.Reviews)
+                .ToListAsync();
         }
     }
 }
