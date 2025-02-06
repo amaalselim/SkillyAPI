@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Skilly.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class users : Migration
+    public partial class cat : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,6 +52,19 @@ namespace Skilly.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "categories",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_categories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -161,31 +174,21 @@ namespace Skilly.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "serviceProviders",
+                name: "notifications",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Governorate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StreetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Age = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gender = table.Column<int>(type: "int", nullable: false),
-                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    profession = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumberOfYearExperience = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BriefSummary = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NationalNumberPDF = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_serviceProviders", x => x.Id);
+                    table.PrimaryKey("PK_notifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_serviceProviders_AspNetUsers_UserId",
+                        name: "FK_notifications_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -216,6 +219,157 @@ namespace Skilly.Persistence.Migrations
                         name: "FK_userProfiles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "serviceProviders",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Governorate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StreetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Age = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gender = table.Column<int>(type: "int", nullable: false),
+                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    profession = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumberOfYearExperience = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BriefSummary = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NationalNumberPDF = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    categoryId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_serviceProviders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_serviceProviders_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_serviceProviders_categories_categoryId",
+                        column: x => x.categoryId,
+                        principalTable: "categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "providerServices",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Deliverytime = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    serviceProviderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    categoryId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_providerServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_providerServices_categories_categoryId",
+                        column: x => x.categoryId,
+                        principalTable: "categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_providerServices_serviceProviders_serviceProviderId",
+                        column: x => x.serviceProviderId,
+                        principalTable: "serviceProviders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "reviews",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Feedback = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Rating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_reviews_serviceProviders_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "serviceProviders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "servicesgalleries",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    galleryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Deliverytime = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    serviceProviderId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_servicesgalleries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_servicesgalleries_serviceProviders_serviceProviderId",
+                        column: x => x.serviceProviderId,
+                        principalTable: "serviceProviders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "providerServicesImages",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    serviceId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_providerServicesImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_providerServicesImages_providerServices_serviceId",
+                        column: x => x.serviceId,
+                        principalTable: "providerServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "galleryImages",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    galleryId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_galleryImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_galleryImages_servicesgalleries_galleryId",
+                        column: x => x.galleryId,
+                        principalTable: "servicesgalleries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -266,9 +420,49 @@ namespace Skilly.Persistence.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_galleryImages_galleryId",
+                table: "galleryImages",
+                column: "galleryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_notifications_UserId",
+                table: "notifications",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_providerServices_categoryId",
+                table: "providerServices",
+                column: "categoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_providerServices_serviceProviderId",
+                table: "providerServices",
+                column: "serviceProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_providerServicesImages_serviceId",
+                table: "providerServicesImages",
+                column: "serviceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_reviews_ProviderId",
+                table: "reviews",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_serviceProviders_categoryId",
+                table: "serviceProviders",
+                column: "categoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_serviceProviders_UserId",
                 table: "serviceProviders",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_servicesgalleries_serviceProviderId",
+                table: "servicesgalleries",
+                column: "serviceProviderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_userProfiles_UserId",
@@ -295,7 +489,16 @@ namespace Skilly.Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "serviceProviders");
+                name: "galleryImages");
+
+            migrationBuilder.DropTable(
+                name: "notifications");
+
+            migrationBuilder.DropTable(
+                name: "providerServicesImages");
+
+            migrationBuilder.DropTable(
+                name: "reviews");
 
             migrationBuilder.DropTable(
                 name: "userProfiles");
@@ -304,7 +507,19 @@ namespace Skilly.Persistence.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "servicesgalleries");
+
+            migrationBuilder.DropTable(
+                name: "providerServices");
+
+            migrationBuilder.DropTable(
+                name: "serviceProviders");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "categories");
         }
     }
 }

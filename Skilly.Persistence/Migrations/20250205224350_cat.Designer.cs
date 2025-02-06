@@ -12,8 +12,8 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241212222458_serives")]
-    partial class serives
+    [Migration("20250205224350_cat")]
+    partial class cat
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,54 @@ namespace Skilly.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Category", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Img")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("categories");
+                });
+
+            modelBuilder.Entity("Skilly.Core.Entities.Notifications", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("notifications");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
                 {
                     b.Property<string>("Id")
@@ -176,17 +224,22 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("categoryId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("serviceProviderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("categoryId");
 
                     b.HasIndex("serviceProviderId");
 
@@ -211,6 +264,37 @@ namespace Skilly.Persistence.Migrations
                     b.HasIndex("serviceId");
 
                     b.ToTable("providerServicesImages");
+                });
+
+            modelBuilder.Entity("Skilly.Core.Entities.Review", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("reviews");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.ServiceProvider", b =>
@@ -273,6 +357,10 @@ namespace Skilly.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("categoryId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("profession")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -280,6 +368,8 @@ namespace Skilly.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("categoryId");
 
                     b.ToTable("serviceProviders");
                 });
@@ -525,13 +615,32 @@ namespace Skilly.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Notifications", b =>
+                {
+                    b.HasOne("Skilly.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
                 {
+                    b.HasOne("Skilly.Core.Entities.Category", "Category")
+                        .WithMany("providerServices")
+                        .HasForeignKey("categoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Skilly.Core.Entities.ServiceProvider", "serviceProvider")
-                        .WithMany()
+                        .WithMany("providerServices")
                         .HasForeignKey("serviceProviderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("serviceProvider");
                 });
@@ -547,6 +656,17 @@ namespace Skilly.Persistence.Migrations
                     b.Navigation("ProviderServices");
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Review", b =>
+                {
+                    b.HasOne("Skilly.Core.Entities.ServiceProvider", "ServiceProvider")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceProvider");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.ServiceProvider", b =>
                 {
                     b.HasOne("Skilly.Core.Entities.User", "User")
@@ -555,13 +675,21 @@ namespace Skilly.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Skilly.Core.Entities.Category", "Category")
+                        .WithMany("serviceProviders")
+                        .HasForeignKey("categoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.Servicesgallery", b =>
                 {
                     b.HasOne("Skilly.Core.Entities.ServiceProvider", "serviceProvider")
-                        .WithMany()
+                        .WithMany("servicesgalleries")
                         .HasForeignKey("serviceProviderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -591,9 +719,25 @@ namespace Skilly.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Category", b =>
+                {
+                    b.Navigation("providerServices");
+
+                    b.Navigation("serviceProviders");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
                 {
                     b.Navigation("ServicesImages");
+                });
+
+            modelBuilder.Entity("Skilly.Core.Entities.ServiceProvider", b =>
+                {
+                    b.Navigation("Reviews");
+
+                    b.Navigation("providerServices");
+
+                    b.Navigation("servicesgalleries");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.Servicesgallery", b =>
