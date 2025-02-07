@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
+using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Security.Claims;
@@ -46,6 +47,19 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+        [HttpGet("GetAllServicegalleryByproviderId")]
+        public async Task<ActionResult<Servicesgallery>> GetservicesbyuserId()
+        {
+            string userId = GetUserIdFromClaims();
+            var user = await _unitOfWork.servicegalleryRepository.GetAllgalleryByproviderId(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+
         [HttpGet("GetGalleryBy/{galleryId}")]
         public async Task<IActionResult> GetServiceGalleryById([FromRoute] string galleryId)
         {
