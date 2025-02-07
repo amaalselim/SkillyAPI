@@ -17,10 +17,12 @@ namespace Skilly.Core.Entities
         public DateTime startDate { get; set; }
         [ForeignKey("Category")]
         public string categoryId { get; set; }
+        [JsonIgnore]
         public virtual Category? Category { get; set; }
         public string? Notes { get; set; }
         [ForeignKey("UserProfile")]
         public string userId { get; set; }
+        [JsonIgnore]
         public virtual UserProfile? UserProfile { get; set; }
         public ICollection<requestServiceImage>? requestServiceImages{ get; set; } = new List<requestServiceImage>();
 
