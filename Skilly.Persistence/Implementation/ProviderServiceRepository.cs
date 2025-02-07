@@ -76,9 +76,10 @@ namespace Skilly.Persistence.Implementation
 
         public async Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId)
         {
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.providerServices
             .Include(g => g.ServicesImages)
-            .FirstOrDefaultAsync(g => g.Id == serviceId && g.serviceProviderId == userId);
+            .FirstOrDefaultAsync(g => g.Id == serviceId && g.serviceProviderId == user.Id);
 
             if (service == null)
             {
@@ -151,6 +152,26 @@ namespace Skilly.Persistence.Implementation
                 throw new ProviderServiceNotFoundException("Service not found.");
             }
             service.ServicesImages = service.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
+            return service;
+        }
+        public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
+        {
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            var service = await _context.providerServices
+                .Include(c => c.ServicesImages)
+                .Where(c => c.serviceProviderId == user.Id)
+               .ToListAsync();
+
+            if (service == null || !service.Any())
+            {
+                return new List<ProviderServices>();
+            }
+            foreach (var item in service)
+            {
+                item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
+
+            }
+
             return service;
         }
     }
