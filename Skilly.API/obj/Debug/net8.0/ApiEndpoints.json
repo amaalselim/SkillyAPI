@@ -581,6 +581,26 @@
   },
   {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
+    "Method": "GetservicesbyuserId",
+    "RelativePath": "api/Provider/ProviderServices/GetAllServicesByproviderId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Skilly.Core.Entities.ProviderServices",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderServicesController",
     "Method": "GetServiceById",
     "RelativePath": "api/Provider/ProviderServices/GeyServiceBy/{serviceId}",
     "HttpMethod": "GET",
@@ -840,9 +860,178 @@
     ]
   },
   {
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.requestServicesController",
+    "Method": "AddService",
+    "RelativePath": "api/UserProfile/requestServices/AddrequestService",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Price",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      },
+      {
+        "Name": "Deliverytime",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "startDate",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Notes",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Images",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.requestServicesController",
+    "Method": "DeleteService",
+    "RelativePath": "api/UserProfile/requestServices/DeleterequestServiceBy/{serviceId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.requestServicesController",
+    "Method": "EditService",
+    "RelativePath": "api/UserProfile/requestServices/EditsequestServiceBy/{serviceId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Price",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      },
+      {
+        "Name": "Deliverytime",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "startDate",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "categoryId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Notes",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Images",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.requestServicesController",
+    "Method": "GetAllServices",
+    "RelativePath": "api/UserProfile/requestServices/getAllRequests",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.requestServicesController",
+    "Method": "GetservicesbyuserId",
+    "RelativePath": "api/UserProfile/requestServices/GetAllRequestsByuserId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Skilly.Core.Entities.ProviderServices",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.userProfile.requestServicesController",
+    "Method": "GetServiceById",
+    "RelativePath": "api/UserProfile/requestServices/GeyrequestsBy/{serviceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "AddUserProfile",
-    "RelativePath": "api/userProfile/addUserProfile",
+    "RelativePath": "api/UserProfile/userProfile/addUserProfile",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -883,7 +1072,7 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "DeleteUserProfile",
-    "RelativePath": "api/userProfile/deleteProfileBy/{id}",
+    "RelativePath": "api/UserProfile/userProfile/deleteProfileBy/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -899,7 +1088,7 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "EditUserProfile",
-    "RelativePath": "api/userProfile/editUserProfile",
+    "RelativePath": "api/UserProfile/userProfile/editUserProfile",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -940,7 +1129,7 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "GetAllUserProfile",
-    "RelativePath": "api/userProfile/GetAllUsersProfile",
+    "RelativePath": "api/UserProfile/userProfile/GetAllUsersProfile",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -960,7 +1149,7 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "GetUserById",
-    "RelativePath": "api/userProfile/GetUserProfileBy/{id}",
+    "RelativePath": "api/UserProfile/userProfile/GetUserProfileBy/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
