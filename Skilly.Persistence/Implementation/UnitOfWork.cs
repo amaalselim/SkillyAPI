@@ -25,6 +25,7 @@ namespace Skilly.Persistence.Implementation
 
         public IReviewRepository reviewRepository {  get; private set; }
         public ICategoryRepository _categoryRepository {  get; private set; }
+        public IRequestserviceRepository _requestserviceRepository {  get; private set; }
 
         public UnitOfWork(IGenericRepository<User> User,
             ApplicationDbContext context,
@@ -33,7 +34,8 @@ namespace Skilly.Persistence.Implementation
            IServicegalleryRepository ServicegalleryRepository,
            IProviderServicesRepository providerServicesRepository,
            IReviewRepository ReviewRepository,
-           ICategoryRepository categoryRepository
+           ICategoryRepository categoryRepository,
+           IRequestserviceRepository requestserviceRepository
 
            )
         {
@@ -45,6 +47,7 @@ namespace Skilly.Persistence.Implementation
             providerServiceRepository = providerServicesRepository;
             reviewRepository = ReviewRepository;
             _categoryRepository = categoryRepository;
+            _requestserviceRepository = requestserviceRepository;
         }
 
         public async Task<int> CompleteAsync()
