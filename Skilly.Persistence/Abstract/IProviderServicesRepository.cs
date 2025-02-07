@@ -11,6 +11,7 @@ namespace Skilly.Persistence.Abstract
     public interface IProviderServicesRepository
     {
         Task<IEnumerable<ProviderServices>> GetAllProviderService();
+        Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId);
         Task<ProviderServices> GetProviderServiceByIdAsync(string galleryId, string userId);
         Task AddProviderService(ProviderservicesDTO providerservicesDTO, string userId);
         Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId);
