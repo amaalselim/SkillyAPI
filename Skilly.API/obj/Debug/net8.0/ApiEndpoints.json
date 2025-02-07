@@ -762,6 +762,26 @@
   },
   {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
+    "Method": "GetservicesbyuserId",
+    "RelativePath": "api/Provider/Servicegallery/GetAllServicegalleryByproviderId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Skilly.Core.Entities.Servicesgallery",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.Areas.Provider.ServicegalleryController",
     "Method": "GetServiceGalleryById",
     "RelativePath": "api/Provider/Servicegallery/GetGalleryBy/{galleryId}",
     "HttpMethod": "GET",
