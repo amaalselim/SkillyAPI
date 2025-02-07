@@ -46,6 +46,28 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+        [HttpGet("GetAllServicesBy/{providerId}")]
+        public async Task<ActionResult<ProviderServices>> GetservicesbyuserId(string providerId)
+        {
+            var user = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(providerId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+        [HttpGet("GetAllServicesBy/{categoryId}")]
+        public async Task<ActionResult<ProviderServices>> GetservicesbycategoryId(string categoryId)
+        {
+            var user = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+
         [HttpGet("GeyServiceBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
         {
@@ -61,16 +83,7 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return NotFound(new { message = ex.Message });
             }
         }
-        [HttpGet("GetAllServicesBy/{categoryId}")]
-        public async Task<ActionResult<ProviderServices>> GetservicesbycategoryId(string categoryId)
-        {
-            var user = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return Ok(user);
-        } 
+        
         [HttpPost("AddService")]
         public async Task<IActionResult> AddService([FromForm] ProviderservicesDTO providerservicesDTO)
         {
@@ -119,7 +132,7 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.DeleteProviderServiceAsync(serviceId, userId);
 
-                return Ok(new { message = "Service gallery deleted successfully." });
+                return Ok(new { message = "Service  deleted successfully." });
             }
             catch (ProviderServiceNotFoundException ex)
             {
