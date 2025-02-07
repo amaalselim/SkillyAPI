@@ -46,10 +46,11 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-        [HttpGet("GetAllServicesBy/{providerId}")]
-        public async Task<ActionResult<ProviderServices>> GetservicesbyuserId(string providerId)
+        [HttpGet("GetAllServicesByproviderId")]
+        public async Task<ActionResult<ProviderServices>> GetservicesbyuserId()
         {
-            var user = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(providerId);
+            string userId = GetUserIdFromClaims();
+            var user = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
             if (user == null)
             {
                 return NotFound();
