@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace Skilly.API.Controllers.Areas.userProfile
 {
-    [Route("api/[controller]")]
+    [Route("api/UserProfile/[controller]")]
     [ApiController]
     public class userProfileController : ControllerBase
     {
