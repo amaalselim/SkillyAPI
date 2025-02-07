@@ -44,7 +44,7 @@ public class MappingProfile : Profile
             }).ToList()));
 
         CreateMap<requestServiceDTO, RequestService>()
-            .ForMember(dest => dest.requestServiceImages, opt => opt.MapFrom(src => Map(src.Images)));
+            .ForMember(dest => dest.requestServiceImages, opt => opt.MapFrom(src => Mapp(src.Images)));
 
         CreateMap<RequestService, requestServiceDTO>()
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.requestServiceImages.Select(img => new requestServiceImage
@@ -83,5 +83,16 @@ public class MappingProfile : Profile
             Img = img.FileName
         }).ToList();
     }
-   
+
+    private List<requestServiceImage> Mapp(IEnumerable<IFormFile> image)
+    {
+        if (image == null || !image.Any())
+            return new List<requestServiceImage>();
+
+        return image.Select(img => new requestServiceImage
+        {
+            Img = img.FileName
+        }).ToList();
+    }
+
 }
