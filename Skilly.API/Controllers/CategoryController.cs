@@ -85,7 +85,7 @@ namespace Skilly.API.Controllers
             }
         }
         [HttpPut("EditCategoryBy/{categoryId}")]
-        public async Task<IActionResult> EditServiceGallery([FromForm] CategoryDTO categoryDTO, [FromRoute] string categoryId)
+        public async Task<IActionResult> EditCategory([FromForm] CategoryDTO categoryDTO, [FromRoute] string categoryId)
         {
             if (categoryDTO == null)
             {
@@ -104,11 +104,11 @@ namespace Skilly.API.Controllers
             }
         }
         [HttpDelete("DeleteCategoryBy/{categoryId}")]
-        public async Task<IActionResult> DeleteServiceGallery([FromRoute] string categoryId)
+        public async Task<IActionResult> DeleteCategory([FromRoute] string categoryId)
         {
             try
             {
-                await _unitOfWork._categoryRepository.DeleteCategoryAsync(categoryId);
+               await _unitOfWork._categoryRepository.DeleteCategoryAsync(categoryId);
 
                 return Ok(new { message = "Category deleted successfully." });
             }
