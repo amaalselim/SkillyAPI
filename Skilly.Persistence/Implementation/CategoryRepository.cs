@@ -43,7 +43,9 @@ namespace Skilly.Persistence.Implementation
         public async Task DeleteCategoryAsync(string id)
         {
             var cat = await _context.categories.FindAsync(id);
+
             _context.categories.Remove(cat);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Category>> GetAllCategoryAsync()
@@ -76,7 +78,9 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new Exception("Category Not Found");
             }
+            category.Name = cat.Name;
             _mapper.Map(category,cat);
+
             var path = @"Images/Category/";
             if (cat.Img != null)
             {
