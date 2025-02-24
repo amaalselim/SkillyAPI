@@ -134,7 +134,7 @@
   },
   {
     "ContainingType": "Skilly.API.Controllers.CategoryController",
-    "Method": "DeleteServiceGallery",
+    "Method": "DeleteCategory",
     "RelativePath": "api/Category/DeleteCategoryBy/{categoryId}",
     "HttpMethod": "DELETE",
     "IsController": true,
@@ -150,7 +150,7 @@
   },
   {
     "ContainingType": "Skilly.API.Controllers.CategoryController",
-    "Method": "EditServiceGallery",
+    "Method": "EditCategory",
     "RelativePath": "api/Category/EditCategoryBy/{categoryId}",
     "HttpMethod": "PUT",
     "IsController": true,
