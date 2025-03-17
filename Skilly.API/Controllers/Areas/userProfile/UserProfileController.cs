@@ -29,10 +29,10 @@ namespace Skilly.API.Controllers.Areas.userProfile
             var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
             return Ok(new { users });
         }
-        [HttpGet("GetUserProfileBy/{id}")]
-        public async Task<ActionResult<UserProfile>> GetUserById(string id)
+        [HttpGet("GetUserProfileBy/{userId}")]
+        public async Task<ActionResult<UserProfile>> GetUserById(string userId)
         {
-            var user = await _unitOfWork.ProfileRepository.GetByIdAsync(id);
+            var user = await _unitOfWork.ProfileRepository.GetByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
@@ -104,13 +104,13 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
         }
 
-        [HttpDelete("deleteProfileBy/{id}")]
-        public async Task<IActionResult> DeleteUserProfile(string id)
+        [HttpDelete("deleteProfileBy/{userId}")]
+        public async Task<IActionResult> DeleteUserProfile(string userId)
         {
             try
             {
 
-                await _unitOfWork.ProfileRepository.DeleteUserProfileAsync(id);
+                await _unitOfWork.ProfileRepository.DeleteUserProfileAsync(userId);
 
                 return Ok(new { message = "User profile deleted successfully." });
             }
