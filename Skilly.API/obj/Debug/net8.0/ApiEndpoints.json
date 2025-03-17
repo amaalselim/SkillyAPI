@@ -397,13 +397,13 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "GetUserById",
-    "RelativePath": "api/Provider/GetServiceProviderBy/{id}",
+    "RelativePath": "api/Provider/GetServiceProviderBy/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "userId",
         "Type": "System.String",
         "IsRequired": true
       }
@@ -1072,11 +1072,6 @@
         "IsRequired": false
       },
       {
-        "Name": "Age",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
         "Name": "Gender",
         "Type": "System.String",
         "IsRequired": false
@@ -1092,13 +1087,13 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "DeleteUserProfile",
-    "RelativePath": "api/UserProfile/userProfile/deleteProfileBy/{id}",
+    "RelativePath": "api/UserProfile/userProfile/deleteProfileBy/{userId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "userId",
         "Type": "System.String",
         "IsRequired": true
       }
@@ -1125,11 +1120,6 @@
       },
       {
         "Name": "StreetName",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Age",
         "Type": "System.String",
         "IsRequired": false
       },
@@ -1169,13 +1159,13 @@
   {
     "ContainingType": "Skilly.API.Controllers.Areas.userProfile.userProfileController",
     "Method": "GetUserById",
-    "RelativePath": "api/UserProfile/userProfile/GetUserProfileBy/{id}",
+    "RelativePath": "api/UserProfile/userProfile/GetUserProfileBy/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "userId",
         "Type": "System.String",
         "IsRequired": true
       }

@@ -98,7 +98,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(p => p.servicesgalleries)
                 .ThenInclude(p => p.Images)
                 .Include(p => p.Reviews)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.UserId ==id);
         }
 
         public async Task<List<ServiceProvider>> GetAllServiceProviderAsync()
@@ -121,7 +121,7 @@ namespace Skilly.Persistence.Implementation
         public async Task DeleteServiceProviderAsync(string Id)
         {
 
-            var ServiceProvider = await _context.serviceProviders.FirstOrDefaultAsync(up => up.Id == Id);
+            var ServiceProvider = await _context.serviceProviders.FirstOrDefaultAsync(up => up.UserId == Id);
             if (ServiceProvider == null)
             {
                 throw new ServiceProviderNotFoundException("User profile not found.");

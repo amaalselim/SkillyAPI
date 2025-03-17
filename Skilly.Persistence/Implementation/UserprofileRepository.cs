@@ -84,9 +84,9 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-        public async Task<UserProfile> GetByIdAsync(string id)
+        public async Task<UserProfile> GetByIdAsync(string userId)
         {
-            return await _context.userProfiles.FindAsync(id);
+            return await _context.userProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
         }
 
         public async Task<IEnumerable<UserProfile>> GetAllUserProfileAsync()
@@ -101,10 +101,10 @@ namespace Skilly.Persistence.Implementation
             return users;
         }
 
-        public async Task DeleteUserProfileAsync(string Id)
+        public async Task DeleteUserProfileAsync(string userId)
         {
             
-            var UserProfile = await _context.userProfiles.FirstOrDefaultAsync(up => up.Id == Id);
+            var UserProfile = await _context.userProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
             if (UserProfile == null)
             {
                 throw new UserProfileNotFoundException("User profile not found.");
