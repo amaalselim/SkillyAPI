@@ -40,10 +40,10 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
         }
 
-        [HttpGet("GetServiceProviderBy/{id}")]
-        public async Task<ActionResult<ServiceProvider>> GetUserById(string id)
+        [HttpGet("GetServiceProviderBy/{userId}")]
+        public async Task<ActionResult<ServiceProvider>> GetUserById(string userId)
         {
-            var user = await _unitOfWork.ServiceProviderRepository.GetByIdAsync(id);
+            var user = await _unitOfWork.ServiceProviderRepository.GetByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
