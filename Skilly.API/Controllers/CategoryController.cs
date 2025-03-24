@@ -17,15 +17,16 @@ namespace Skilly.API.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-        private string GetUserIdFromClaims()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new UnauthorizedAccessException("User not authorized.");
-            }
-            return userId;
-        }
+        //private string GetUserIdFromClaims()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        throw new UnauthorizedAccessException("User not authorized.");
+        //    }
+        //    return userId;
+        //}
+
         [HttpGet("getAllCategories")]
         public async Task<IActionResult> GetAllCategories()
         {
@@ -65,6 +66,9 @@ namespace Skilly.API.Controllers
                 return NotFound(new { message = ex.Message });
             }
         }
+        
+
+
         [HttpPost("AddCategory")]
         public async Task<IActionResult> AddCategory([FromForm] CategoryDTO categoryDTO)
         {
