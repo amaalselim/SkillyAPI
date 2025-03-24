@@ -201,6 +201,133 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "AddOffer",
+    "RelativePath": "api/OfferSalary/AddOffer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "offersalaryDTO",
+        "Type": "Skilly.Application.DTOs.offersalaryDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "DeleteOffer",
+    "RelativePath": "api/OfferSalary/DeleteOfferBy/{offerId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "offerId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "EditOffer",
+    "RelativePath": "api/OfferSalary/EditOffersBy/{offerId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "offersalaryDTO",
+        "Type": "Skilly.Application.DTOs.offersalaryDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "offerId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "GetAlloffers",
+    "RelativePath": "api/OfferSalary/getAllOffers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "GetAlloffersByserviceId",
+    "RelativePath": "api/OfferSalary/getAllOffersBy/{serviceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "GetOfferById",
+    "RelativePath": "api/OfferSalary/GetOfferBy/{Id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "GetOfferByserviceId",
+    "RelativePath": "api/OfferSalary/GetOfferBy/{serviceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Skilly.API.Controllers.OfferSalaryController",
+    "Method": "GetOffersCountByServiceId",
+    "RelativePath": "api/OfferSalary/GetOffersCountBy/{ServiceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Skilly.API.Controllers.Areas.Provider.ProviderController",
     "Method": "AddServiceProvider",
     "RelativePath": "api/Provider/addServiceProvider",
