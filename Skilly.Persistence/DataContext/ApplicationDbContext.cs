@@ -29,6 +29,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<Category> categories { get; set; }
         public DbSet<RequestService> requestServices { get; set; }
         public DbSet<requestServiceImage> requestServiceImages { get; set; }
+        public DbSet<OfferSalary> offerSalaries { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -47,7 +48,6 @@ namespace Skilly.Persistence.DataContext
                 .HasOne(r => r.ServiceProvider)
                 .WithMany(sp => sp.Reviews)
                 .HasForeignKey(r => r.ProviderId);
-
 
         }
     }
