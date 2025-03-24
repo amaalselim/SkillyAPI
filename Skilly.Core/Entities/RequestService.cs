@@ -25,6 +25,7 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public virtual UserProfile? UserProfile { get; set; }
         public ICollection<requestServiceImage>? requestServiceImages{ get; set; } = new List<requestServiceImage>();
+        public ICollection<OfferSalary>? offerSalaries{ get; set; } = new List<OfferSalary>();
 
     }
 }
