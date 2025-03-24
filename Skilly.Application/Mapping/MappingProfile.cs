@@ -60,6 +60,14 @@ public class MappingProfile : Profile
         CreateMap<CategoryDTO, Category>()
             .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img != null ? src.Img.FileName : null));
 
+        CreateMap<OfferSalary, offersalaryDTO>();
+        CreateMap<offersalaryDTO, OfferSalary>()
+     .ForMember(dest => dest.serviceId, opt => opt.MapFrom(src =>
+         string.IsNullOrWhiteSpace(src.serviceId) ? null : src.serviceId))
+     .ForMember(dest => dest.requestserviceId, opt => opt.MapFrom(src =>
+         string.IsNullOrWhiteSpace(src.requestserviceId) ? null : src.requestserviceId));
+
+
 
     }
 
