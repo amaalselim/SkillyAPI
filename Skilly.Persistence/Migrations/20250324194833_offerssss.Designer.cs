@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Skilly.Persistence.DataContext;
 
@@ -11,9 +12,11 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250324194833_offerssss")]
+    partial class offerssss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,9 +218,6 @@ namespace Skilly.Persistence.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProviderServicesId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
 
@@ -228,8 +228,6 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProviderServicesId");
 
                     b.HasIndex("requestserviceId");
 
@@ -715,19 +713,13 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.OfferSalary", b =>
                 {
-                    b.HasOne("Skilly.Core.Entities.ProviderServices", null)
-                        .WithMany("offerSalaries")
-                        .HasForeignKey("ProviderServicesId");
-
                     b.HasOne("Skilly.Core.Entities.RequestService", "RequestService")
                         .WithMany("offerSalaries")
-                        .HasForeignKey("requestserviceId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("requestserviceId");
 
                     b.HasOne("Skilly.Core.Entities.ProviderServices", "ProviderServices")
-                        .WithMany()
-                        .HasForeignKey("serviceId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany("offerSalaries")
+                        .HasForeignKey("serviceId");
 
                     b.Navigation("ProviderServices");
 
