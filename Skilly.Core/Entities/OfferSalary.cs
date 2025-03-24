@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,5 +10,15 @@ namespace Skilly.Core.Entities
 {
     public class OfferSalary
     {
+        public string Id { get; set; }= Guid.NewGuid().ToString();
+        public decimal Salary { get; set; }
+        public string Deliverytime { get; set; }
+        public string? Notes { get; set; }
+        [ForeignKey(nameof(ProviderServices))]
+        public string? serviceId { get; set; }
+        public virtual ProviderServices? ProviderServices { get; set; }
+        [ForeignKey(nameof(RequestService))]
+        public string? requestserviceId { get; set; }
+        public virtual RequestService? RequestService { get; set; }
     }
 }
