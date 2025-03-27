@@ -21,12 +21,14 @@ using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Implementation;
 using System.Globalization;
 using System.Text;
+using Skilly.API.Hubs;
+using System.Threading.Tasks;
 
 namespace Skilly.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -201,6 +203,7 @@ namespace Skilly.API
             });
 
             app.UseRouting();
+            app.MapHub<ChatHub>("/chatHub");
             app.UseCors("MyPolicy");
 
 
