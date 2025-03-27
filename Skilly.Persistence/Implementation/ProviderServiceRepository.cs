@@ -118,6 +118,7 @@ namespace Skilly.Persistence.Implementation
             var service = await _context.providerServices
                 .Include(i => i.ServicesImages)
                 .Include(i => i.serviceProvider)
+                .Include(i=>i.offerSalaries)
                 .ToListAsync();
 
             if (service == null || !service.Any())
@@ -127,7 +128,7 @@ namespace Skilly.Persistence.Implementation
             foreach (var item in service)
             {
                 item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
-
+                item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
             }
 
             return service;
@@ -136,6 +137,7 @@ namespace Skilly.Persistence.Implementation
         public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
         {
             return await _context.providerServices.Include(c=>c.ServicesImages)
+                .Include(c=>c.offerSalaries)
                 .Where(c => c.categoryId == categoryId).ToListAsync();
         }
 
@@ -145,6 +147,7 @@ namespace Skilly.Persistence.Implementation
             var service = await _context.providerServices
                 .Include(g => g.ServicesImages)
                 .Include(g => g.serviceProvider)
+                .Include(g=>g.offerSalaries)
                 .FirstOrDefaultAsync(g => g.Id ==serviceId && g.serviceProviderId == provider.Id);
 
             if (service == null)
@@ -152,6 +155,7 @@ namespace Skilly.Persistence.Implementation
                 throw new ProviderServiceNotFoundException("Service not found.");
             }
             service.ServicesImages = service.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
+            service.offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>();
             return service;
         }
         public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
@@ -159,6 +163,7 @@ namespace Skilly.Persistence.Implementation
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.providerServices
                 .Include(c => c.ServicesImages)
+                .Include(c=>c.offerSalaries)
                 .Where(c => c.serviceProviderId == user.Id)
                .ToListAsync();
 
@@ -169,7 +174,7 @@ namespace Skilly.Persistence.Implementation
             foreach (var item in service)
             {
                 item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
-
+                item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
             }
 
             return service;
