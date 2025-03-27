@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Skilly.Core.Entities;
 using Skilly.Persistence.DataContext;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,17 @@ namespace Skilly.API.Hubs
         }
         public async Task SendMessage(string SenderId,string receiverId,string message)
         {
+            var senderExists = await _context.Users.AnyAsync(u => u.Id == SenderId) ||
+                   await _context.serviceProviders.AnyAsync(p => p.Id == SenderId);
+
+            var receiverExists = await _context.Users.AnyAsync(u => u.Id == receiverId) ||
+                                 await _context.serviceProviders.AnyAsync(p => p.Id == receiverId);
+
+            if (!senderExists || !receiverExists)
+            {
+                throw new HubException("Sender or Receiver not found.");
+            }
+
             var msg = new Message
             {
                 SenderId = SenderId,
