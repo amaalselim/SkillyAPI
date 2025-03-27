@@ -16,11 +16,9 @@ namespace Skilly.API.Hubs
         }
         public async Task SendMessage(string SenderId,string receiverId,string message)
         {
-            var senderExists = await _context.Users.AnyAsync(u => u.Id == SenderId) ||
-                   await _context.serviceProviders.AnyAsync(p => p.Id == SenderId);
+            var senderExists = await _context.users.AnyAsync(u => u.Id == SenderId);
 
-            var receiverExists = await _context.Users.AnyAsync(u => u.Id == receiverId) ||
-                                 await _context.serviceProviders.AnyAsync(p => p.Id == receiverId);
+            var receiverExists = await _context.users.AnyAsync(u => u.Id == receiverId);
 
             if (!senderExists || !receiverExists)
             {
