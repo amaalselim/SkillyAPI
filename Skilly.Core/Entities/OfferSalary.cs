@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Skilly.Core.Entities
@@ -16,9 +17,11 @@ namespace Skilly.Core.Entities
         public string? Notes { get; set; }
         [ForeignKey(nameof(ProviderServices))]
         public string? serviceId { get; set; }
+        [JsonIgnore]
         public virtual ProviderServices? ProviderServices { get; set; }
         [ForeignKey(nameof(RequestService))]
         public string? requestserviceId { get; set; }
+        [JsonIgnore]
         public virtual RequestService? RequestService { get; set; }
     }
 }
