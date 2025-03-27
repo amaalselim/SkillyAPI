@@ -119,6 +119,7 @@ namespace Skilly.Persistence.Implementation
         public async Task<IEnumerable<RequestService>> GetAllRequests()
         {
             var service = await _context.requestServices
+                .Include(c => c.offerSalaries)
                 .Include(c=>c.requestServiceImages)
                .ToListAsync();
 
@@ -129,7 +130,7 @@ namespace Skilly.Persistence.Implementation
             foreach (var item in service)
             {
                 item.requestServiceImages = item.requestServiceImages.Where(img => img.Img.StartsWith("Images/UserProfile/RequestServices/")).ToList();
-
+                item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
             }
 
             return service;
@@ -140,6 +141,7 @@ namespace Skilly.Persistence.Implementation
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.requestServices
                 .Include(c => c.requestServiceImages)
+                .Include(c=>c.offerSalaries)
                 .Where(c=>c.userId==user.Id)
                .ToListAsync();
             
@@ -150,7 +152,7 @@ namespace Skilly.Persistence.Implementation
             foreach (var item in service)
             {
                 item.requestServiceImages = item.requestServiceImages.Where(img => img.Img.StartsWith("Images/UserProfile/RequestServices/")).ToList();
-
+                item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
             }
 
             return service;
@@ -162,6 +164,7 @@ namespace Skilly.Persistence.Implementation
             var service = await _context.requestServices
                 .Include(g => g.requestServiceImages)
                 .Include(g => g.UserProfile)
+                .Include(g=>g.offerSalaries)
                 .FirstOrDefaultAsync(g => g.Id == requestId&& g.userId == user.Id);
 
             if (service == null)
@@ -169,6 +172,7 @@ namespace Skilly.Persistence.Implementation
                 throw new Exception("Service not found.");
             }
             service.requestServiceImages = service.requestServiceImages.Where(img => img.Img.StartsWith("Images/UserProfile/RequestServices/")).ToList();
+            service.offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>();
             return service;
         }
     }
