@@ -17,7 +17,7 @@ namespace Skilly.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -173,6 +173,38 @@ namespace Skilly.Persistence.Migrations
                     b.ToTable("categories");
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Message", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.Notifications", b =>
                 {
                     b.Property<string>("Id")
@@ -215,9 +247,6 @@ namespace Skilly.Persistence.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProviderServicesId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
 
@@ -228,8 +257,6 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProviderServicesId");
 
                     b.HasIndex("requestserviceId");
 
@@ -702,6 +729,25 @@ namespace Skilly.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Message", b =>
+                {
+                    b.HasOne("Skilly.Core.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Skilly.Core.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.Notifications", b =>
                 {
                     b.HasOne("Skilly.Core.Entities.User", "User")
@@ -715,19 +761,13 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.OfferSalary", b =>
                 {
-                    b.HasOne("Skilly.Core.Entities.ProviderServices", null)
-                        .WithMany("offerSalaries")
-                        .HasForeignKey("ProviderServicesId");
-
                     b.HasOne("Skilly.Core.Entities.RequestService", "RequestService")
                         .WithMany("offerSalaries")
-                        .HasForeignKey("requestserviceId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("requestserviceId");
 
                     b.HasOne("Skilly.Core.Entities.ProviderServices", "ProviderServices")
-                        .WithMany()
-                        .HasForeignKey("serviceId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany("offerSalaries")
+                        .HasForeignKey("serviceId");
 
                     b.Navigation("ProviderServices");
 

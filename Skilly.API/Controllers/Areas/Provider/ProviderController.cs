@@ -39,10 +39,21 @@ namespace Skilly.API.Controllers.Areas.Provider
                 });
             }
         }
-
-        [HttpGet("GetServiceProviderBy/{userId}")]
-        public async Task<ActionResult<ServiceProvider>> GetUserById(string userId)
+        private string GetUserIdFromClaims()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
+            return userId;
+        }
+
+
+        [HttpGet("GetServiceProviderByUserId")]
+        public async Task<ActionResult<ServiceProvider>> GetUserById()
+        {
+            var userId = GetUserIdFromClaims();
             var user = await _unitOfWork.ServiceProviderRepository.GetByIdAsync(userId);
             if (user == null)
             {

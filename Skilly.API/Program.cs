@@ -21,8 +21,8 @@ using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Implementation;
 using System.Globalization;
 using System.Text;
-using Skilly.API.Hubs;
 using System.Threading.Tasks;
+using Skilly.Persistence.Hubs;
 
 namespace Skilly.API
 {
@@ -78,6 +78,7 @@ namespace Skilly.API
             builder.Services.AddScoped<IClaimsService,ClaimsService>();
             builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<IAuthService,AuthService>();
+            builder.Services.AddScoped<IChatService,ChatService>(); 
             builder.Services.AddScoped<IFirebaseAuthService,FirebaseAuthService>(); 
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -132,6 +133,8 @@ namespace Skilly.API
 
 
             builder.Services.AddControllers();
+            builder.Services.AddSignalR();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -170,6 +173,7 @@ namespace Skilly.API
             #endregion
 
             builder.Services.AddLogging();
+            builder.Logging.AddConsole();
             var app = builder.Build();
 
             //app.UseMiddleware<LocalizationMiddleware>();    

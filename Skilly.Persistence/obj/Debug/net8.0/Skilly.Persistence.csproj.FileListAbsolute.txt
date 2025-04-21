@@ -2,8 +2,12 @@ C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Persist
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Persistence.runtimeconfig.json
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Persistence.dll
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Persistence.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Application.dll
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Core.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Infrastructure.dll
+C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Application.pdb
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Core.pdb
+C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Infrastructure.pdb
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\Skilly.Persistence.csproj.AssemblyReference.cache
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\Skilly.Persistence.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\Skilly.Persistence.AssemblyInfoInputs.cache
@@ -16,7 +20,3 @@ C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\refint\Skilly.
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\Skilly.Persistence.pdb
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\Skilly.Persistence.genruntimeconfig.cache
 C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\obj\Debug\net8.0\ref\Skilly.Persistence.dll
-C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Application.dll
-C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Infrastructure.dll
-C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Application.pdb
-C:\Users\Win10\Desktop\Skilly\Skilly.Persistence\bin\Debug\net8.0\Skilly.Infrastructure.pdb

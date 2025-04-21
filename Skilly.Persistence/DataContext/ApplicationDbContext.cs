@@ -30,7 +30,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<RequestService> requestServices { get; set; }
         public DbSet<requestServiceImage> requestServiceImages { get; set; }
         public DbSet<OfferSalary> offerSalaries { get; set; }
-        public DbSet<Message> messages { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

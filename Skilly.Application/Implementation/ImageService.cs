@@ -60,7 +60,7 @@ namespace Skilly.Application.Implementation
             }
 
 
-            return Path.Combine(folderPath, file.FileName); 
+            return Path.Combine(folderPath, file.FileName);
         }
 
 
