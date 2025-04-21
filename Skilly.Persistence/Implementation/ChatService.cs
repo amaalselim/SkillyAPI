@@ -38,14 +38,12 @@ namespace Skilly.Persistence.Implementation
             _context.Messages.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            // إرسال للطرف المستقبل لو متصل
             if (ChatHub.Users.TryGetValue(messageDTO.receiverId, out var receiverConnectionId))
             {
                 await _hubContext.Clients.Client(receiverConnectionId)
                     .SendAsync("ReceiveMessage", messageDTO.senderId, messageDTO.content);
             }
 
-            // إرسال لنفس المرسل لو متصل
             if (ChatHub.Users.TryGetValue(messageDTO.senderId, out var senderConnectionId))
             {
                 await _hubContext.Clients.Client(senderConnectionId)
