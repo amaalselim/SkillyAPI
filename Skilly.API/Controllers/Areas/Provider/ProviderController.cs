@@ -54,23 +54,23 @@ namespace Skilly.API.Controllers.Areas.Provider
         public async Task<ActionResult<ServiceProvider>> GetUserById()
         {
             var userId = GetUserIdFromClaims();
-            var user = await _unitOfWork.ServiceProviderRepository.GetByIdAsync(userId);
-            if (user == null)
+            var provider = await _unitOfWork.ServiceProviderRepository.GetByIdAsync(userId);
+            if (provider == null)
             {
                 return NotFound();
             }
-            return Ok(new { user });
+            return Ok(new {provider });
         }
 
         [HttpGet("GetAllServiceProvidersBy/{categoryId}")]
         public async Task<ActionResult<ServiceProvider>> GetserviceProviderbycategoryId(string categoryId)
         {
-            var user = await _unitOfWork.ServiceProviderRepository.GetAllserviceProvidersbyCategoryId(categoryId);
-            if (user == null)
+            var provider = await _unitOfWork.ServiceProviderRepository.GetAllserviceProvidersbyCategoryId(categoryId);
+            if (provider == null)
             {
                 return NotFound();
             }
-            return Ok(new { user } );
+            return Ok(new { provider } );
         } 
         [HttpPost("addServiceProvider")]
         [Authorize]
@@ -89,7 +89,7 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 return Ok(new
                 {
-                    message = "User profile added successfully.",
+                    message = "provider added successfully.",
                     data = ServiceProviderDTO
                 });
             }
@@ -119,7 +119,7 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 return Ok(new
                 {
-                    message = "User profile updated successfully.",
+                    message = "Provider updated successfully.",
                     data = ServiceProviderDTO
                 });
             }
@@ -145,7 +145,7 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 await _unitOfWork.ServiceProviderRepository.DeleteServiceProviderAsync(id);
 
-                return Ok(new { message = "User profile deleted successfully." });
+                return Ok(new { message = "provider deleted successfully." });
             }
             catch (UserNotFoundException ex)
             {

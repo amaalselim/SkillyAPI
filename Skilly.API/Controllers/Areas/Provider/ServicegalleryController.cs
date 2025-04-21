@@ -51,12 +51,12 @@ namespace Skilly.API.Controllers.Areas.Provider
         public async Task<ActionResult<Servicesgallery>> GetservicesbyuserId()
         {
             string userId = GetUserIdFromClaims();
-            var user = await _unitOfWork.servicegalleryRepository.GetAllgalleryByproviderId(userId);
-            if (user == null)
+            var servicesgallery = await _unitOfWork.servicegalleryRepository.GetAllgalleryByproviderId(userId);
+            if (servicesgallery == null)
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { servicesgallery });
         }
 
 

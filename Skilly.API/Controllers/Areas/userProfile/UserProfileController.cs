@@ -37,7 +37,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { user });
         }
         [HttpPost("addUserProfile")]
         [Authorize]

@@ -50,12 +50,12 @@ namespace Skilly.API.Controllers.Areas.userProfile
         public async Task<ActionResult<ProviderServices>> GetservicesbyuserId()
         {
             string userId = GetUserIdFromClaims();
-            var user = await _unitOfWork._requestserviceRepository.GetAllRequestsByUserId(userId);
-            if (user == null)
+            var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByUserId(userId);
+            if (services == null)
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { services });
         }
         [HttpGet("GeyrequestsBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
@@ -106,7 +106,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork._requestserviceRepository.EditRequestService(requestServiceDTO, userId, serviceId);
 
-                return Ok(new { message = "Service gallery updated successfully.", data = requestServiceDTO });
+                return Ok(new { message = " service updated successfully.", data = requestServiceDTO });
             }
             catch (Exception ex)
             {

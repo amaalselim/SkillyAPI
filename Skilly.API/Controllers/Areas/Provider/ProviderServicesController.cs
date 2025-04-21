@@ -50,22 +50,22 @@ namespace Skilly.API.Controllers.Areas.Provider
         public async Task<ActionResult<ProviderServices>> GetservicesbyuserId()
         {
             string userId = GetUserIdFromClaims();
-            var user = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
-            if (user == null)
+            var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
+            if (service == null)
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { service });
         }
         [HttpGet("GetAllServicesBy/{categoryId}")]
         public async Task<ActionResult<ProviderServices>> GetservicesbycategoryId(string categoryId)
         {
-            var user = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
-            if (user == null)
+            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
+            if (service == null)
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { service });
         }
 
 
@@ -118,7 +118,7 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.EditProviderService(providerservicesDTO, userId, serviceId);
 
-                return Ok(new { message = "Service gallery updated successfully.", data = providerservicesDTO });
+                return Ok(new { message = "Service updated successfully.", data = providerservicesDTO });
             }
             catch (ProviderServiceNotFoundException ex)
             {
