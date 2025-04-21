@@ -23,15 +23,25 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             _unitOfWork = unitOfWork;
         }
+        private string GetUserIdFromClaims()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
+            return userId;
+        }
         [HttpGet("GetAllUsersProfile")]
         public async Task<ActionResult<IEnumerable<UserProfile>>> GetAllUserProfile()
         { 
             var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
             return Ok(new { users });
         }
-        [HttpGet("GetUserProfileBy/{userId}")]
-        public async Task<ActionResult<UserProfile>> GetUserById(string userId)
+        [HttpGet("GetUserProfileByuserId")]
+        public async Task<ActionResult<UserProfile>> GetUserById()
         {
+            var userId= GetUserIdFromClaims();
             var user = await _unitOfWork.ProfileRepository.GetByIdAsync(userId);
             if (user == null)
             {
@@ -45,7 +55,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             try
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = GetUserIdFromClaims();
 
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -75,7 +85,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             try
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId =GetUserIdFromClaims();
 
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -104,12 +114,12 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
         }
 
-        [HttpDelete("deleteProfileBy/{userId}")]
-        public async Task<IActionResult> DeleteUserProfile(string userId)
+        [HttpDelete("deleteProfileByuserId")]
+        public async Task<IActionResult> DeleteUserProfile()
         {
             try
             {
-
+                var userId=GetUserIdFromClaims();
                 await _unitOfWork.ProfileRepository.DeleteUserProfileAsync(userId);
 
                 return Ok(new { message = "User profile deleted successfully." });
