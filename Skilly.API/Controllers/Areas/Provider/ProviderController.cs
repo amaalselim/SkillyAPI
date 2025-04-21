@@ -59,7 +59,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { user });
         }
 
         [HttpGet("GetAllServiceProvidersBy/{categoryId}")]
@@ -70,7 +70,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { user } );
         } 
         [HttpPost("addServiceProvider")]
         [Authorize]
