@@ -12,8 +12,8 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250418174852_a")]
-    partial class a
+    [Migration("20250422234351_notmap")]
+    partial class notmap
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,26 +176,9 @@ namespace Skilly.Persistence.Migrations
                     b.ToTable("categories");
                 });
 
-            modelBuilder.Entity("Skilly.Core.Entities.ChatRoom", b =>
-                {
-                    b.Property<string>("ChatRoomId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.PrimitiveCollection<string>("UserIds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ChatRoomId");
-
-                    b.ToTable("chatRooms");
-                });
-
             modelBuilder.Entity("Skilly.Core.Entities.Message", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ChatRoomId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
@@ -217,8 +200,6 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChatRoomId");
 
                     b.HasIndex("ReceiverId");
 
@@ -310,6 +291,9 @@ namespace Skilly.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("ServiceRequestTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("categoryId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -365,6 +349,9 @@ namespace Skilly.Persistence.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ServiceRequestTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("categoryId")
                         .IsRequired()
@@ -753,20 +740,16 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.Message", b =>
                 {
-                    b.HasOne("Skilly.Core.Entities.ChatRoom", null)
-                        .WithMany("Messages")
-                        .HasForeignKey("ChatRoomId");
-
                     b.HasOne("Skilly.Core.Entities.User", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Skilly.Core.Entities.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receiver");
@@ -928,11 +911,6 @@ namespace Skilly.Persistence.Migrations
                     b.Navigation("providerServices");
 
                     b.Navigation("serviceProviders");
-                });
-
-            modelBuilder.Entity("Skilly.Core.Entities.ChatRoom", b =>
-                {
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>

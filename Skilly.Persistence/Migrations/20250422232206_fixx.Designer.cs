@@ -12,8 +12,8 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250418175151_fix")]
-    partial class fix
+    [Migration("20250422232206_fixx")]
+    partial class fixx
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -291,6 +291,9 @@ namespace Skilly.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("ServiceRequestTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("categoryId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -346,6 +349,9 @@ namespace Skilly.Persistence.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ServiceRequestTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("categoryId")
                         .IsRequired()
@@ -737,13 +743,13 @@ namespace Skilly.Persistence.Migrations
                     b.HasOne("Skilly.Core.Entities.User", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Skilly.Core.Entities.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receiver");

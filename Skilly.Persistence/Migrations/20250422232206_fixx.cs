@@ -1,15 +1,30 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Skilly.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class a : Migration
+    public partial class fixx : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<DateTime>(
+                name: "ServiceRequestTime",
+                table: "requestServices",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "ServiceRequestTime",
+                table: "providerServices",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
             migrationBuilder.AlterColumn<string>(
                 name: "SenderId",
                 table: "Messages",
@@ -25,29 +40,6 @@ namespace Skilly.Persistence.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
-
-            migrationBuilder.AddColumn<string>(
-                name: "ChatRoomId",
-                table: "Messages",
-                type: "nvarchar(450)",
-                nullable: true);
-
-            migrationBuilder.CreateTable(
-                name: "chatRooms",
-                columns: table => new
-                {
-                    ChatRoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserIds = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_chatRooms", x => x.ChatRoomId);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_ChatRoomId",
-                table: "Messages",
-                column: "ChatRoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ReceiverId",
@@ -65,7 +57,7 @@ namespace Skilly.Persistence.Migrations
                 column: "ReceiverId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Messages_AspNetUsers_SenderId",
@@ -73,14 +65,7 @@ namespace Skilly.Persistence.Migrations
                 column: "SenderId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Messages_chatRooms_ChatRoomId",
-                table: "Messages",
-                column: "ChatRoomId",
-                principalTable: "chatRooms",
-                principalColumn: "ChatRoomId");
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
@@ -94,17 +79,6 @@ namespace Skilly.Persistence.Migrations
                 name: "FK_Messages_AspNetUsers_SenderId",
                 table: "Messages");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_Messages_chatRooms_ChatRoomId",
-                table: "Messages");
-
-            migrationBuilder.DropTable(
-                name: "chatRooms");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Messages_ChatRoomId",
-                table: "Messages");
-
             migrationBuilder.DropIndex(
                 name: "IX_Messages_ReceiverId",
                 table: "Messages");
@@ -114,8 +88,12 @@ namespace Skilly.Persistence.Migrations
                 table: "Messages");
 
             migrationBuilder.DropColumn(
-                name: "ChatRoomId",
-                table: "Messages");
+                name: "ServiceRequestTime",
+                table: "requestServices");
+
+            migrationBuilder.DropColumn(
+                name: "ServiceRequestTime",
+                table: "providerServices");
 
             migrationBuilder.AlterColumn<string>(
                 name: "SenderId",
