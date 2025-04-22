@@ -50,6 +50,18 @@ namespace Skilly.Persistence.DataContext
                 .WithMany(sp => sp.Reviews)
                 .HasForeignKey(r => r.ProviderId);
 
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
