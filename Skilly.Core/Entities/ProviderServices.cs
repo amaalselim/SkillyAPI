@@ -30,6 +30,7 @@ namespace Skilly.Core.Entities
         public string categoryId { get; set; }
         [JsonIgnore]    
         public virtual Category? Category { get; set; }
+        [JsonIgnore]
         public ICollection<OfferSalary>? offerSalaries { get; set; } = new List<OfferSalary>();
     }
 }

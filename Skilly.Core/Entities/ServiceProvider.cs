@@ -34,8 +34,13 @@ namespace Skilly.Core.Entities
         public string categoryId { get; set; }
         [JsonIgnore]
         public virtual Category? Category { get; set; }
+        [JsonIgnore]
         public ICollection<ProviderServices>? providerServices { get; set; } = new List<ProviderServices>();
+        [JsonIgnore]
+
         public ICollection<Servicesgallery>? servicesgalleries { get; set; } = new List<Servicesgallery>();
+        [JsonIgnore]
+
         public ICollection<Review>? Reviews { get; set; } = new List<Review>();
 
     }

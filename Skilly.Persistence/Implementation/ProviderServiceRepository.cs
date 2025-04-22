@@ -117,7 +117,7 @@ namespace Skilly.Persistence.Implementation
         {
             var service = await _context.providerServices
                 .Include(i => i.ServicesImages)
-                //.Include(i => i.serviceProvider)
+                .Include(i => i.serviceProvider)
                 //.Include(i=>i.offerSalaries)
                 .ToListAsync();
 
