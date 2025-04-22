@@ -117,8 +117,8 @@ namespace Skilly.Persistence.Implementation
         {
             var service = await _context.providerServices
                 .Include(i => i.ServicesImages)
-                .Include(i => i.serviceProvider)
-                .Include(i=>i.offerSalaries)
+                //.Include(i => i.serviceProvider)
+                //.Include(i=>i.offerSalaries)
                 .ToListAsync();
 
             if (service == null || !service.Any())
@@ -127,8 +127,9 @@ namespace Skilly.Persistence.Implementation
             }
             foreach (var item in service)
             {
+                item.ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName;
                 item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
-                item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
+                //item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
             }
 
             return service;
@@ -136,15 +137,24 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
         {
-            return await _context.providerServices.Include(c=>c.ServicesImages)
+            var services= await _context.providerServices
+                .Include(c=>c.serviceProvider)
+                .Include(c=>c.ServicesImages)
                 .Include(c=>c.offerSalaries)
                 .Where(c => c.categoryId == categoryId).ToListAsync();
+
+            foreach (var item in services)
+            {
+                item.ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName;
+            }
+            return services;    
         }
 
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId, string userId)
         {
             var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.providerServices
+                .Include(c=>c.serviceProvider)
                 .Include(g => g.ServicesImages)
                 .Include(g => g.serviceProvider)
                 .Include(g=>g.offerSalaries)
@@ -154,6 +164,7 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new ProviderServiceNotFoundException("Service not found.");
             }
+            service.ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName;
             service.ServicesImages = service.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
             service.offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>();
             return service;
@@ -162,6 +173,7 @@ namespace Skilly.Persistence.Implementation
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.providerServices
+                .Include(c => c.serviceProvider)
                 .Include(c => c.ServicesImages)
                 .Include(c=>c.offerSalaries)
                 .Where(c => c.serviceProviderId == user.Id)
