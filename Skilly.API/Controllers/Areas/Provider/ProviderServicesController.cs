@@ -69,7 +69,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         }
 
 
-        [HttpGet("GeyServiceBy/{serviceId}")]
+        [HttpGet("GetServiceBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
         {
             try
