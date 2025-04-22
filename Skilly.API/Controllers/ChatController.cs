@@ -26,18 +26,33 @@ namespace Skilly.API.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendMessage([FromBody] MessageDTO messageDto)
         {
-            //var senderId = GetUserId();
+            try
+            {
+                //var senderId = GetUserId();
 
-            //if (string.IsNullOrEmpty(senderId))
-            //{
-            //    return Unauthorized("User not authenticated");
-            //}
+                //    //if (string.IsNullOrEmpty(senderId))
+                //    //{
+                //    //    return Unauthorized("User not authenticated");
+                //    //}
 
-            //messageDto.senderId = senderId;
+                //    //messageDto.senderId = senderId;
+                await _chatService.SendMessageAsync(messageDto);
 
-            await _chatService.SendMessageAsync(messageDto);
-            return Ok(new { message = "Message sent successfully" });
+                await _hubContext.Clients.User(messageDto.receiverId)
+                    .SendAsync("ReceiveMessage", messageDto.senderId, messageDto.content);
+
+                await _hubContext.Clients.User(messageDto.senderId)
+                    .SendAsync("ReceiveMessage", messageDto.senderId, messageDto.content);
+
+                return Ok(new { message = "Message sent successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
+            }
         }
+
+
 
         [HttpGet("messages")]
         public async Task<IActionResult> GetMessages([FromQuery] string senderId,[FromQuery] string receiverId)
