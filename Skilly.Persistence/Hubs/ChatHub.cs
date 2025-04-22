@@ -49,16 +49,11 @@ namespace Skilly.Persistence.Hubs
 
             await Clients.Caller.SendAsync("ReceiveMessages", messageDtos);
         }
-        public async Task SendMessage(string senderId, string receiverId, string messageContent)
+        public async Task SendMessage(string senderId, string receiverId, string content)
         {
-            var messageDTO = new MessageDTO
-            {
-                senderId = senderId,
-                receiverId = receiverId,
-                content = messageContent
-            };
-            await _chatService.SendMessageAsync(messageDTO);
-            
+            await Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
+            await Clients.User(senderId).SendAsync("ReceiveMessage", senderId, content);
+
         }
     }
 }
