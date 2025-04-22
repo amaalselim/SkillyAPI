@@ -137,11 +137,17 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
         }
 
-        [HttpDelete("deleteProviderBy/{id}")]
-        public async Task<IActionResult> DeleteServiceProvider(string id)
+        [HttpDelete("deleteProviderByuserId")]
+        public async Task<IActionResult> DeleteServiceProvider()
         {
             try
             {
+                var id = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(id))
+                {
+                    return Unauthorized(new { message = "User not authenticated." });
+                }
+
 
                 await _unitOfWork.ServiceProviderRepository.DeleteServiceProviderAsync(id);
 
