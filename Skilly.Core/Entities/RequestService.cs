@@ -11,6 +11,7 @@ namespace Skilly.Core.Entities
     public class RequestService
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
+        public DateTime ServiceRequestTime { get; set; } = DateTime.UtcNow;
         public string Name {  get; set; }
         public decimal Price { get; set; }
         public string Deliverytime { get; set; }
@@ -22,6 +23,8 @@ namespace Skilly.Core.Entities
         public string? Notes { get; set; }
         [ForeignKey("UserProfile")]
         public string userId { get; set; }
+        [NotMapped]
+        public string userName { get; set; }
         [JsonIgnore]
         public virtual UserProfile? UserProfile { get; set; }
         public ICollection<requestServiceImage>? requestServiceImages{ get; set; } = new List<requestServiceImage>();

@@ -10,10 +10,14 @@ namespace Skilly.Core.Entities
 {
     public class ServicesgalleryImage
     {
+        [JsonIgnore]
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Img {  get; set; }
+        [JsonIgnore]
         [ForeignKey("Servicesgallery")]
+
         public string galleryId { get; set; }
+
         [JsonIgnore]
         public Servicesgallery? Servicesgallery { get; set; }
     }
