@@ -51,7 +51,7 @@ namespace Skilly.API.Controllers
             }
         }
         [HttpDelete("DeleteBannerBy/{bannerId}")]
-        public async Task<IActionResult> DeleteCategory([FromRoute] string bannerId)
+        public async Task<IActionResult> DeleteCategory([FromRoute] int bannerId)
         {
             try
             {
