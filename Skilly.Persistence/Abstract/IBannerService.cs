@@ -12,5 +12,6 @@ namespace Skilly.Persistence.Abstract
     {
         Task<Banner> UploadBannerAsync(BannerCreateDTO bannerCreateDTO);
         Task<IEnumerable<Banner>> GetAllBannerAsync();
+        Task DeleteBannerAsync(string id);
     }
 }

@@ -50,5 +50,19 @@ namespace Skilly.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpDelete("DeleteBannerBy/{bannerId}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute] string bannerId)
+        {
+            try
+            {
+                await _unitOfWork._BannerService.DeleteBannerAsync(bannerId);
+
+                return Ok(new { message = "banner deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
     }
 }

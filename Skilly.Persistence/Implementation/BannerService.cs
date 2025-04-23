@@ -49,5 +49,13 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
             return banner;
         }
+
+        public async Task DeleteBannerAsync(string id)
+        {
+            var banner = await _context.banners.FindAsync(id);
+
+            _context.banners.Remove(banner);
+            await _context.SaveChangesAsync();
+        }
     }
 }
