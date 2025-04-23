@@ -27,6 +27,9 @@ namespace Skilly.Persistence.Implementation
         public ICategoryRepository _categoryRepository {  get; private set; }
         public IRequestserviceRepository _requestserviceRepository {  get; private set; }
         public IOfferSalaryRepository _OfferSalaryRepository { get; private set; }
+
+        public IBannerService _BannerService {  get; private set; }
+
         public UnitOfWork(IGenericRepository<User> User,
             ApplicationDbContext context,
             IUserProfileRepository userProfileRepository,
@@ -36,7 +39,8 @@ namespace Skilly.Persistence.Implementation
            IReviewRepository ReviewRepository,
            ICategoryRepository categoryRepository,
            IRequestserviceRepository requestserviceRepository,
-           IOfferSalaryRepository OfferSalaryRepository
+           IOfferSalaryRepository OfferSalaryRepository,
+           IBannerService bannerService
 
            )
         {
@@ -50,6 +54,7 @@ namespace Skilly.Persistence.Implementation
             _categoryRepository = categoryRepository;
             _requestserviceRepository = requestserviceRepository;
             _OfferSalaryRepository = OfferSalaryRepository;
+            _BannerService = bannerService;
         }
 
         public async Task<int> CompleteAsync()

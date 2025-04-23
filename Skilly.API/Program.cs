@@ -79,6 +79,7 @@ namespace Skilly.API
             builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<IAuthService,AuthService>();
             builder.Services.AddScoped<IChatService,ChatService>(); 
+            builder.Services.AddScoped<IBannerService,BannerService>(); 
             builder.Services.AddScoped<IFirebaseAuthService,FirebaseAuthService>(); 
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));

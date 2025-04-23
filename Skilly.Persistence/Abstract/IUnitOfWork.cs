@@ -18,6 +18,8 @@ namespace Skilly.Persistence.Abstract
         ICategoryRepository _categoryRepository { get; }
         IRequestserviceRepository _requestserviceRepository { get; }
         IOfferSalaryRepository _OfferSalaryRepository { get; }
+
+        IBannerService _BannerService { get; }
         
         Task<int> CompleteAsync();
     }

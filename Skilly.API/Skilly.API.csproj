@@ -28,6 +28,7 @@
   <ItemGroup>
     <Folder Include="Configs\" />
     <Folder Include="wwwroot\Images\Category\" />
+    <Folder Include="wwwroot\Images\Banner\" />
   </ItemGroup>
 
 </Project>

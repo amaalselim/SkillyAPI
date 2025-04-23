@@ -31,6 +31,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<requestServiceImage> requestServiceImages { get; set; }
         public DbSet<OfferSalary> offerSalaries { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Banner> banners{ get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
