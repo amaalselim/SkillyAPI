@@ -4,6 +4,7 @@ using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace Skilly.API.Controllers
 {
@@ -17,16 +18,27 @@ namespace Skilly.API.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+        private string GetUserIdFromClaims()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
+            return userId;
+        }
         [HttpGet("GetAllUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
+            
             var users = await _unitOfWork.Users.GetAllAsync();
             return Ok(new { users });
         }
-        [HttpGet("GetUserBy/{id}")]
-        public async Task<ActionResult<User>> GetUserById(string id)
+        [HttpGet("GetUserById}")]
+        public async Task<ActionResult<User>> GetUserById()
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var userid = GetUserIdFromClaims();
+            var user = await _unitOfWork.Users.GetByIdAsync(userid);
             if (user == null)
             {
                 return NotFound();
@@ -45,16 +57,16 @@ namespace Skilly.API.Controllers
 
             return NoContent();
         }
-        [HttpDelete("DeleteUserBy/{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
+        [HttpDelete("DeleteUserById")]
+        public async Task<IActionResult> DeleteUser()
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var userId= GetUserIdFromClaims();
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
-
-            await _unitOfWork.Users.DeleteAsync(id);
+            await _unitOfWork.Users.DeleteAsync(userId);
             return NoContent();
         }
     }
