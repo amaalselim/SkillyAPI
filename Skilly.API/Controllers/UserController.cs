@@ -43,7 +43,7 @@ namespace Skilly.API.Controllers
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { user });
         }
         [HttpPut("EditUserBy/{id}")]
         public async Task<IActionResult> EditUser(string id, User user)
