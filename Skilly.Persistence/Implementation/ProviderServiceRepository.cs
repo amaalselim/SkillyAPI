@@ -36,7 +36,8 @@ namespace Skilly.Persistence.Implementation
             var path = @"Images/ServiceProvider/MyServices/";
             var service = _mapper.Map<ProviderServices>(providerservicesDTO);
             service.serviceProviderId = user.Id;
-            
+            service.ServiceRequestTime = DateTime.UtcNow;
+
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
                 foreach (var image in providerservicesDTO.Images)
