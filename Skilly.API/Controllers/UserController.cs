@@ -34,7 +34,7 @@ namespace Skilly.API.Controllers
             var users = await _unitOfWork.Users.GetAllAsync();
             return Ok(new { users });
         }
-        [HttpGet("GetUserById}")]
+        [HttpGet("GetUserById")]
         public async Task<ActionResult<User>> GetUserById()
         {
             var userid = GetUserIdFromClaims();
