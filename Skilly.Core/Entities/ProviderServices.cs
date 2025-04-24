@@ -12,7 +12,7 @@ namespace Skilly.Core.Entities
     public class ProviderServices
     {
         public string Id { get; set; }= Guid.NewGuid().ToString();
-        public DateTime ServiceRequestTime { get; set; }= DateTime.UtcNow;
+        public DateTime? ServiceRequestTime { get; set; }= DateTime.UtcNow;
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
