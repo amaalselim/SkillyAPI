@@ -58,10 +58,12 @@ namespace Skilly.Application.Implementation
             {
                 await file.CopyToAsync(fileStream);
             }
+            string baseUrl = "https://skilly.runasp.net/";
+            string fileUrl = $"{baseUrl}{folderPath.Replace("\\", "/")}{file.FileName}";
 
-
-            return Path.Combine(folderPath, file.FileName);
+            return fileUrl;
         }
+
 
 
 
