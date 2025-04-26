@@ -68,10 +68,9 @@ namespace Skilly.Application.Implementation
                     {
                         Success = true,
                         Message = "Login successful.",
-                        Token = token,
-                        UserType=user.UserType,
-                        firstName=user.FirstName,
-                        email = user.Email,
+
+                        Token = token.Result,
+                        UserType=user.UserType.ToString(),
                         Expire = loginDTO.RememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddHours(20)
                     };
                 }
