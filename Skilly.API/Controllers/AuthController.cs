@@ -9,17 +9,15 @@ using Vonage.Common;
 
 namespace Skilly.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IFirebaseAuthService _firebaseAuthService;
 
-        public AuthController(IAuthService authService, IFirebaseAuthService firebaseAuthService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
-            _firebaseAuthService = firebaseAuthService;
         }
         //[HttpPost("Select-UserType")]
         //public IActionResult SelectUserType([FromBody] UserTypeRequestDTO userTypeRequestDTO)
@@ -33,7 +31,7 @@ namespace Skilly.API.Controllers
         //}
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterDTO registerDTO)
+        public async Task<IActionResult> Register([FromBody]RegisterDTO registerDTO)
         {
             var result = await _authService.RegisterAsync(registerDTO);
 
@@ -62,18 +60,39 @@ namespace Skilly.API.Controllers
 
             return BadRequest(new { Success = false, Message = "Invalid verification code." });
         }
-
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(LoginDTO loginDTO)
-        {
-            var response = await _authService.LoginAsync(loginDTO);
 
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Invalid model",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
+                });
+            }
+
+            var response = await _authService.LoginAsync(loginDTO);
             return response != null
                 ? Ok(response)
                 : BadRequest(new { Success = false, Message = "Invalid login attempt." });
         }
+
+
+        //[HttpPost("Login")]
+        //public async Task<IActionResult> Login([FromBody]LoginDTO loginDTO)
+        //{
+        //    var response = await _authService.LoginAsync(loginDTO);
+
+        //    return response != null
+        //        ? Ok(response)
+        //        : BadRequest(new { Success = false, Message = "Invalid login attempt." });
+        //}
+
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ForgetPasswordDTO forgetPasswordDTO)
+        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordDTO forgetPasswordDTO)
         {
             var token = await _authService.GeneratePasswordResetTokenAsync(forgetPasswordDTO);
             if (token == null)
@@ -131,7 +150,7 @@ namespace Skilly.API.Controllers
             });
         }
         [HttpPost("update-password")]
-        public async Task<IActionResult> UpdatePassword(UpdatePasswordDTO updatePasswordDTO)
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -162,42 +181,42 @@ namespace Skilly.API.Controllers
                 });
             }
         }
-        [HttpPost("Login-Google")]
-        public async Task<IActionResult> LoginGoogle([FromBody] TokenDto tokenDto)
-        {
-            if (string.IsNullOrEmpty(tokenDto.IdToken))
-            {
-                return BadRequest(new
-                {
-                    Success = false,
-                    Message = "ID token cannot be null or empty.",
-                    Errors = new[] { "ID token cannot be null or empty." }
-                });
-            }
+        //[HttpPost("Login-Google")]
+        //public async Task<IActionResult> LoginGoogle([FromBody] TokenDto tokenDto)
+        //{
+        //    if (string.IsNullOrEmpty(tokenDto.IdToken))
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Success = false,
+        //            Message = "ID token cannot be null or empty.",
+        //            Errors = new[] { "ID token cannot be null or empty." }
+        //        });
+        //    }
 
-            try
-            {
-                var firebaseUserInfo = await _firebaseAuthService.VerifyGoogleTokenAsync(tokenDto.IdToken);
+        //    try
+        //    {
+        //        var firebaseUserInfo = await _firebaseAuthService.VerifyGoogleTokenAsync(tokenDto.IdToken);
 
-                return Ok(new
-                {
-                    Success = true,
-                    Message = "Token verified successfully.",
-                    Data = firebaseUserInfo
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    Success = false,
-                    Message = "Error verifying token.",
-                    Errors = new[] { ex.Message }
-                });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            Success = true,
+        //            Message = "Token verified successfully.",
+        //            Data = firebaseUserInfo
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Success = false,
+        //            Message = "Error verifying token.",
+        //            Errors = new[] { ex.Message }
+        //        });
+        //    }
+        //}
 
-        
+
 
         //[HttpPost("verify-otp")]
         //public async Task<IActionResult> Verifyotp([FromBody]VerifyOtpDTO verifyOtpDTO)
