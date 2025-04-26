@@ -25,8 +25,12 @@ namespace Skilly.Core.Entities
         public string userId { get; set; }
         [NotMapped]
         public string userName { get; set; }
+        public string userImg { get; set; }
+        [NotMapped]
+        public List<string> Images { get; set; }
         [JsonIgnore]
         public virtual UserProfile? UserProfile { get; set; }
+        [JsonIgnore]
         public ICollection<requestServiceImage>? requestServiceImages{ get; set; } = new List<requestServiceImage>();
         [JsonIgnore]
         public ICollection<OfferSalary>? offerSalaries{ get; set; } = new List<OfferSalary>();

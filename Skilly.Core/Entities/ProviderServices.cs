@@ -18,13 +18,17 @@ namespace Skilly.Core.Entities
         public decimal Price { get; set; }
         public string Deliverytime { get; set; }
         public string? Notes { get; set; }
+        [JsonIgnore]
         public ICollection<ProviderServicesImage> ServicesImages { get; set; } = new List<ProviderServicesImage>();
         [ForeignKey("serviceProvider")]
         public string serviceProviderId { get; set; }
         [NotMapped]
         public string ServiceProviderName { get; set; }
+        public string providerImg { get; set; }
         [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
+        [NotMapped]
+        public List<string> Images { get; set; }
 
         [ForeignKey("Category")]
         public string categoryId { get; set; }

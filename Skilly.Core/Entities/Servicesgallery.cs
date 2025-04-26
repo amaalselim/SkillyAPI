@@ -15,11 +15,14 @@ namespace Skilly.Core.Entities
         public string Description { get; set; }
         public string Deliverytime { get; set; }
         public string Img { get; set; }
-        public ICollection<ServicesgalleryImage> Images { get; set; } = new List<ServicesgalleryImage>();
+        [JsonIgnore]
+        public ICollection<ServicesgalleryImage> galleryImages { get; set; } = new List<ServicesgalleryImage>();
         [ForeignKey("serviceProvider")]
         public string serviceProviderId { get; set; }
         [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
+        [NotMapped]
+        public List<string> Images { get; set; }
 
     }
 }
