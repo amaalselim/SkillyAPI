@@ -37,6 +37,7 @@ namespace Skilly.Persistence.Implementation
             var service = _mapper.Map<ProviderServices>(providerservicesDTO);
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateTime.UtcNow;
+            service.providerImg = user.Img;
 
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
@@ -113,84 +114,155 @@ namespace Skilly.Persistence.Implementation
             }
             await _context.SaveChangesAsync();
         }
-
         public async Task<IEnumerable<ProviderServices>> GetAllProviderService()
         {
-            var service = await _context.providerServices
+            var services = await _context.providerServices
                 .Include(i => i.ServicesImages)
                 .Include(i => i.serviceProvider)
-                //.Include(i=>i.offerSalaries)
                 .ToListAsync();
 
-            if (service == null || !service.Any())
+            if (services == null || !services.Any())
             {
                 return new List<ProviderServices>();
             }
-            foreach (var item in service)
-            {
-                item.ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName;
-                item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
-                //item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
-            }
 
-            return service;
+            var serviceDtos = services.Select(item => new ProviderServices
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                ServiceRequestTime = item.ServiceRequestTime,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                categoryId=item.categoryId,
+                Notes = item.Notes,
+                serviceProviderId = item.serviceProviderId,
+                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                providerImg= item.serviceProvider.Img,
+                Images = item.ServicesImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>()
+            }).ToList();
+
+            return serviceDtos;
         }
 
-        public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
-        {
-            var services= await _context.providerServices
-                .Include(c=>c.serviceProvider)
-                .Include(c=>c.ServicesImages)
-                .Include(c=>c.offerSalaries)
-                .Where(c => c.categoryId == categoryId).ToListAsync();
-
-            foreach (var item in services)
-            {
-                item.ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName;
-            }
-            return services;    
-        }
 
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId, string userId)
         {
             var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.providerServices
-                .Include(c=>c.serviceProvider)
+                .Include(c => c.serviceProvider)
                 .Include(g => g.ServicesImages)
-                .Include(g => g.serviceProvider)
-                .Include(g=>g.offerSalaries)
-                .FirstOrDefaultAsync(g => g.Id ==serviceId && g.serviceProviderId == provider.Id);
+                .Include(g => g.offerSalaries)
+                .FirstOrDefaultAsync(g => g.Id == serviceId && g.serviceProviderId == provider.Id);
 
             if (service == null)
             {
                 throw new ProviderServiceNotFoundException("Service not found.");
             }
-            service.ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName;
-            service.ServicesImages = service.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
-            service.offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>();
-            return service;
+
+            var serviceDto = new ProviderServices
+            {
+                Id = service.Id,
+                Name = service.Name,
+                Description = service.Description,
+                ServiceRequestTime = service.ServiceRequestTime,
+                Price = service.Price,
+                Deliverytime = service.Deliverytime,
+                categoryId = service.categoryId,
+                Notes = service.Notes,
+                serviceProviderId = service.serviceProviderId,
+                ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName,
+                providerImg = service.serviceProvider.Img,
+                Images = service.ServicesImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>(),
+                offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>()
+            };
+
+            return serviceDto;
         }
-        public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
+        public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
         {
-            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
-            var service = await _context.providerServices
+            var services = await _context.providerServices
                 .Include(c => c.serviceProvider)
                 .Include(c => c.ServicesImages)
-                .Include(c=>c.offerSalaries)
-                .Where(c => c.serviceProviderId == user.Id)
-               .ToListAsync();
+                .Include(c => c.offerSalaries)
+                .Where(c => c.categoryId == categoryId)
+                .ToListAsync();
 
-            if (service == null || !service.Any())
+            if (services == null || !services.Any())
             {
                 return new List<ProviderServices>();
             }
-            foreach (var item in service)
+
+            var serviceDtos = services.Select(item => new ProviderServices
             {
-                item.ServicesImages = item.ServicesImages.Where(img => img.Img.StartsWith("Images/ServiceProvider/MyServices/")).ToList();
-                item.offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>();
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                ServiceRequestTime = item.ServiceRequestTime,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                Notes = item.Notes,
+                categoryId = item.categoryId,
+                serviceProviderId = item.serviceProviderId,
+                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                providerImg = item.serviceProvider.Img,
+                Images = item.ServicesImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>()
+            }).ToList();
+
+            return serviceDtos;
+        }
+
+
+
+
+        public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
+        {
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+            {
+                return new List<ProviderServices>();
             }
 
-            return service;
+            var services = await _context.providerServices
+                .Include(c => c.serviceProvider)
+                .Include(c => c.ServicesImages)
+                .Include(c => c.offerSalaries)
+                .Where(c => c.serviceProviderId == user.Id)
+                .ToListAsync();
+
+            if (services == null || !services.Any())
+            {
+                return new List<ProviderServices>();
+            }
+
+            var serviceDtos = services.Select(item => new ProviderServices
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                ServiceRequestTime = item.ServiceRequestTime,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                Notes = item.Notes,
+                categoryId = item.categoryId,
+                serviceProviderId = item.serviceProviderId,
+                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                providerImg = item.serviceProvider.Img,
+                Images = item.ServicesImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>()
+            }).ToList();
+
+            return serviceDtos;
         }
+
     }
 }

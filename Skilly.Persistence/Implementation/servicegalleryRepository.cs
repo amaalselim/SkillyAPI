@@ -48,7 +48,7 @@ namespace Skilly.Persistence.Implementation
                 {
                     var imagePath = await _imageService.SaveFileAsync(image, path);
 
-                    gallery.Images.Add(new ServicesgalleryImage
+                    gallery.galleryImages.Add(new ServicesgalleryImage
                     {
                         Img = imagePath,
                         galleryId = gallery.Id
@@ -64,7 +64,7 @@ namespace Skilly.Persistence.Implementation
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var gallery = await _context.servicesgalleries
-                .Include(g => g.Images)
+                .Include(g => g.galleryImages)
                 .FirstOrDefaultAsync(g => g.Id == galleryId && g.serviceProviderId == user.Id);
 
             if (gallery == null)
@@ -78,13 +78,13 @@ namespace Skilly.Persistence.Implementation
                 await _imageService.DeleteFileAsync(imagePath);
             }
 
-            foreach (var image in gallery.Images)
+            foreach (var image in gallery.galleryImages)
             {
                 string imagePath = Path.Combine(path, gallery.Img);
                 await _imageService.DeleteFileAsync(imagePath);
             }
 
-            gallery.Images.Clear();
+            gallery.galleryImages.Clear();
             _context.servicesgalleries.Remove(gallery);
             await _context.SaveChangesAsync();
         }
@@ -92,7 +92,7 @@ namespace Skilly.Persistence.Implementation
         public async Task EditServiceGallery(servicegalleryDTO servicegalleryDTO, string userId, string galleryId)
         {
             var gallery = await _context.servicesgalleries
-            .Include(g => g.Images)
+            .Include(g => g.galleryImages)
             .FirstOrDefaultAsync(g => g.Id == galleryId && g.serviceProviderId == userId);
 
             if (gallery == null)
@@ -114,11 +114,11 @@ namespace Skilly.Persistence.Implementation
             }
             if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
             {
-                foreach (var image in gallery.Images)
+                foreach (var image in gallery.galleryImages)
                 {
                     await _imageService.DeleteFileAsync(image.Img);
                 }
-                gallery.Images.Clear();
+                gallery.galleryImages.Clear();
 
                 if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
                 {
@@ -126,7 +126,7 @@ namespace Skilly.Persistence.Implementation
                     foreach (var image in servicegalleryDTO.Images)
                     {
                         var imagePath = await _imageService.SaveFileAsync(image, path);
-                        gallery.Images.Add(new ServicesgalleryImage
+                        gallery.galleryImages.Add(new ServicesgalleryImage
                         {
                             Img = imagePath,
                             galleryId = gallery.Id
@@ -136,61 +136,92 @@ namespace Skilly.Persistence.Implementation
             }
             await _context.SaveChangesAsync();
         }
+
+
         public async Task<IEnumerable<Servicesgallery>> GetAllServiceGallery()
         {
             var gallery = await _context.servicesgalleries
-                .Include(i => i.Images) 
-                .Include(i => i.serviceProvider) 
+                .Include(i => i.galleryImages)
+                .Include(i => i.serviceProvider)
                 .ToListAsync();
 
             if (gallery == null || !gallery.Any())
             {
-                return new List<Servicesgallery>(); 
+                return new List<Servicesgallery>();
             }
-            foreach (var item in gallery)
+
+            var galleryDtos = gallery.Select(item => new Servicesgallery
             {
-                item.Images = item.Images.Where(img => img.Img.StartsWith("Images/ServiceProvider/Servicegallery/")).ToList();
+                Id = item.Id,
+                galleryName= item.galleryName,
+                Description = item.Description,
+                Deliverytime = item.Deliverytime,
+                Img = item.Img,
+                serviceProviderId = item.serviceProviderId,
+                Images = item.galleryImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>()
+            }).ToList();
 
-            }
-
-            return gallery;
+            return galleryDtos;
         }
-
 
         public async Task<Servicesgallery> GetServiceGalleryByIdAsync(string galleryId, string userId)
         {
             var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var gallery = await _context.servicesgalleries
-                .Include(g => g.Images) 
-                .Include(g=>g.serviceProvider)
+                .Include(i => i.galleryImages)
+                .Include(g => g.serviceProvider)
                 .FirstOrDefaultAsync(g => g.Id == galleryId && g.serviceProviderId == provider.Id);
 
             if (gallery == null)
             {
                 throw new ServiceGalleryNotFoundException("Gallery not found.");
             }
-            gallery.Images = gallery.Images.Where(img => img.Img.StartsWith("Images/ServiceProvider/Servicegallery/")).ToList();
-            return gallery;
+
+            var galleryDto = new Servicesgallery
+            {
+                Id = gallery.Id,
+                galleryName = gallery.galleryName,
+                Description = gallery.Description,
+                Deliverytime = gallery.Deliverytime,
+                Img = gallery.Img,
+                serviceProviderId = gallery.serviceProviderId,
+                Images = gallery.galleryImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>()
+            };
+
+            return galleryDto;
         }
-        public async Task<IEnumerable<Servicesgallery>> GetAllgalleryByproviderId(string providerId)
+
+        public async Task<IEnumerable<Servicesgallery>> GetAllgalleryByProviderId(string providerId)
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == providerId);
             var service = await _context.servicesgalleries
-                .Include(c => c.Images)
-                .Where(c => c.serviceProviderId== user.Id)
-               .ToListAsync();
+                .Include(i => i.galleryImages)
+                .Where(c => c.serviceProviderId == user.Id)
+                .ToListAsync();
 
             if (service == null || !service.Any())
             {
                 return new List<Servicesgallery>();
             }
-            foreach (var item in service)
+
+            var galleryDtos = service.Select(item => new Servicesgallery
             {
-                item.Images = item.Images.Where(img => img.Img.StartsWith("Images/ServiceProvider/Servicegallery/")).ToList();
+                Id = item.Id,
+                galleryName = item.galleryName,
+                Description = item.Description,
+                Deliverytime = item.Deliverytime,
+                Img = item.Img,
+                serviceProviderId = item.serviceProviderId,
+                Images = item.galleryImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>()
+            }).ToList();
 
-            }
-
-            return service;
+            return galleryDtos;
         }
     }
 }
