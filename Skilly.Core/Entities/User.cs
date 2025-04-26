@@ -17,7 +17,7 @@ namespace Skilly.Core.Entities
         public string PhoneNumber {  get; set; }
         public UserType UserType { get; set; }
         public int? verificationCode { get; set; }
-        //public string FcmToken { get; set; }
+        public string? FcmToken { get; set; }
 
     }
 }
