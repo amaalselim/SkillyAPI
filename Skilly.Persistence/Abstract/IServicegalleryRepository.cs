@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Skilly.Persistence.Abstract
 {
     public interface IServicegalleryRepository 
-    {
+    {  
         Task<IEnumerable<Servicesgallery>> GetAllServiceGallery();
-        Task<IEnumerable<Servicesgallery>> GetAllgalleryByproviderId(string providerId);
+        Task<IEnumerable<Servicesgallery>> GetAllgalleryByProviderId(string providerId);
         Task<Servicesgallery> GetServiceGalleryByIdAsync(string galleryId, string userId);
         Task AddServiceGallery(servicegalleryDTO servicegalleryDTO, string userId);
         Task EditServiceGallery(servicegalleryDTO servicegalleryDTO, string userId, string galleryId);

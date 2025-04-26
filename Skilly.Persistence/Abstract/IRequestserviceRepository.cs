@@ -11,6 +11,7 @@ namespace Skilly.Persistence.Abstract
     public interface IRequestserviceRepository
     {
         Task<IEnumerable<RequestService>> GetAllRequests();
+        
         Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId);
         Task<RequestService> GetRequestById(string requestId, string userId);
         Task AddRequestService(requestServiceDTO requestServiceDTO, string userId);
