@@ -30,7 +30,7 @@ public class MappingProfile : Profile
 
         // Service Gallery
         CreateMap<Servicesgallery, servicegalleryDTO>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(img => new ServicesgalleryImage
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.galleryImages.Select(img => new ServicesgalleryImage
             {
                 Img = img.Img
             }).ToList()));
