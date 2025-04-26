@@ -427,7 +427,7 @@
             },
             "Google.Apis.Auth": {
               "target": "Package",
-              "version": "[1.68.0, )"
+              "version": "[1.69.0, )"
             },
             "Microsoft.AspNetCore.SignalR.Core": {
               "target": "Package",

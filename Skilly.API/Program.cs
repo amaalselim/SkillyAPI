@@ -47,11 +47,17 @@ namespace Skilly.API
 
 
 
-            var serviceAccountFilePath =builder.Configuration["FirebaseConfig:ServiceAccountFile"];
-            FirebaseApp.Create(new AppOptions()
+            var firebaseServiceAccountPath = builder.Configuration["FirebaseConfig:ServiceAccountFile"];
+
+            var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), firebaseServiceAccountPath);
+
+            if (FirebaseApp.DefaultInstance == null)
             {
-                Credential = GoogleCredential.FromFile(serviceAccountFilePath)
-            });
+                FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = GoogleCredential.FromFile(firebasePath)
+                });
+            }
 
 
             var smtpSettings = builder.Configuration.GetSection("SMTP");
@@ -79,8 +85,9 @@ namespace Skilly.API
             builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<IAuthService,AuthService>();
             builder.Services.AddScoped<IChatService,ChatService>(); 
-            builder.Services.AddScoped<IBannerService,BannerService>(); 
-            builder.Services.AddScoped<IFirebaseAuthService,FirebaseAuthService>(); 
+            builder.Services.AddScoped<IBannerService,BannerService>();
+            //builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
+            builder.Services.AddScoped<FirebaseV1Service>(); 
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
            // builder.Services.AddTransient<ExceptionMiddleware>();
@@ -124,16 +131,12 @@ namespace Skilly.API
             });
             builder.Services.AddLogging();
 
-            if(FirebaseApp.DefaultInstance == null)
-{
-                FirebaseApp.Create(new AppOptions()
-                {
-                    Credential = GoogleCredential.GetApplicationDefault(),
-                });
-            }
+
+            
 
 
             builder.Services.AddControllers();
+
             builder.Services.AddSignalR();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -158,14 +161,14 @@ namespace Skilly.API
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
+                { new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
             new string[] {}
         }
                 });
@@ -196,26 +199,16 @@ namespace Skilly.API
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
             app.Use(async (context, next) =>
             {
-                try
-                {
-                    await next.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "An error occurred while processing the request.");
-                    throw; 
-                }
+                Console.WriteLine($"Incoming Request: {context.Request.Path}");
+                await next();
+                Console.WriteLine($"Response Status: {context.Response.StatusCode}");
             });
 
             app.UseRouting();
-            app.MapHub<ChatHub>("/chatHub");
             app.UseCors("MyPolicy");
-
-
             app.UseAuthentication();
             app.UseAuthorization();
-
-
+            app.MapHub<ChatHub>("/chatHub");
             app.MapControllers();
 
             app.Run();

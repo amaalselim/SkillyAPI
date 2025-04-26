@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "XgvXImJMm5Q=",
+  "dgSpecHash": "hXrmkluN5BM=",
   "success": true,
   "projectFilePath": "C:\\Users\\Win10\\Desktop\\Skilly\\Skilly.API\\Skilly.API.csproj",
   "expectedPackageFiles": [
@@ -12,9 +12,9 @@
     "C:\\Users\\Win10\\.nuget\\packages\\firebaseadmin\\3.1.0\\firebaseadmin.3.1.0.nupkg.sha512",
     "C:\\Users\\Win10\\.nuget\\packages\\google.api.gax\\4.8.0\\google.api.gax.4.8.0.nupkg.sha512",
     "C:\\Users\\Win10\\.nuget\\packages\\google.api.gax.rest\\4.8.0\\google.api.gax.rest.4.8.0.nupkg.sha512",
-    "C:\\Users\\Win10\\.nuget\\packages\\google.apis\\1.68.0\\google.apis.1.68.0.nupkg.sha512",
-    "C:\\Users\\Win10\\.nuget\\packages\\google.apis.auth\\1.68.0\\google.apis.auth.1.68.0.nupkg.sha512",
-    "C:\\Users\\Win10\\.nuget\\packages\\google.apis.core\\1.68.0\\google.apis.core.1.68.0.nupkg.sha512",
+    "C:\\Users\\Win10\\.nuget\\packages\\google.apis\\1.69.0\\google.apis.1.69.0.nupkg.sha512",
+    "C:\\Users\\Win10\\.nuget\\packages\\google.apis.auth\\1.69.0\\google.apis.auth.1.69.0.nupkg.sha512",
+    "C:\\Users\\Win10\\.nuget\\packages\\google.apis.core\\1.69.0\\google.apis.core.1.69.0.nupkg.sha512",
     "C:\\Users\\Win10\\.nuget\\packages\\handy.dotnetcore-compatibility.colortranslations\\0.2.1\\handy.dotnetcore-compatibility.colortranslations.0.2.1.nupkg.sha512",
     "C:\\Users\\Win10\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Win10\\.nuget\\packages\\jose-jwt\\5.1.0\\jose-jwt.5.1.0.nupkg.sha512",
