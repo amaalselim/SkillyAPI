@@ -84,5 +84,21 @@ public class MappingProfile : Profile
                 string.IsNullOrWhiteSpace(src.serviceId) ? null : src.serviceId))
             .ForMember(dest => dest.requestserviceId, opt => opt.MapFrom(src =>
                 string.IsNullOrWhiteSpace(src.requestserviceId) ? null : src.requestserviceId));
+
+
+        CreateMap<Chat, ChatDTO>()
+             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+             .ForMember(dest => dest.LastUpdatedAt, opt => opt.MapFrom(src => src.LastUpdatedAt));
+
+        CreateMap<Message,MessageResponseDto>()
+            .ForMember(dest => dest.SentAt, opt => opt.MapFrom(src => src.SentAt));
+
+        CreateMap<Message, MessageDTO>();
+        CreateMap<MessageDTO, Message>();
+
+        CreateMap<CreateChatDTO, Chat>();
+        CreateMap<ChatDTO, Chat>(); 
+
+
     }
 }
