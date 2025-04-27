@@ -31,6 +31,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<requestServiceImage> requestServiceImages { get; set; }
         public DbSet<OfferSalary> offerSalaries { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Chat> chats { get; set; }
         public DbSet<Banner> banners{ get; set; }
 
 
@@ -61,6 +62,18 @@ namespace Skilly.Persistence.DataContext
                 .HasOne(m => m.Receiver)
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Chat>()
+               .HasOne(c => c.FirstUser)
+               .WithMany()
+               .HasForeignKey(c => c.FirstUserId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Chat>()
+                .HasOne(c => c.SecondUser)
+                .WithMany()
+                .HasForeignKey(c => c.SecondUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
         }
