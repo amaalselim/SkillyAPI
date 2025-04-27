@@ -18,5 +18,11 @@ namespace Skilly.Core.Entities
         public virtual User Sender { get; set; }
         public virtual User Receiver { get; set; }
 
+        [ForeignKey("Chat")]
+        public string ChatId { get; set; }
+        public virtual Chat Chat { get; set; }
+
+        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+
     }
 }

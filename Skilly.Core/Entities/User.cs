@@ -18,6 +18,8 @@ namespace Skilly.Core.Entities
         public UserType UserType { get; set; }
         public int? verificationCode { get; set; }
         public string? FcmToken { get; set; }
+        public ICollection<Chat> ChatsOfUser { get; set; }
+        public ICollection<Chat> ChatsOfProvider { get; set; }
 
     }
 }
