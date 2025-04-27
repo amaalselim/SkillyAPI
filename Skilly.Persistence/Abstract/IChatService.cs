@@ -10,15 +10,9 @@ namespace Skilly.Persistence.Abstract
 {
     public interface IChatService
     {
-        Task SendMessageAsync(MessageDTO messageDTO);
-        Task<List<Message>> GetChatAsync(string user1Id, string user2Id);
-
-        //Task<List<MessageResponseDto>> GetMessagesBetweenUsersAsync(string userId1, string userId2);
-        //Task<List<ChatResponseDto>> GetChatsForUserAsync(string userId);
-        //Task<bool> MarkAsReadAsync(string messageId);
-        //Task<bool> EditMessageAsync(string messageId, string newContent);
-        //Task<bool> DeleteMessageAsync(string messageId);
-        //Task<Message?> GetMessageByIdAsync(string messageId);
-
+        Task<ChatDTO> CreateChatAsync(CreateChatDTO dto);
+        Task<MessageDTO> SendMessageAsync(MessageDTO dto);
+        Task<List<ChatDTO>> GetChatsForUserAsync(string userId);
+        Task<List<MessageResponseDto>> GetMessagesForChatAsync(string chatId, string userId);
     }
 }
