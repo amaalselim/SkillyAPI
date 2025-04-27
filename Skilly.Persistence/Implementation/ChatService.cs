@@ -94,12 +94,11 @@ namespace Skilly.Persistence.Implementation
             var message = new Message
             {
                 ChatId = chat.Id,
-                SenderId=senderId,
+                SenderId = senderId,
                 ReceiverId = dto.receiverId,
                 Content = dto.content,
-                SentAt = DateTime.UtcNow,
-                Timestamp = DateTime.UtcNow,
-                
+                SentAt = DateTime.Now,
+                Timestamp = DateTime.Now,
                 IsRead = false
             };
 

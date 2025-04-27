@@ -22,7 +22,7 @@ namespace Skilly.Core.Entities
         public string ChatId { get; set; }
         public virtual Chat Chat { get; set; }
 
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime SentAt { get; set; } = DateTime.Now;
 
     }
 }
