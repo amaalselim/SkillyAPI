@@ -15,6 +15,7 @@ namespace Skilly.Core.Entities
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }= DateTime.UtcNow;
         public bool IsRead { get; set; } = false;
+        public DateTime? ReadAt { get; set; }
         public virtual User Sender { get; set; }
         public virtual User Receiver { get; set; }
 
