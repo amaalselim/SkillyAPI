@@ -100,6 +100,9 @@ namespace Skilly.API.Controllers
                     return Unauthorized("User not authenticated");
                 }
                 var messages = await _chatService.GetMessagesForChatAsync(chatId, userId);
+
+                await _hubContext.Clients.User(userId)
+            .SendAsync("MessagesForChatUpdated", messages);
                 return Ok(new { status = "success", data = messages });
             }
             catch (Exception ex)
