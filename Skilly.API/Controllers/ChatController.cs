@@ -27,29 +27,6 @@ namespace Skilly.API.Controllers
             return User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         }
 
-        //[HttpPost("CreateChat")]
-        //public async Task<IActionResult> CreateChat([FromBody] CreateChatDTO createChatDTO)
-        //{
-        //    try
-        //    {
-        //        var chat = await _chatService.CreateChatAsync(createChatDTO);
-        //        if (chat == null)
-        //        {
-        //            return Ok(new { status = "success", message = "Chat already exist."});
-        //        }
-
-        //        await _hubContext.Clients.Users(createChatDTO.FirstUserId, createChatDTO.SecondUserId)
-        //        .SendAsync("NewChatCreated", "A new chat has been created.");
-
-
-        //        return Ok(new { status = "success", message = "Chat created successfully.", data = chat });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { status = "error", message = ex.Message });
-        //    }
-        //}
-
         [HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromBody] MessageDTO messageDTO)
         {
