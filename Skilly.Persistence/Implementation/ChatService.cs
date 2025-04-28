@@ -8,6 +8,7 @@ using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Hubs;
+using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -187,8 +188,31 @@ namespace Skilly.Persistence.Implementation
             return messageDtos;
         }
 
+        public async Task<Chat> MarkChatMessagesAsReadAsync(string chatId, string userId)
+        {
+            var messages = await _context.Messages
+                .Where(m => m.ChatId == chatId && m.ReceiverId == userId && !m.IsRead)
+                .ToListAsync();
 
+            if (!messages.Any())
+            {
+                return null; 
+            }
 
+            foreach (var message in messages)
+            {
+                message.IsRead = true;
+                message.ReadAt = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var chat = await _context.chats
+                .Where(c => c.Id == chatId)
+                .FirstOrDefaultAsync();
+
+            return chat;
+        }
 
 
     }

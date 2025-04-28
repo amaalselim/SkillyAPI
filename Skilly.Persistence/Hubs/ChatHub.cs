@@ -73,5 +73,20 @@ namespace Skilly.Persistence.Hubs
             await Clients.Group(chatId)
                 .SendAsync("MessagesUpdated", "Messages have been updated.");
         }
+
+        public async Task MarkMessagesAsRead(string chatId, string senderId, string receiverId)
+        {
+            if (Users.TryGetValue(senderId, out var senderConnectionId))
+            {
+                await Clients.Client(senderConnectionId)
+                    .SendAsync("MessagesMarkedAsRead", chatId);
+            }
+
+            if (Users.TryGetValue(receiverId, out var receiverConnectionId))
+            {
+                await Clients.Client(receiverConnectionId)
+                    .SendAsync("MessagesMarkedAsRead", chatId);
+            }
+        }
     }
 }

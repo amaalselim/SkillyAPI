@@ -112,7 +112,7 @@ namespace Skilly.API.Controllers
                 return BadRequest(new { status = "error", message = ex.Message });
             }
         }
-        [HttpGet("GetMessagesForChatbyuserId/{chatId}")]
+        [HttpGet("GetMessagesForChatOfUser/{chatId}")]
         public async Task<IActionResult> GetMessagesForChat(string chatId)
         {
             try
@@ -130,6 +130,33 @@ namespace Skilly.API.Controllers
                 return BadRequest(new { status = "error", message = ex.Message });
             }
         }
+
+        [HttpPost("MarkChatMessagesAsRead/{chatId}")]
+        public async Task<IActionResult> MarkChatMessagesAsRead(string chatId)
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var chat=await _chatService.MarkChatMessagesAsReadAsync(chatId, userId);
+
+
+                await _hubContext.Clients.User(chat.FirstUserId).SendAsync("MessagesMarkedAsRead", chatId);
+                await _hubContext.Clients.User(chat.SecondUserId).SendAsync("MessagesMarkedAsRead", chatId);
+
+
+                return Ok(new { status = "success", message = "Messages marked as read." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { status = "error", message = ex.Message });
+            }
+        }
+
 
     }
 }
