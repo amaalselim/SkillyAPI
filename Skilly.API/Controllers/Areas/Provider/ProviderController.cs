@@ -73,7 +73,6 @@ namespace Skilly.API.Controllers.Areas.Provider
             return Ok(new { provider } );
         } 
         [HttpPost("addServiceProvider")]
-        [Authorize]
         public async Task<IActionResult> AddServiceProvider([FromForm] ServiceProviderDTO ServiceProviderDTO)
         {
             try
@@ -103,7 +102,6 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
         }
         [HttpPut("editServiceProvider")]
-        [Authorize]
         public async Task<IActionResult> EditServiceProvider([FromForm] ServiceProviderDTO ServiceProviderDTO)
         {
             try

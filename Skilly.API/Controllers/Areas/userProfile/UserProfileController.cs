@@ -50,7 +50,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             return Ok(new { user });
         }
         [HttpPost("addUserProfile")]
-        [Authorize]
         public async Task<IActionResult> AddUserProfile([FromForm] UserProfileDTO UserProfileDTO)
         {
             try
@@ -80,7 +79,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
         }
         [HttpPut("editUserProfile")]
-        [Authorize]
         public async Task<IActionResult> EditUserProfile([FromForm] UserProfileDTO UserProfileDTO)
         {
             try
