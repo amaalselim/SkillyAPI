@@ -51,15 +51,25 @@ namespace Skilly.API.Controllers
         [HttpPost("verify-email")]
         public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
         {
-            var isVerified = await _authService.VerifyEmailCodeAsync(verificationDTO);
+            var token = await _authService.VerifyEmailCodeAsync(verificationDTO);
 
-            if (isVerified)
+            if (token != null)
             {
-                return Ok(new { Success = true, Message = "Email confirmed successfully." });
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Email confirmed successfully.",
+                    Token = token
+                });
             }
 
-            return BadRequest(new { Success = false, Message = "Invalid verification code." });
+            return BadRequest(new
+            {
+                Success = false,
+                Message = "Invalid verification code."
+            });
         }
+
         [HttpPost("Login")]
 
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)

@@ -10,6 +10,7 @@ using Skilly.Infrastructure.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,7 +94,7 @@ namespace Skilly.Application.Implementation
 
             var user = _mapper.Map<User>(registerDTO);
             user.UserType = registerDTO.UserType;
-            //user.FcmToken = registerDTO.FcmToken;
+           // user.FcmToken = registerDTO.FcmToken;
             user.EmailConfirmed = false;
 
             var result = await _usermanager.CreateAsync(user, registerDTO.Password);
@@ -171,23 +172,25 @@ namespace Skilly.Application.Implementation
         {
             return await _usermanager.FindByEmailAsync(email);
         }
-        public async Task<bool> VerifyEmailCodeAsync(VerficationCodeDTO verficationCodeDTO)
+        public async Task<string> VerifyEmailCodeAsync(VerficationCodeDTO verficationCodeDTO)
         {
             var user = await _usermanager.FindByEmailAsync(verficationCodeDTO.email);
             if (user == null)
             {
-                return false;
+                return null;
             }
-          
+            var claims = await _claimsService.GetClaimsAsync(user.PhoneNumber, user.Id);
+
+            var token = _tokenService.CreateTokenAsync(claims,false);
             if (user.verificationCode.ToString() == verficationCodeDTO.code)
             {
                 user.EmailConfirmed = true;
                 user.verificationCode = null;
                 await _usermanager.UpdateAsync(user);
-                return true;  
+                return token.Result;  
             }
 
-            return false;
+            return null;
         }
 
 
