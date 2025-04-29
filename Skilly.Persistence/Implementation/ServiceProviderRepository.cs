@@ -96,7 +96,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(p => p.providerServices)
                 .ThenInclude(p => p.ServicesImages)
                 .Include(p => p.servicesgalleries)
-                .ThenInclude(p => p.Images)
+                .ThenInclude(p => p.galleryImages)
                 .Include(p => p.Reviews)
                 .FirstOrDefaultAsync(p => p.UserId ==id);
         }
