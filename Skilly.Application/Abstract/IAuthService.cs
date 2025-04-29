@@ -17,6 +17,6 @@ namespace Skilly.Application.Abstract
         Task SendResetPasswordEmailAsync(string email);
         Task<string> GeneratePasswordResetTokenAsync(ForgetPasswordDTO forgetPasswordDTO);
         Task<User> FindByEmailAsync(string email);
-        Task<bool> VerifyEmailCodeAsync(VerficationCodeDTO verficationCodeDTO);
+        Task<string> VerifyEmailCodeAsync(VerficationCodeDTO verficationCodeDTO);
     }
 }
