@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Skilly.Application.DTOs
@@ -18,7 +19,6 @@ namespace Skilly.Application.DTOs
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email  { get; set; }
         public string Password { get; set; }
-
         public UserType UserType { get; set; }
         public string? FcmToken { get; set; }
     }
