@@ -38,6 +38,7 @@ namespace Skilly.Persistence.Implementation
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
+            service.uId = user.UserId;
 
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
@@ -78,10 +79,10 @@ namespace Skilly.Persistence.Implementation
 
         public async Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId)
         {
-            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId== userId);
             var service = await _context.providerServices
             .Include(g => g.ServicesImages)
-            .FirstOrDefaultAsync(g => g.Id == serviceId && g.serviceProviderId == user.Id);
+            .FirstOrDefaultAsync(g => g.Id == serviceId && g.uId == user.Id);
 
             if (service == null)
             {

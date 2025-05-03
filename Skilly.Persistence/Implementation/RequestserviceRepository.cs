@@ -50,6 +50,7 @@ namespace Skilly.Persistence.Implementation
             service.userId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.userImg = user.Img;
+            service.uId = user.UserId;
 
             await _context.requestServices.AddAsync(service);
             await _context.SaveChangesAsync();
@@ -73,11 +74,13 @@ namespace Skilly.Persistence.Implementation
 
             await _context.SaveChangesAsync();
 
-            // إرسال نوتيفيكيشن للمزودين في نفس الكاتيجوري
             var providers = await _context.serviceProviders
                 .Where(u => u.categoryId == service.categoryId && u.User.FcmToken != null)
                 .Include(p => p.User)
                 .ToListAsync();
+
+            string title = "طلب خدمة جديد";
+            string body = $"تم نشر طلب جديد في قسم {service.Category?.Name?? "خدمات"}، يمكنك مشاهدته الآن.";
 
             foreach (var provider in providers)
             {
@@ -85,15 +88,24 @@ namespace Skilly.Persistence.Implementation
                 {
                     await _firebaseV1Service.SendNotificationAsync(
                         provider.User.FcmToken,
-                        "New Service Request",
-                        $"There's a new service in your category. Check it out!"
+                        title,
+                        body
                     );
+
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = provider.UserId,
+                        Title =title,
+                        Body = body,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError($"Failed to send notification to provider {provider.Id}: {ex.Message}");
                 }
             }
+            await _context.SaveChangesAsync();
         }
 
 
@@ -123,7 +135,7 @@ namespace Skilly.Persistence.Implementation
             var service = await _context.requestServices
                 .Include(c => c.UserProfile)
            .Include(g => g.requestServiceImages)
-           .FirstOrDefaultAsync(g => g.Id == requestId && g.userId == user.Id);
+           .FirstOrDefaultAsync(g => g.Id == requestId && g.uId == user.Id);
 
             if (service == null)
             {
