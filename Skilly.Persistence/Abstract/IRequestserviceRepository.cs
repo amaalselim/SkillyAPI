@@ -13,7 +13,7 @@ namespace Skilly.Persistence.Abstract
         Task<IEnumerable<RequestService>> GetAllRequests();
         
         Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId);
-        Task<RequestService> GetRequestById(string requestId, string userId);
+        Task<RequestService> GetRequestById(string requestId);
         Task AddRequestService(requestServiceDTO requestServiceDTO, string userId);
         Task EditRequestService(requestServiceDTO requestServiceDTO, string userId, string requestId);
         Task DeleteRequestServiceAsync(string requestId, string userId);

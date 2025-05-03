@@ -12,7 +12,7 @@ namespace Skilly.Persistence.Abstract
     {
         Task<IEnumerable<ProviderServices>> GetAllProviderService();
         Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId);
-        Task<ProviderServices> GetProviderServiceByIdAsync(string galleryId, string userId);
+        Task<ProviderServices> GetProviderServiceByIdAsync(string galleryId);
         Task AddProviderService(ProviderservicesDTO providerservicesDTO, string userId);
         Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId);
         Task DeleteProviderServiceAsync(string serviceId, string userId);
