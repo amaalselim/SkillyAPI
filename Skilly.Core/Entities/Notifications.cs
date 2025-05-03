@@ -13,6 +13,8 @@ namespace Skilly.Core.Entities
         public string Id { get; set; } = Guid.NewGuid().ToString();
         [ForeignKey("User")]
         public string UserId { get; set; }
+        [NotMapped]
+        public string userImg { get; set; }
         [JsonIgnore]
         public virtual User? User { get; set; }
         

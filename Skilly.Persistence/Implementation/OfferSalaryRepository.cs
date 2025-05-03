@@ -89,6 +89,7 @@ namespace Skilly.Persistence.Implementation
                         UserId = providerService.serviceProvider.UserId,
                         Title = title,
                         Body = body,
+                        userImg=providerService.serviceProvider.Img,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     }); 
                 }
@@ -117,6 +118,7 @@ namespace Skilly.Persistence.Implementation
                         UserId = requestService.UserProfile.UserId,
                         Title = title,
                         Body = body,
+                        userImg = requestService.UserProfile.Img,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
