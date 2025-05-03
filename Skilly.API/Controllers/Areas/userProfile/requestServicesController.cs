@@ -27,7 +27,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
             return userId;
         }
-        [HttpGet("getAllRequests")]
+        [HttpGet("GetAllRequests")]
         public async Task<IActionResult> GetAllServices()
         {
             try
@@ -57,7 +57,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
             return Ok(new { services });
         }
-        [HttpGet("GeyrequestsBy/{serviceId}")]
+        [HttpGet("GetRequestsBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
         {
             try
