@@ -17,11 +17,13 @@ namespace Skilly.Persistence.Implementation
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly FirebaseV1Service _firebase;
 
-        public OfferSalaryRepository(ApplicationDbContext context, IMapper mapper)
+        public OfferSalaryRepository(ApplicationDbContext context, IMapper mapper,FirebaseV1Service firebase)
         {
             _context = context;
             _mapper = mapper;
+            _firebase = firebase;
         }
 
         public async Task AddOfferAsync(createofferDTO offersalaryDTO,string userId)
@@ -32,19 +34,16 @@ namespace Skilly.Persistence.Implementation
 
                 if (await _context.providerServices.AnyAsync(s => s.Id == id))
                 {
-                    // موجود في جدول providerServices
                     offersalaryDTO.serviceId = id;
                     offersalaryDTO.requestserviceId = null;
                 }
                 else if (await _context.requestServices.AnyAsync(r => r.Id == id))
                 {
-                    // موجود في جدول requestServices
                     offersalaryDTO.requestserviceId = id;
                     offersalaryDTO.serviceId = null;
                 }
                 else
                 {
-                    // مش موجود في أي جدول
                     offersalaryDTO.serviceId = null;
                     offersalaryDTO.requestserviceId = null;
                 }
@@ -63,6 +62,69 @@ namespace Skilly.Persistence.Implementation
             
             await _context.offerSalaries.AddAsync(offer);
             await _context.SaveChangesAsync();
+
+
+
+            var user =await _context.users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (offer.serviceId != null)
+            {
+                var providerService = await _context.providerServices
+                    .Include(p => p.serviceProvider)
+                    .FirstOrDefaultAsync(p => p.Id == offer.serviceId && p.serviceProvider.User.FcmToken != null);
+
+                string title = "عرض سعر جديد";
+                string body = $"تم تقديم عرض سعر على خدمتك من المستخدم {user.FirstName+" "+user.LastName}";
+
+                var provviderr = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.serviceProvider.UserId);
+                if (providerService?.serviceProvider != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        provviderr.FcmToken,
+                        title,
+                        body
+                    );
+
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = providerService.serviceProvider.UserId,
+                        Title = title,
+                        Body = body,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    }); 
+                }
+                await _context.SaveChangesAsync();
+            }
+            else if (offer.requestserviceId != null)
+            {
+                var requestService = await _context.requestServices
+                    .Include(r => r.UserProfile)
+                    .FirstOrDefaultAsync(r => r.Id == offer.requestserviceId && r.UserProfile.User.FcmToken != null);
+
+                string title = "عرض سعر جديد";
+                string body = $"تم تقديم عرض سعر على طلبك من موفر الخدمة {user.FirstName+" "+user.LastName}";
+
+                var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
+                if (requestService?.UserProfile != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        userr.FcmToken,
+                        title,
+                        body
+                    );
+
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = requestService.UserProfile.UserId,
+                        Title = title,
+                        Body = body,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            await _context.SaveChangesAsync();
+
         }
 
 
