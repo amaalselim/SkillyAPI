@@ -27,6 +27,8 @@ namespace Skilly.Core.Entities
         public string ServiceProviderName { get; set; }
         public string providerImg { get; set; }
         [JsonIgnore]
+        public string uId { get; set; }
+        [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
         [NotMapped]
         public List<string> Images { get; set; }

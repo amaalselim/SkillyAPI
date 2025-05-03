@@ -23,6 +23,8 @@ namespace Skilly.Core.Entities
         public string? Notes { get; set; }
         [ForeignKey("UserProfile")]
         public string userId { get; set; }
+        [JsonIgnore]
+        public string uId { get; set; }
         [NotMapped]
         public string userName { get; set; }
         public string userImg { get; set; }

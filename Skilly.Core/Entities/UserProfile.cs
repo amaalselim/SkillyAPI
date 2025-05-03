@@ -26,7 +26,7 @@ namespace Skilly.Core.Entities
         [ForeignKey("User")]
         public string UserId { get; set; }
         [JsonIgnore]
-        public User User { get; set; }
+        public virtual User? User { get; set; }
 
     }
 }
