@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Skilly.Persistence.DataContext;
 
@@ -11,9 +12,11 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503123918_edittime")]
+    partial class edittime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,16 +333,11 @@ namespace Skilly.Persistence.Migrations
                     b.Property<string>("serviceId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("userId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("requestserviceId");
 
                     b.HasIndex("serviceId");
-
-                    b.HasIndex("userId");
 
                     b.ToTable("offerSalaries");
                 });
@@ -908,15 +906,9 @@ namespace Skilly.Persistence.Migrations
                         .WithMany("offerSalaries")
                         .HasForeignKey("serviceId");
 
-                    b.HasOne("Skilly.Core.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("userId");
-
                     b.Navigation("ProviderServices");
 
                     b.Navigation("RequestService");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
