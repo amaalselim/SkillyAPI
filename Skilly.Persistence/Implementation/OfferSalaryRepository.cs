@@ -24,22 +24,47 @@ namespace Skilly.Persistence.Implementation
             _mapper = mapper;
         }
 
-        public async Task AddOfferAsync(offersalaryDTO offersalaryDTO)
+        public async Task AddOfferAsync(createofferDTO offersalaryDTO,string userId)
         {
-            if (!await _context.providerServices.AnyAsync(s => s.Id == offersalaryDTO.serviceId))
+            if (!string.IsNullOrEmpty(offersalaryDTO.serviceId))
             {
-                offersalaryDTO.serviceId = null;
+                var id = offersalaryDTO.serviceId;
+
+                if (await _context.providerServices.AnyAsync(s => s.Id == id))
+                {
+                    // موجود في جدول providerServices
+                    offersalaryDTO.serviceId = id;
+                    offersalaryDTO.requestserviceId = null;
+                }
+                else if (await _context.requestServices.AnyAsync(r => r.Id == id))
+                {
+                    // موجود في جدول requestServices
+                    offersalaryDTO.requestserviceId = id;
+                    offersalaryDTO.serviceId = null;
+                }
+                else
+                {
+                    // مش موجود في أي جدول
+                    offersalaryDTO.serviceId = null;
+                    offersalaryDTO.requestserviceId = null;
+                }
             }
 
-            if (!await _context.requestServices.AnyAsync(r => r.Id == offersalaryDTO.requestserviceId))
+            var offer = new OfferSalary
             {
-                offersalaryDTO.requestserviceId = null;
-            }
+                userId=userId,
+                Salary = offersalaryDTO.Salary,
+                Deliverytime = offersalaryDTO.Deliverytime,
+                Notes = offersalaryDTO.Notes,
+                serviceId = offersalaryDTO.serviceId,
+                requestserviceId = offersalaryDTO.requestserviceId
+            };
 
-            var offer = _mapper.Map<OfferSalary>(offersalaryDTO);
+            
             await _context.offerSalaries.AddAsync(offer);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task DeleteOfferAsync(string id)
         {
@@ -54,12 +79,20 @@ namespace Skilly.Persistence.Implementation
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
-                    Salary = o.Salary,
+                    userId = o.userId,
+                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userImg = o.serviceId != null
+                        ? o.ProviderServices.providerImg
+                        : o.RequestService.userImg != null
+                            ? o.RequestService.userImg
+                            : null
+
+                    ,Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id: null,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
+                    requestserviceId = o.RequestService != null ? o.RequestService.Id: null,
                     RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
                 })
                 .ToListAsync();
@@ -71,12 +104,19 @@ namespace Skilly.Persistence.Implementation
                 .Select(o => new offersalaryDTO
                 {
                     ID= o.Id,
+                    userId = o.userId,
+                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userImg = o.serviceId != null
+                        ? o.ProviderServices.providerImg
+                        : o.RequestService.userImg != null
+                            ? o.RequestService.userImg
+                            : null,
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
+                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
                     RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
                 })
                 .Where(x => x.serviceId == serviceId || x.requestserviceId == serviceId)
@@ -89,12 +129,19 @@ namespace Skilly.Persistence.Implementation
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
+                    userId = o.userId,
+                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userImg = o.serviceId != null
+                        ? o.ProviderServices.providerImg
+                        : o.RequestService.userImg != null
+                            ? o.RequestService.userImg
+                            : null,
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
+                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
                     RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
                 })
                 .FirstOrDefaultAsync(x => x.ID == id);
@@ -105,12 +152,19 @@ namespace Skilly.Persistence.Implementation
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
+                    userId = o.userId,
+                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userImg = o.serviceId != null
+                        ? o.ProviderServices.providerImg
+                        : o.RequestService.userImg != null
+                            ? o.RequestService.userImg
+                            : null,
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
+                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
                     RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
                 })
                 .FirstOrDefaultAsync(x => x.serviceId == serviceId || x.requestserviceId==serviceId);

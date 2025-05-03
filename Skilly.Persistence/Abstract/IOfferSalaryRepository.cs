@@ -15,7 +15,7 @@ namespace Skilly.Persistence.Abstract
         Task<List<offersalaryDTO>> GetAllOffersByServiceId(string serviceId);
         Task<offersalaryDTO> GetOfferByIdAsync(string id);
         Task<offersalaryDTO> GetOfferByserviceIdAsync(string serviceId);
-        Task AddOfferAsync(offersalaryDTO offersalaryDTO);
+        Task AddOfferAsync(createofferDTO offersalaryDTO,string userId);
         Task UpdateOfferAsync(offersalaryDTO offersalaryDTO, string id);
         Task DeleteOfferAsync(string id);
         Task<int> GetOffersCountByServiceIdAsync(string serviceId);
