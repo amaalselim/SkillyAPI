@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs;
 using Skilly.Persistence.Abstract;
+using System.Security.Claims;
 
 namespace Skilly.API.Controllers
 {
@@ -17,6 +18,18 @@ namespace Skilly.API.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+
+        private string GetUserIdFromClaims()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
+            return userId;
+        }
+        
         [HttpGet("getAllOffers")]
         public async Task<IActionResult> GetAlloffers()
         {
@@ -110,7 +123,7 @@ namespace Skilly.API.Controllers
 
 
         [HttpPost("AddOffer")]
-        public async Task<IActionResult> AddOffer([FromBody] offersalaryDTO offersalaryDTO )
+        public async Task<IActionResult> AddOffer([FromBody]createofferDTO offersalaryDTO )
         {
             if (offersalaryDTO == null)
             {
@@ -119,7 +132,12 @@ namespace Skilly.API.Controllers
 
             try
             {
-                await _unitOfWork._OfferSalaryRepository.AddOfferAsync(offersalaryDTO);
+                var userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authorized.");
+                }
+                await _unitOfWork._OfferSalaryRepository.AddOfferAsync(offersalaryDTO,userId);
 
                 return Ok(new { message = "Offers added successfully.", data = offersalaryDTO });
             }
