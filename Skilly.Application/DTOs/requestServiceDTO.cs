@@ -12,7 +12,7 @@ namespace Skilly.Application.DTOs
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Deliverytime { get; set; }
-        public DateTime startDate { get; set; }
+        public DateOnly startDate { get; set; }
         public string categoryId { get; set; }
         public string? Notes { get; set; }
         //public DateTime? ServiceRequestTime { get; set; } = DateTime.UtcNow;
