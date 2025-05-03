@@ -23,5 +23,9 @@ namespace Skilly.Core.Entities
         public string? requestserviceId { get; set; }
         [JsonIgnore]
         public virtual RequestService? RequestService { get; set; }
+        [ForeignKey(nameof(User))]
+        public string? userId { get; set; }
+        [JsonIgnore]
+        public virtual User? User { get; set; }
     }
 }
