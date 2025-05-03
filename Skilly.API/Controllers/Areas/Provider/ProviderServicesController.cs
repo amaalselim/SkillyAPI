@@ -74,8 +74,8 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             try
             {
-                string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId, userId);
+                //string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId);
 
                 return Ok(new { service });
             }

@@ -51,6 +51,11 @@ namespace Skilly.Persistence.Implementation
                 var path = @"Images/ServiceProvider/";
                 ServiceProvider.Img = await _imageService.SaveFileAsync(ServiceProviderDTO.Img, path);
             }
+            if (ServiceProviderDTO.NationalNumberPDF!= null)
+            {
+                var path = @"Images/ServiceProvider/File/";
+                ServiceProvider.NationalNumberPDF = await _imageService.SaveFileAsync(ServiceProviderDTO.NationalNumberPDF, path);
+            }
             await _context.serviceProviders.AddAsync(ServiceProvider);
             await _context.SaveChangesAsync();
         }

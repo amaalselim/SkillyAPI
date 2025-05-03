@@ -62,8 +62,8 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             try
             {
-                string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId, userId);
+                //string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
 
                 return Ok(new { service });
             }

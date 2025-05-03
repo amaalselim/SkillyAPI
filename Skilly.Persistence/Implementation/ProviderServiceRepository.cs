@@ -36,7 +36,7 @@ namespace Skilly.Persistence.Implementation
             var path = @"Images/ServiceProvider/MyServices/";
             var service = _mapper.Map<ProviderServices>(providerservicesDTO);
             service.serviceProviderId = user.Id;
-            service.ServiceRequestTime = DateTime.UtcNow;
+            service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
 
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
@@ -148,14 +148,14 @@ namespace Skilly.Persistence.Implementation
         }
 
 
-        public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId, string userId)
+        public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId)
         {
-            var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            //var provider = await _context.serviceProviders.ToListAsync();
             var service = await _context.providerServices
                 .Include(c => c.serviceProvider)
                 .Include(g => g.ServicesImages)
                 .Include(g => g.offerSalaries)
-                .FirstOrDefaultAsync(g => g.Id == serviceId && g.serviceProviderId == provider.Id);
+                .FirstOrDefaultAsync(g => g.Id == serviceId);
 
             if (service == null)
             {

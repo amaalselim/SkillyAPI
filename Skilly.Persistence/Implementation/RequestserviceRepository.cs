@@ -45,11 +45,10 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new UserProfileNotFoundException("User not found.");
             }
-
-            var path = @"Images/UserProfile/RequestServices/";
+                        var path = @"Images/UserProfile/RequestServices/";
             var service = _mapper.Map<RequestService>(requestServiceDTO);
             service.userId = user.Id;
-            service.ServiceRequestTime = DateTime.UtcNow;
+            service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.userImg = user.Img;
 
             await _context.requestServices.AddAsync(service);
@@ -230,19 +229,19 @@ namespace Skilly.Persistence.Implementation
         }
 
 
-        public async Task<RequestService> GetRequestById(string requestId, string userId)
+        public async Task<RequestService> GetRequestById(string requestId)
         {
-            var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (user == null)
-            {
-                throw new Exception("User not found.");
-            }
+            //var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
+            //if (user == null)
+            //{
+            //    throw new Exception("User not found.");
+            //}
 
             var service = await _context.requestServices
                 .Include(g => g.requestServiceImages)
                 .Include(g => g.UserProfile)
                 .Include(g => g.offerSalaries)
-                .FirstOrDefaultAsync(g => g.Id == requestId && g.userId == user.Id);
+                .FirstOrDefaultAsync(g => g.Id == requestId);
 
             if (service == null)
             {
