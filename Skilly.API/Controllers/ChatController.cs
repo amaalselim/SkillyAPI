@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.chat;
 using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
@@ -15,7 +16,7 @@ namespace Skilly.API.Controllers
         private readonly IChatService _chatService;
         private readonly IHubContext<ChatHub> _hubContext;
 
-        public ChatController(IChatService chatService,IHubContext<ChatHub> hubContext)
+        public ChatController(IChatService chatService, IHubContext<ChatHub> hubContext)
         {
             _chatService = chatService;
             _hubContext = hubContext;
@@ -65,7 +66,7 @@ namespace Skilly.API.Controllers
         {
             try
             {
-                var userId= GetUserId();
+                var userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized("User not authenticated");
@@ -98,7 +99,8 @@ namespace Skilly.API.Controllers
                 var messages = await _chatService.GetMessagesForChatAsync(chatId, userId);
 
                 await _hubContext.Clients.User(userId)
-            .SendAsync("MessagesForChatUpdated", messages);
+                    .SendAsync("MessagesForChatUpdated", messages);
+
                 return Ok(new { status = "success", data = messages });
             }
             catch (Exception ex)
@@ -107,9 +109,14 @@ namespace Skilly.API.Controllers
             }
         }
 
-        [HttpPost("MarkChatMessagesAsRead/{chatId}")]
-        public async Task<IActionResult> MarkChatMessagesAsRead(string chatId)
+        [HttpPost("MarkMessageAsRead")]
+        public async Task<IActionResult> MarkMessageAsRead([FromBody] MarksasReadDTO marksasReadDTO)
         {
+            if (string.IsNullOrEmpty(marksasReadDTO.MessageId))
+            {
+                return BadRequest(new { status = "error", message = "Message ID is required." });
+            }
+
             try
             {
                 var userId = GetUserId();
@@ -118,21 +125,23 @@ namespace Skilly.API.Controllers
                     return Unauthorized("User not authenticated");
                 }
 
-                var chat=await _chatService.MarkChatMessagesAsReadAsync(chatId, userId);
+                var message = await _chatService.MarkChatMessagesAsReadAsync(marksasReadDTO.MessageId, userId);
 
+                if (message != null)
+                {
+                    await _hubContext.Clients.User(userId)
+                        .SendAsync("MessageRead",marksasReadDTO.MessageId);
 
-                await _hubContext.Clients.User(chat.FirstUserId).SendAsync("MessagesMarkedAsRead", chatId);
-                await _hubContext.Clients.User(chat.SecondUserId).SendAsync("MessagesMarkedAsRead", chatId);
+                    return Ok(new { status = "success", message = "Message marked as read." });
+                }
 
-
-                return Ok(new { status = "success", message = "Messages marked as read." });
+                return BadRequest(new { status = "error", message = "Failed to mark message as read." });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { status = "error", message = ex.Message });
             }
         }
-        
-
     }
+
 }
