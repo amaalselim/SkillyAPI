@@ -2,27 +2,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
-using Skilly.Persistence.Implementation;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers.Areas.userProfile
 {
     [Route("api/UserProfile/[controller]")]
     [ApiController]
-    public class userProfileController : ControllerBase
+    public class UserProfileController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public userProfileController(IUnitOfWork unitOfWork)
+        public UserProfileController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -32,25 +30,46 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
             return userId;
         }
+
         [HttpGet("GetAllUsersProfile")]
         public async Task<ActionResult<IEnumerable<UserProfile>>> GetAllUserProfile()
-        { 
-            var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
-            return Ok(new { users });
+        {
+            try
+            {
+                var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
+                if (users == null || !users.Any())
+                {
+                    return NotFound(new { message = "No user profiles found." }); // 404 Not Found
+                }
+                return Ok(new { users }); 
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" }); // 500 Internal Server Error
+            }
         }
+
         [HttpGet("GetUserProfileByuserId")]
         public async Task<ActionResult<UserProfile>> GetUserById()
         {
-            var userId= GetUserIdFromClaims();
-            var user = await _unitOfWork.ProfileRepository.GetByIdAsync(userId);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var userId = GetUserIdFromClaims();
+                var user = await _unitOfWork.ProfileRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User profile not found." }); // 404 Not Found
+                }
+                return Ok(new { user }); 
             }
-            return Ok(new { user });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" }); // 500 Internal Server Error
+            }
         }
+
         [HttpPost("addUserProfile")]
-        public async Task<IActionResult> AddUserProfile([FromForm] UserProfileDTO UserProfileDTO)
+        public async Task<IActionResult> AddUserProfile([FromForm] UserProfileDTO userProfileDTO)
         {
             try
             {
@@ -58,57 +77,58 @@ namespace Skilly.API.Controllers.Areas.userProfile
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized(new { message = "User not authenticated." });
+                    return Unauthorized(new { message = "User not authenticated." }); // 401 Unauthorized
                 }
 
-                await _unitOfWork.ProfileRepository.AddUserProfileAsync(UserProfileDTO, userId);
+                await _unitOfWork.ProfileRepository.AddUserProfileAsync(userProfileDTO, userId);
 
-                return Ok(new
+                return CreatedAtAction(nameof(GetUserById), new { userId = userId }, new
                 {
                     message = "User profile added successfully.",
-                    data = UserProfileDTO
-                });
+                    data = userProfileDTO
+                }); 
             }
             catch (UserNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ex.Message }); 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message }); // 500 Internal Server Error
             }
         }
+
         [HttpPut("editUserProfile")]
-        public async Task<IActionResult> EditUserProfile([FromForm] UserProfileDTO UserProfileDTO)
+        public async Task<IActionResult> EditUserProfile([FromForm] UserProfileDTO userProfileDTO)
         {
             try
             {
-                var userId =GetUserIdFromClaims();
+                var userId = GetUserIdFromClaims();
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized(new { message = "User not authenticated." });
+                    return Unauthorized(new { message = "User not authenticated." }); // 401 Unauthorized
                 }
 
-                await _unitOfWork.ProfileRepository.EditUserProfileAsync(UserProfileDTO, userId);
+                await _unitOfWork.ProfileRepository.EditUserProfileAsync(userProfileDTO, userId);
 
                 return Ok(new
                 {
                     message = "User profile updated successfully.",
-                    data = UserProfileDTO
-                });
+                    data = userProfileDTO
+                }); 
             }
             catch (UserNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ex.Message }); 
             }
             catch (UserProfileNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ex.Message }); 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message }); // 500 Internal Server Error
             }
         }
 
@@ -117,22 +137,22 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             try
             {
-                var userId=GetUserIdFromClaims();
+                var userId = GetUserIdFromClaims();
                 await _unitOfWork.ProfileRepository.DeleteUserProfileAsync(userId);
 
-                return Ok(new { message = "User profile deleted successfully." });
+                return Ok(new { message = "User profile deleted successfully." }); // 200 OK
             }
             catch (UserNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ex.Message }); 
             }
             catch (UserProfileNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = ex.Message }); 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message }); // 500 Internal Server Error
             }
         }
     }

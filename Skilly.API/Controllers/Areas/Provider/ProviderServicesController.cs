@@ -18,6 +18,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -27,70 +28,69 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return userId;
         }
+
         [HttpGet("getAllServices")]
         public async Task<IActionResult> GetAllServices()
         {
             try
             {
-                //string userId = GetUserIdFromClaims();
                 var Services = await _unitOfWork.providerServiceRepository.GetAllProviderService();
                 if (Services == null)
                 {
-                    return NotFound(new { message = "No Services found." });
+                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
                 }
 
-                return Ok(new { Services });
+                return StatusCode(StatusCodes.Status200OK, new { Services });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
         [HttpGet("GetAllServicesByproviderId")]
-        public async Task<ActionResult<ProviderServices>> GetservicesbyuserId()
+        public async Task<IActionResult> GetservicesbyuserId()
         {
             string userId = GetUserIdFromClaims();
             var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
             if (service == null)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
             }
-            return Ok(new { service });
+            return StatusCode(StatusCodes.Status200OK, new { service });
         }
+
         [HttpGet("GetAllServicesBy/{categoryId}")]
-        public async Task<ActionResult<ProviderServices>> GetservicesbycategoryId(string categoryId)
+        public async Task<IActionResult> GetservicesbycategoryId(string categoryId)
         {
             var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
             if (service == null)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this category." });
             }
-            return Ok(new { service });
+            return StatusCode(StatusCodes.Status200OK, new { service });
         }
-
 
         [HttpGet("GetServiceBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
         {
             try
             {
-                //string userId = GetUserIdFromClaims();
                 var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId);
-
-                return Ok(new { service });
+                return StatusCode(StatusCodes.Status200OK, new { service });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
-        
+
         [HttpPost("AddService")]
         public async Task<IActionResult> AddService([FromForm] ProviderservicesDTO providerservicesDTO)
         {
             if (providerservicesDTO == null)
             {
-                return BadRequest(new { message = "Invalid service data." });
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
             }
 
             try
@@ -98,19 +98,20 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.AddProviderService(providerservicesDTO, userId);
 
-                return Ok(new { message = "Service added successfully.", data = providerservicesDTO });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service added successfully.", data = providerservicesDTO });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
+
         [HttpPut("EditServiceBy/{serviceId}")]
         public async Task<IActionResult> EditService([FromForm] ProviderservicesDTO providerservicesDTO, [FromRoute] string serviceId)
         {
             if (providerservicesDTO == null)
             {
-                return BadRequest(new { message = "Invalid service data." });
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
             }
 
             try
@@ -118,13 +119,14 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.EditProviderService(providerservicesDTO, userId, serviceId);
 
-                return Ok(new { message = "Service updated successfully.", data = providerservicesDTO });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service updated successfully.", data = providerservicesDTO });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
+
         [HttpDelete("DeleteServiceBy/{serviceId}")]
         public async Task<IActionResult> DeleteService([FromRoute] string serviceId)
         {
@@ -133,11 +135,11 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.DeleteProviderServiceAsync(serviceId, userId);
 
-                return Ok(new { message = "Service  deleted successfully." });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service deleted successfully." });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
     }

@@ -18,6 +18,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -27,52 +28,63 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
             return userId;
         }
+
         [HttpGet("GetAllRequests")]
         public async Task<IActionResult> GetAllServices()
         {
             try
             {
-                //string userId = GetUserIdFromClaims();
-                var Services = await _unitOfWork._requestserviceRepository.GetAllRequests();
-                if (Services == null)
+                var services = await _unitOfWork._requestserviceRepository.GetAllRequests();
+                if (services == null || !services.Any())
                 {
-                    return NotFound(new { message = "No Services found." });
+                    return NotFound(new { message = "No services found." });
                 }
 
-                return Ok(new { Services });
+                return Ok(new { services });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
         [HttpGet("GetAllRequestsByuserId")]
-        public async Task<ActionResult<ProviderServices>> GetservicesbyuserId()
+        public async Task<IActionResult> GetServicesByUserId()
         {
-            string userId = GetUserIdFromClaims();
-            var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByUserId(userId);
-            if (services == null)
+            try
             {
-                return NotFound();
+                string userId = GetUserIdFromClaims();
+                var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByUserId(userId);
+                if (services == null || !services.Any())
+                {
+                    return NotFound(new { message = "No services found for this user." });
+                }
+                return Ok(new { services });
             }
-            return Ok(new { services });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
         }
+
         [HttpGet("GetRequestsBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
         {
             try
             {
-                //string userId = GetUserIdFromClaims();
                 var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
-
+                if (service == null)
+                {
+                    return NotFound(new { message = "Service not found." });
+                }
                 return Ok(new { service });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-        
+
         [HttpPost("AddrequestService")]
         public async Task<IActionResult> AddService([FromForm] requestServiceDTO requestServiceDTO)
         {
@@ -86,17 +98,18 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork._requestserviceRepository.AddRequestService(requestServiceDTO, userId);
 
-                return Ok(new { message = "Service added successfully.", data = requestServiceDTO});
+                return StatusCode(201, new { message = "Service added successfully.", data = requestServiceDTO });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-        [HttpPut("EditsequestServiceBy/{serviceId}")]
+
+        [HttpPut("EditrequestServiceBy/{serviceId}")]
         public async Task<IActionResult> EditService([FromForm] requestServiceDTO requestServiceDTO, [FromRoute] string serviceId)
         {
-            if (requestServiceDTO== null)
+            if (requestServiceDTO == null)
             {
                 return BadRequest(new { message = "Invalid service data." });
             }
@@ -104,30 +117,42 @@ namespace Skilly.API.Controllers.Areas.userProfile
             try
             {
                 string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
+                if (service == null)
+                {
+                    return NotFound(new { message = "Service not found." });
+                }
+
                 await _unitOfWork._requestserviceRepository.EditRequestService(requestServiceDTO, userId, serviceId);
 
-                return Ok(new { message = " service updated successfully.", data = requestServiceDTO });
+                return Ok(new { message = "Service updated successfully.", data = requestServiceDTO });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
         [HttpDelete("DeleterequestServiceBy/{serviceId}")]
         public async Task<IActionResult> DeleteService([FromRoute] string serviceId)
         {
             try
             {
                 string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
+                if (service == null)
+                {
+                    return NotFound(new { message = "Service not found." });
+                }
+
                 await _unitOfWork._requestserviceRepository.DeleteRequestServiceAsync(serviceId, userId);
 
                 return Ok(new { message = "Service deleted successfully." });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-
     }
 }

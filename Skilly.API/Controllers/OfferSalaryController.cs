@@ -19,7 +19,6 @@ namespace Skilly.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -29,51 +28,44 @@ namespace Skilly.API.Controllers
             }
             return userId;
         }
-        
+
         [HttpGet("getAllOffers")]
-        public async Task<IActionResult> GetAlloffers()
+        public async Task<IActionResult> GetAllOffers()
         {
             try
             {
-                var offer= await _unitOfWork._OfferSalaryRepository.GetAllOffersAsync();
+                var offers = await _unitOfWork._OfferSalaryRepository.GetAllOffersAsync();
 
-                if (offer == null || !offer.Any())
+                if (offers == null || !offers.Any())
                 {
-                    return NotFound(new { message = "No Offerrs found." });
+                    return NotFound(new { message = "No offers found." });
                 }
-                return Ok(new { offer });
+
+                return Ok(new { offers });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
         [HttpGet("getAllOffersBy/{serviceId}")]
-        public async Task<IActionResult> GetAlloffersByserviceId(string serviceId)
+        public async Task<IActionResult> GetAllOffersByServiceId(string serviceId)
         {
             try
             {
-                var offer = await _unitOfWork._OfferSalaryRepository.GetAllOffersByServiceId(serviceId);
+                var offers = await _unitOfWork._OfferSalaryRepository.GetAllOffersByServiceId(serviceId);
 
-                if (offer == null || !offer.Any())
+                if (offers == null || !offers.Any())
                 {
-                    return NotFound(new { message = "No Offerrs found." });
+                    return NotFound(new { message = "No offers found for the specified service." });
                 }
-                return Ok(new { offer });
+
+                return Ok(new { offers });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    message = "Internal server error",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
 
@@ -84,50 +76,60 @@ namespace Skilly.API.Controllers
             {
                 var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByIdAsync(Id);
 
+                if (offer == null)
+                {
+                    return NotFound(new { message = "Offer not found." });
+                }
+
                 return Ok(new { offer });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
 
         [HttpGet("GetOfferBy/{serviceId}")]
-        public async Task<IActionResult> GetOfferByserviceId([FromRoute] string serviceId)
+        public async Task<IActionResult> GetOfferByServiceId([FromRoute] string serviceId)
         {
             try
             {
-                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByserviceIdAsync(serviceId);   
+                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByIdAsync(serviceId);
+
+                if (offer == null)
+                {
+                    return NotFound(new { message = "Offer not found for the specified service." });
+                }
 
                 return Ok(new { offer });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
         [HttpGet("GetOffersCountBy/{serviceId}")]
         public async Task<IActionResult> GetOffersCountByServiceId([FromRoute] string serviceId)
         {
             try
             {
-                var offers = await _unitOfWork._OfferSalaryRepository.GetOffersCountByServiceIdAsync(serviceId);
+                var offersCount = await _unitOfWork._OfferSalaryRepository.GetOffersCountByServiceIdAsync(serviceId);
 
-                return Ok(new { offers });
+                return Ok(new { offersCount });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
 
-
         [HttpPost("AddOffer")]
-        public async Task<IActionResult> AddOffer([FromBody]createofferDTO offersalaryDTO )
+        public async Task<IActionResult> AddOffer([FromBody] createofferDTO offerSalaryDTO)
         {
-            if (offersalaryDTO == null)
+            if (offerSalaryDTO == null)
             {
-                return BadRequest(new { message = "Invalid Offer data." });
+                return BadRequest(new { message = "Invalid offer data." });
             }
 
             try
@@ -135,48 +137,63 @@ namespace Skilly.API.Controllers
                 var userId = GetUserIdFromClaims();
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authorized.");
+                    return Unauthorized(new { message = "User not authorized." });
                 }
-                await _unitOfWork._OfferSalaryRepository.AddOfferAsync(offersalaryDTO,userId);
 
-                return Ok(new { message = "Offers added successfully.", data = offersalaryDTO });
+                await _unitOfWork._OfferSalaryRepository.AddOfferAsync(offerSalaryDTO, userId);
+
+                return Ok(new { message = "Offer added successfully.", data = offerSalaryDTO });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
-        [HttpPut("EditOffersBy/{offerId}")]
-        public async Task<IActionResult> EditOffer([FromBody] offersalaryDTO offersalaryDTO, [FromRoute] string offerId)
+
+        [HttpPut("EditOfferBy/{offerId}")]
+        public async Task<IActionResult> EditOffer([FromBody] offersalaryDTO offerSalaryDTO, [FromRoute] string offerId)
         {
-            if (offersalaryDTO == null)
+            if (offerSalaryDTO == null)
             {
-                return BadRequest(new { message = "Invalid Offer data." });
+                return BadRequest(new { message = "Invalid offer data." });
             }
 
             try
             {
-                await _unitOfWork._OfferSalaryRepository.UpdateOfferAsync(offersalaryDTO,offerId);
+                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByIdAsync(offerId);
+                if (offer == null)
+                {
+                    return NotFound(new { message = "Offer not found." });
+                }
 
-                return Ok(new { message = "Category updated successfully.", data = offersalaryDTO });
+                await _unitOfWork._OfferSalaryRepository.UpdateOfferAsync(offerSalaryDTO, offerId);
+
+                return Ok(new { message = "Offer updated successfully.", data = offerSalaryDTO });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
         [HttpDelete("DeleteOfferBy/{offerId}")]
         public async Task<IActionResult> DeleteOffer([FromRoute] string offerId)
         {
             try
             {
+                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByIdAsync(offerId);
+                if (offer == null)
+                {
+                    return NotFound(new { message = "Offer not found." });
+                }
+
                 await _unitOfWork._OfferSalaryRepository.DeleteOfferAsync(offerId);
 
                 return Ok(new { message = "Offer deleted successfully." });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
     }

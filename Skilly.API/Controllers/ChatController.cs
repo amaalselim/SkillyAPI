@@ -35,31 +35,28 @@ namespace Skilly.API.Controllers
                 var senderId = GetUserId();
                 if (string.IsNullOrEmpty(senderId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized(new { status = "error", message = "User not authenticated" });
                 }
 
                 var message = await _chatService.SendMessageAsync(messageDTO);
                 if (message != null)
                 {
-                    // استخدم User وليس Client
                     await _hubContext.Clients.User(messageDTO.receiverId)
                         .SendAsync("ReceiveMessage", senderId, messageDTO.content);
 
                     await _hubContext.Clients.User(senderId)
                         .SendAsync("ReceiveMessage", senderId, messageDTO.content);
 
-                    return Ok(new { status = "success", message = "Message sent successfully.", data = message });
+                    return StatusCode(201, new { status = "success", message = "Message sent successfully.", data = message });
                 }
 
                 return BadRequest(new { status = "error", message = "Failed to send message." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { status = "error", message = ex.Message });
+                return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
-
-
 
         [HttpGet("GetChatsForUser")]
         public async Task<IActionResult> GetChatsForUser()
@@ -69,23 +66,24 @@ namespace Skilly.API.Controllers
                 var userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized(new { status = "error", message = "User not authenticated" });
                 }
                 var chats = await _chatService.GetChatsForUserAsync(userId);
                 if (chats == null || !chats.Any())
                 {
-                    return BadRequest(new { status = "error", message = "No chats found for this user." });
+                    return NotFound(new { status = "error", message = "No chats found for this user." });
                 }
                 await _hubContext.Clients.User(userId)
-                .SendAsync("ChatsUpdated", chats);
+                    .SendAsync("ChatsUpdated", chats);
 
                 return Ok(new { status = "success", data = chats });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { status = "error", message = ex.Message });
+                return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
+
         [HttpGet("GetMessagesForChatOfUser/{chatId}")]
         public async Task<IActionResult> GetMessagesForChat(string chatId)
         {
@@ -94,7 +92,7 @@ namespace Skilly.API.Controllers
                 var userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized(new { status = "error", message = "User not authenticated" });
                 }
                 var messages = await _chatService.GetMessagesForChatAsync(chatId, userId);
 
@@ -105,7 +103,7 @@ namespace Skilly.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { status = "error", message = ex.Message });
+                return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
 
@@ -122,7 +120,7 @@ namespace Skilly.API.Controllers
                 var userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized(new { status = "error", message = "User not authenticated" });
                 }
 
                 var message = await _chatService.MarkChatMessagesAsReadAsync(marksasReadDTO.MessageId, userId);
@@ -130,7 +128,7 @@ namespace Skilly.API.Controllers
                 if (message != null)
                 {
                     await _hubContext.Clients.User(userId)
-                        .SendAsync("MessageRead",marksasReadDTO.MessageId);
+                        .SendAsync("MessageRead", marksasReadDTO.MessageId);
 
                     return Ok(new { status = "success", message = "Message marked as read." });
                 }
@@ -139,9 +137,8 @@ namespace Skilly.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { status = "error", message = ex.Message });
+                return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
     }
-
 }

@@ -16,6 +16,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -31,7 +32,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             if (reviewDTO == null)
             {
-                return BadRequest(new { message = "Invalid review data." });
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid review data." });
             }
 
             try
@@ -39,11 +40,11 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.reviewRepository.AddReviewAsync(userId, reviewDTO);
 
-                return Ok(new { message = "Review added successfully.", data = reviewDTO });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Review added successfully.", data = new { reviewDTO } });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
 
@@ -52,17 +53,17 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             if (string.IsNullOrEmpty(providerId))
             {
-                return BadRequest(new { message = "Provider ID is required." });
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Provider ID is required." });
             }
 
             try
             {
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByProviderIdAsync(providerId);
-                return Ok(new { reviews });
+                return StatusCode(StatusCodes.Status200OK, new { reviews });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
     }

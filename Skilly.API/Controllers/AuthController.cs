@@ -19,25 +19,38 @@ namespace Skilly.API.Controllers
         {
             _authService = authService;
         }
-        //[HttpPost("Select-UserType")]
-        //public IActionResult SelectUserType([FromBody] UserTypeRequestDTO userTypeRequestDTO)
+
+
+        //[HttpPost("verify-email")]
+        //public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
         //{
-        //    if (!Enum.TryParse(userTypeRequestDTO.UserType.ToString(), out UserType userType) || !Enum.IsDefined(typeof(UserType), userType))
+        //    var token = await _authService.VerifyEmailCodeAsync(verificationDTO);
+
+        //    if (token != null)
         //    {
-        //        return BadRequest(new { Success = false, Message = "Invalid UserType." });
+        //        return Ok(new
+        //        {
+        //            Success = true,
+        //            Message = "Email confirmed successfully.",
+        //            Token = token
+        //        });
         //    }
 
-        //    return Ok(new { Success = true, UserType = userType });
+        //    return BadRequest(new
+        //    {
+        //        Success = false,
+        //        Message = "Invalid verification code."
+        //    });
         //}
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody]RegisterDTO registerDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
             var result = await _authService.RegisterAsync(registerDTO);
 
             if (result.Succeeded)
             {
-                return Ok(new { Success = true, Message = "User Registered Successfully. Please verify your email." });
+                return CreatedAtAction(nameof(Register), new { message = "User Registered Successfully. Please verify your email." });
             }
 
             return BadRequest(new
@@ -48,30 +61,7 @@ namespace Skilly.API.Controllers
             });
         }
 
-        [HttpPost("verify-email")]
-        public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
-        {
-            var token = await _authService.VerifyEmailCodeAsync(verificationDTO);
-
-            if (token != null)
-            {
-                return Ok(new
-                {
-                    Success = true,
-                    Message = "Email confirmed successfully.",
-                    Token = token
-                });
-            }
-
-            return BadRequest(new
-            {
-                Success = false,
-                Message = "Invalid verification code."
-            });
-        }
-
         [HttpPost("Login")]
-
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             if (!ModelState.IsValid)
@@ -89,17 +79,6 @@ namespace Skilly.API.Controllers
                 ? Ok(response)
                 : BadRequest(new { Success = false, Message = "Invalid login attempt." });
         }
-
-
-        //[HttpPost("Login")]
-        //public async Task<IActionResult> Login([FromBody]LoginDTO loginDTO)
-        //{
-        //    var response = await _authService.LoginAsync(loginDTO);
-
-        //    return response != null
-        //        ? Ok(response)
-        //        : BadRequest(new { Success = false, Message = "Invalid login attempt." });
-        //}
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordDTO forgetPasswordDTO)
@@ -131,6 +110,7 @@ namespace Skilly.API.Controllers
                 });
             }
         }
+
         [HttpPost("verify-code")]
         public async Task<IActionResult> VerifyCode([FromBody] VerficationCodeDTO verficationCodeDTO)
         {
@@ -159,6 +139,7 @@ namespace Skilly.API.Controllers
                 Message = "Verification successful."
             });
         }
+
         [HttpPost("update-password")]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDTO)
         {
@@ -191,6 +172,7 @@ namespace Skilly.API.Controllers
                 });
             }
         }
+
         //[HttpPost("Login-Google")]
         //public async Task<IActionResult> LoginGoogle([FromBody] TokenDto tokenDto)
         //{

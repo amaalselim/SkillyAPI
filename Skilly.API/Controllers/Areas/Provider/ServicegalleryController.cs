@@ -4,7 +4,6 @@ using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
-using Skilly.Persistence.Implementation;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers.Areas.Provider
@@ -19,6 +18,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -28,37 +28,37 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return userId;
         }
+
         [HttpGet("getAllGallery")]
         public async Task<IActionResult> GetAllServiceGallery()
         {
             try
             {
-                //string userId = GetUserIdFromClaims();
                 var galleries = await _unitOfWork.servicegalleryRepository.GetAllServiceGallery();
                 if (galleries == null)
                 {
-                    return NotFound(new { message = "No service galleries found." });
+                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No service galleries found." });
                 }
 
-                return Ok(new { galleries });
+                return StatusCode(StatusCodes.Status200OK, new { galleries });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
         [HttpGet("GetAllServicegalleryByproviderId")]
-        public async Task<ActionResult<Servicesgallery>> GetservicesbyuserId()
+        public async Task<IActionResult> GetservicesbyuserId()
         {
             string userId = GetUserIdFromClaims();
             var servicesgallery = await _unitOfWork.servicegalleryRepository.GetAllgalleryByProviderId(userId);
             if (servicesgallery == null)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No galleries found for this provider." });
             }
-            return Ok(new { servicesgallery });
+            return StatusCode(StatusCodes.Status200OK, new { servicesgallery });
         }
-
 
         [HttpGet("GetGalleryBy/{galleryId}")]
         public async Task<IActionResult> GetServiceGalleryById([FromRoute] string galleryId)
@@ -68,19 +68,20 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 var gallery = await _unitOfWork.servicegalleryRepository.GetServiceGalleryByIdAsync(galleryId, userId);
 
-                return Ok(new { gallery });
+                return StatusCode(StatusCodes.Status200OK, new { gallery });
             }
             catch (ServiceGalleryNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
+
         [HttpPost("AddGallery")]
         public async Task<IActionResult> AddServiceGallery([FromForm] servicegalleryDTO servicegalleryDTO)
         {
             if (servicegalleryDTO == null)
             {
-                return BadRequest(new { message = "Invalid service gallery data." });
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service gallery data." });
             }
 
             try
@@ -88,19 +89,20 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.servicegalleryRepository.AddServiceGallery(servicegalleryDTO, userId);
 
-                return Ok(new { message = "Service gallery added successfully.", data = servicegalleryDTO });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service gallery added successfully.", data = servicegalleryDTO });
             }
             catch (ServiceProviderNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
+
         [HttpPut("EditgalleryBy/{galleryId}")]
         public async Task<IActionResult> EditServiceGallery([FromForm] servicegalleryDTO servicegalleryDTO, [FromRoute] string galleryId)
         {
             if (servicegalleryDTO == null)
             {
-                return BadRequest(new { message = "Invalid service gallery data." });
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service gallery data." });
             }
 
             try
@@ -108,13 +110,14 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.servicegalleryRepository.EditServiceGallery(servicegalleryDTO, userId, galleryId);
 
-                return Ok(new { message = "Service gallery updated successfully.", data = servicegalleryDTO });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service gallery updated successfully.", data = servicegalleryDTO });
             }
             catch (ServiceGalleryNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
+
         [HttpDelete("DeleteGalleryBy/{galleryId}")]
         public async Task<IActionResult> DeleteServiceGallery([FromRoute] string galleryId)
         {
@@ -123,11 +126,11 @@ namespace Skilly.API.Controllers.Areas.Provider
                 string userId = GetUserIdFromClaims();
                 await _unitOfWork.servicegalleryRepository.DeleteServiceGalleryAsync(galleryId, userId);
 
-                return Ok(new { message = "Service gallery deleted successfully." });
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service gallery deleted successfully." });
             }
             catch (ServiceGalleryNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
     }

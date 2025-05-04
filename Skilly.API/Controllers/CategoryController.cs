@@ -17,15 +17,6 @@ namespace Skilly.API.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-        //private string GetUserIdFromClaims()
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    if (string.IsNullOrEmpty(userId))
-        //    {
-        //        throw new UnauthorizedAccessException("User not authorized.");
-        //    }
-        //    return userId;
-        //}
 
         [HttpGet("getAllCategories")]
         public async Task<IActionResult> GetAllCategories()
@@ -38,7 +29,7 @@ namespace Skilly.API.Controllers
                 {
                     return NotFound(new { message = "No Categories found." });
                 }
-               return Ok(new { categories });
+                return Ok(new { categories });
             }
             catch (Exception ex)
             {
@@ -51,7 +42,6 @@ namespace Skilly.API.Controllers
             }
         }
 
-
         [HttpGet("GetCategoryBy/{categoryId}")]
         public async Task<IActionResult> GetCategoryById([FromRoute] string categoryId)
         {
@@ -59,15 +49,18 @@ namespace Skilly.API.Controllers
             {
                 var category = await _unitOfWork._categoryRepository.GetCategoryByIdAsync(categoryId);
 
+                if (category == null)
+                {
+                    return NotFound(new { message = "Category not found." });
+                }
+
                 return Ok(new { category });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
-        
-
 
         [HttpPost("AddCategory")]
         public async Task<IActionResult> AddCategory([FromForm] CategoryDTO categoryDTO)
@@ -80,14 +73,14 @@ namespace Skilly.API.Controllers
             try
             {
                 await _unitOfWork._categoryRepository.AddCategoryAsync(categoryDTO);
-
-                return Ok(new { message = "Category added successfully.", data = categoryDTO });
+                return StatusCode(201, new { message = "Category added successfully.", data = categoryDTO }); // 201 Created
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
         [HttpPut("EditCategoryBy/{categoryId}")]
         public async Task<IActionResult> EditCategory([FromForm] CategoryDTO categoryDTO, [FromRoute] string categoryId)
         {
@@ -98,27 +91,40 @@ namespace Skilly.API.Controllers
 
             try
             {
+                var existingCategory = await _unitOfWork._categoryRepository.GetCategoryByIdAsync(categoryId);
+                if (existingCategory == null)
+                {
+                    return NotFound(new { message = "Category not found." });
+                }
+
                 await _unitOfWork._categoryRepository.UpdateCategoryAsync(categoryDTO, categoryId);
 
                 return Ok(new { message = "Category updated successfully.", data = categoryDTO });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
         [HttpDelete("DeleteCategoryBy/{categoryId}")]
         public async Task<IActionResult> DeleteCategory([FromRoute] string categoryId)
         {
             try
             {
-               await _unitOfWork._categoryRepository.DeleteCategoryAsync(categoryId);
+                var category = await _unitOfWork._categoryRepository.GetCategoryByIdAsync(categoryId);
+                if (category == null)
+                {
+                    return NotFound(new { message = "Category not found." });
+                }
+
+                await _unitOfWork._categoryRepository.DeleteCategoryAsync(categoryId);
 
                 return Ok(new { message = "Category deleted successfully." });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
     }

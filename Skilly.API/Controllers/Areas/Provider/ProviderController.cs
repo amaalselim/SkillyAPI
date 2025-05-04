@@ -28,7 +28,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 var providers = await _unitOfWork.ServiceProviderRepository.GetAllServiceProviderAsync();
-                return Ok(new { providers });
+                return StatusCode(200, new { providers });
             }
             catch (Exception ex)
             {
@@ -57,9 +57,9 @@ namespace Skilly.API.Controllers.Areas.Provider
             var provider = await _unitOfWork.ServiceProviderRepository.GetByIdAsync(userId);
             if (provider == null)
             {
-                return NotFound();
+                return StatusCode(404);
             }
-            return Ok(new {provider });
+            return StatusCode(200, new { provider });
         }
 
         [HttpGet("GetAllServiceProvidersBy/{categoryId}")]
@@ -68,10 +68,11 @@ namespace Skilly.API.Controllers.Areas.Provider
             var provider = await _unitOfWork.ServiceProviderRepository.GetAllserviceProvidersbyCategoryId(categoryId);
             if (provider == null)
             {
-                return NotFound();
+                return StatusCode(404);
             }
-            return Ok(new { provider } );
-        } 
+            return StatusCode(200, new { provider });
+        }
+
         [HttpPost("addServiceProvider")]
         public async Task<IActionResult> AddServiceProvider([FromForm] ServiceProviderDTO ServiceProviderDTO)
         {
@@ -81,12 +82,12 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized(new { message = "User not authenticated." });
+                    return StatusCode(401, new { message = "User not authenticated." });
                 }
 
                 await _unitOfWork.ServiceProviderRepository.AddServiceProviderAsync(ServiceProviderDTO, userId);
 
-                return Ok(new
+                return StatusCode(201, new
                 {
                     message = "provider added successfully.",
                     data = ServiceProviderDTO
@@ -94,13 +95,14 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             catch (UserNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(404, new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
             }
         }
+
         [HttpPut("editServiceProvider")]
         public async Task<IActionResult> EditServiceProvider([FromForm] ServiceProviderDTO ServiceProviderDTO)
         {
@@ -110,12 +112,12 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized(new { message = "User not authenticated." });
+                    return StatusCode(401, new { message = "User not authenticated." });
                 }
 
                 await _unitOfWork.ServiceProviderRepository.EditServiceProviderAsync(ServiceProviderDTO, userId);
 
-                return Ok(new
+                return StatusCode(200, new
                 {
                     message = "Provider updated successfully.",
                     data = ServiceProviderDTO
@@ -123,11 +125,11 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             catch (UserNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(404, new { message = ex.Message });
             }
             catch (ServiceProviderNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(404, new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -143,28 +145,26 @@ namespace Skilly.API.Controllers.Areas.Provider
                 var id = GetUserIdFromClaims();
                 if (string.IsNullOrEmpty(id))
                 {
-                    return Unauthorized(new { message = "User not authenticated." });
+                    return StatusCode(401, new { message = "User not authenticated." });
                 }
-
 
                 await _unitOfWork.ServiceProviderRepository.DeleteServiceProviderAsync(id);
 
-                return Ok(new { message = "provider deleted successfully." });
+                return StatusCode(200, new { message = "provider deleted successfully." });
             }
             catch (UserNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(404, new { message = ex.Message });
             }
             catch (ServiceProviderNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(404, new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
             }
         }
-
 
     }
 }
