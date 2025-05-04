@@ -22,7 +22,7 @@ using Skilly.Persistence.Implementation;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
-using Skilly.Persistence.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Skilly.API
 {
@@ -86,6 +86,9 @@ namespace Skilly.API
             builder.Services.AddScoped<IAuthService,AuthService>();
             builder.Services.AddScoped<IChatService,ChatService>(); 
             builder.Services.AddScoped<IBannerService,BannerService>();
+            builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+
+
             //builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
             builder.Services.AddScoped<FirebaseV1Service>(); 
 
@@ -119,6 +122,20 @@ namespace Skilly.API
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
             builder.Services.Configure<FormOptions>(options =>
             {
@@ -132,12 +149,13 @@ namespace Skilly.API
             builder.Services.AddLogging();
 
 
-            
-
-
             builder.Services.AddControllers();
 
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
+            {
+                options.EnableDetailedErrors = true;
+            });
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

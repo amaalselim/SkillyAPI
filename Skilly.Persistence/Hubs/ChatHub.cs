@@ -1,92 +1,75 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Skilly.Application.DTOs;
-using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
-namespace Skilly.Persistence.Hubs
+public class ChatHub : Hub
 {
-    public class ChatHub : Hub
-    {
-        // قاموس لتخزين الاتصال (Connection ID) الخاص بكل مستخدم
-        public static ConcurrentDictionary<string, string> Users = new ConcurrentDictionary<string, string>();
+    public static ConcurrentDictionary<string, string> Users = new ConcurrentDictionary<string, string>();
 
-        public ChatHub()
+    public ChatHub()
+    {
+    }
+    public async Task SendMessage(string receiverId, string messageContent)
+    {
+        var senderId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrEmpty(receiverId) && Users.TryGetValue(receiverId, out var receiverConnectionId))
         {
+            await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderId, messageContent);
         }
-        public override Task OnConnectedAsync()
+
+        if (!string.IsNullOrEmpty(senderId) && Users.TryGetValue(senderId, out var senderConnectionId))
         {
-            var userId = Context.GetHttpContext()?.Request.Query["userId"];
+            await Clients.Client(senderConnectionId).SendAsync("ReceiveMessage", senderId, messageContent);
+        }
+        Console.WriteLine($"Message sent from {senderId} to {receiverId}: {messageContent}");
+    }
+
+
+
+
+
+    public override async Task OnConnectedAsync()
+    {
+        var token = Context.GetHttpContext()?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            var userId = await GetUserIdFromToken(token); // استخدم التوكين للحصول على معرف المستخدم
             if (!string.IsNullOrEmpty(userId))
             {
-                Users[userId] = Context.ConnectionId;
+                Users[userId] = Context.ConnectionId; // تخزين الاتصال باستخدام userId
+                Console.WriteLine($"User {userId} connected with connection ID: {Context.ConnectionId}");
             }
-            return base.OnConnectedAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception exception)
-        {
-            var user = Users.FirstOrDefault(x => x.Value == Context.ConnectionId);
-            if (!string.IsNullOrEmpty(user.Key))
+            else
             {
-                Users.TryRemove(user.Key, out _);
-            }
-            return base.OnDisconnectedAsync(exception);
-        }
-
-        public async Task NotifyNewChat(string firstUserId, string secondUserId)
-        {
-            await Clients.Users(firstUserId, secondUserId)
-                .SendAsync("NewChatCreated", "A new chat has been created.");
-        }
-
-        public async Task NotifyChatExists(string firstUserId, string secondUserId)
-        {
-            await Clients.Users(firstUserId, secondUserId)
-                .SendAsync("ChatExists", "The chat already exists.");
-        }
-
-        public async Task NotifyMessageReceived(string senderId, string receiverId, string content)
-        {
-            if (Users.TryGetValue(receiverId, out var receiverConnectionId))
-            {
-                await Clients.Client(receiverConnectionId)
-                    .SendAsync("ReceiveMessage", senderId, content);
-            }
-
-            if (Users.TryGetValue(senderId, out var senderConnectionId))
-            {
-                await Clients.Client(senderConnectionId)
-                    .SendAsync("ReceiveMessage", senderId, content);
+                await Clients.Caller.SendAsync("Unauthorized", "Invalid token");
             }
         }
-
-        public async Task NotifyChatsUpdated(string userId)
+        else
         {
-            await Clients.User(userId)
-                .SendAsync("ChatsUpdated", "Your chat list has been updated.");
+            await Clients.Caller.SendAsync("Unauthorized", "Token not provided");
         }
 
-        public async Task NotifyMessagesUpdated(string chatId)
-        {
-            await Clients.Group(chatId)
-                .SendAsync("MessagesUpdated", "Messages have been updated.");
-        }
+        await base.OnConnectedAsync();
+    }
 
-        public async Task MarkMessagesAsRead(string chatId, string senderId, string receiverId)
+    public override Task OnDisconnectedAsync(Exception exception)
+    {
+        var user = Users.FirstOrDefault(x => x.Value == Context.ConnectionId);
+        if (!string.IsNullOrEmpty(user.Key))
         {
-            if (Users.TryGetValue(senderId, out var senderConnectionId))
-            {
-                await Clients.Client(senderConnectionId)
-                    .SendAsync("MessagesMarkedAsRead", chatId);
-            }
-
-            if (Users.TryGetValue(receiverId, out var receiverConnectionId))
-            {
-                await Clients.Client(receiverConnectionId)
-                    .SendAsync("MessagesMarkedAsRead", chatId);
-            }
+            Users.TryRemove(user.Key, out _);
         }
+        return base.OnDisconnectedAsync(exception);
+    }
+
+    private async Task<string> GetUserIdFromToken(string token)
+    {
+        var jwtHandler = new JwtSecurityTokenHandler();
+        var jsonToken = jwtHandler.ReadToken(token) as JwtSecurityToken;
+        var userId = jsonToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        return userId;
     }
 }

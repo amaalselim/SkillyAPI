@@ -2,200 +2,327 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real-Time Private Chat</title>
-    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@3.1.8/dist/browser/signalr.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chats</title>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@5.0.0/dist/browser/signalr.min.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #eaf0f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #007bff;
+            color: white;
             margin: 0;
             padding: 20px;
         }
 
-        h2 {
+        #authContainer {
             text-align: center;
-            margin-bottom: 20px;
-            color: #333;
+            margin: 20px auto;
         }
 
-        .chat-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .chat-header {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-            .chat-header input {
-                flex: 1;
-                padding: 8px 12px;
-                border: 1px solid #ddd;
+            #authContainer input,
+            #authContainer button {
+                padding: 10px;
+                margin: 5px;
                 border-radius: 8px;
+                border: 1px solid #ccc;
             }
 
-        #chatBox {
-            border: 1px solid #ddd;
-            padding: 10px;
-            height: 350px;
-            overflow-y: auto;
-            background: #fafafa;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-
-        .message {
-            padding: 10px 14px;
-            margin: 6px 0;
-            border-radius: 10px;
-            max-width: 70%;
-            clear: both;
-            word-wrap: break-word;
-        }
-
-        .sent {
-            background-color: #dcf8c6;
-            float: right;
-            text-align: right;
-        }
-
-        .received {
-            background-color: #f1f0f0;
-            float: left;
-            text-align: left;
-        }
-
-        .chat-footer {
-            display: flex;
-            gap: 10px;
-        }
-
-            .chat-footer input {
-                flex: 1;
-                padding: 10px 14px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
+            #authContainer button {
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                border: none;
             }
 
-            .chat-footer button {
-                background-color: #4caf50;
+                #authContainer button:hover {
+                    background-color: #0056b3;
+                }
+
+        #chatsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .chat-item {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 280px;
+        }
+
+            .chat-item button {
+                margin-top: 10px;
+                width: 100%;
+                padding: 10px;
+                background-color: #007bff;
                 color: white;
                 border: none;
-                padding: 10px 18px;
-                border-radius: 8px;
+                border-radius: 6px;
                 cursor: pointer;
             }
 
-                .chat-footer button:hover {
-                    background-color: #45a049;
+                .chat-item button:hover {
+                    background-color: #0056b3;
                 }
+
+        #chatWindow {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+        }
+
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin: 5px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .left {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+        }
+
+        .right {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .chat-input-container {
+            display: flex;
+        }
+
+        #chatInput {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        #sendMessageButton {
+            padding: 10px 16px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+            #sendMessageButton:hover {
+                background-color: #0056b3;
+            }
     </style>
 </head>
 <body>
+    <h1>Chats</h1>
 
-    <div class="chat-container">
-        <h2>SignalR Private Chat</h2>
+    <div id="authContainer">
+        <input type="text" id="tokenInput" placeholder="Enter token">
+        <input type="text" id="userIdInput" placeholder="Enter user ID">
+        <button id="authenticateButton">Authenticate</button>
+    </div>
 
-        <div class="chat-header">
-            <input type="text" id="myId" placeholder="Your ID" />
-            <input type="text" id="receiverId" placeholder="Receiver ID" />
-            <button onclick="connect()">Connect</button>
-        </div>
+    <div id="chatsContainer"></div>
 
-        <div id="chatBox"></div>
-
-        <div class="chat-footer">
-            <input type="text" id="messageInput" placeholder="Type message..." />
-            <button onclick="sendMessage()">Send</button>
+    <div id="chatWindow">
+        <div id="chatMessages"></div>
+        <div class="chat-input-container">
+            <input type="text" id="chatInput" placeholder="Type a message">
+            <button id="sendMessageButton">Send</button>
         </div>
     </div>
 
     <script>
-        let connection;
+        let token = null;
+        let userId = null;
+        let currentChatId = null;
+        let currentReceiverId = null;
+        let connection = null;
 
-        function connect() {
-            const myId = document.getElementById("myId").value;
-            if (!myId) return alert("Enter your ID first!");
+        document.getElementById("authenticateButton").addEventListener("click", () => {
+            token = document.getElementById("tokenInput").value.trim();
+            userId = document.getElementById("userIdInput").value.trim();
 
+            if (token && userId) {
+                initializeChat();
+            } else {
+                alert("Please enter both token and user ID.");
+            }
+        });
+
+        function initializeChat() {
             connection = new signalR.HubConnectionBuilder()
-                .withUrl(`/chatHub?userId=${myId}`)
+                .withUrl("http://localhost:5271/chatHub", {
+                    accessTokenFactory: () => token
+                })
                 .build();
 
-            connection.on("ReceiveMessages", (messages) => {
-                const chatBox = document.getElementById("chatBox");
-                const myUserId = document.getElementById("myId").value;
-                messages.forEach(msg => {
-                    appendMessage(msg.senderId, msg.content, myUserId);
-                });
-                chatBox.scrollTop = chatBox.scrollHeight;
-            });
-
-            connection.on("ReceiveMessage", (senderId, content) => {
-                const myUserId = document.getElementById("myId").value;
-                appendMessage(senderId, content, myUserId);
+            connection.on("ReceiveMessage", (senderId, messageContent) => {
+                console.log("Message received:", senderId, messageContent);
+                if (currentChatId) {
+                    displayMessage(senderId, messageContent);
+                }
             });
 
             connection.start()
                 .then(() => {
-                    alert("Connected as " + myId);
-                    const receiverId = document.getElementById("receiverId").value;
-                    if (receiverId) {
-                        connection.invoke("GetMessages", myId, receiverId)
-                            .catch(err => console.error("Error fetching messages:", err));
-                    }
+                    console.log("SignalR connected");
+                    getChats();
                 })
-                .catch(err => console.error("Error connecting:", err));
-        }
+                .catch(err => console.error("SignalR error:", err));
 
-        function sendMessage() {
-            const myId = document.getElementById("myId").value;
-            const receiverId = document.getElementById("receiverId").value;
-            const messageContent = document.getElementById("messageInput").value;
+            async function getChats() {
+                try {
+                    const res = await fetch("http://localhost:5271/api/Chat/GetChatsForUser", {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await res.json();
 
-            if (!myId || !receiverId || !messageContent) {
-                return alert("Please fill in your ID, receiver's ID and message!");
+                    if (data.status === "success") {
+                        const chatsContainer = document.getElementById("chatsContainer");
+                        chatsContainer.innerHTML = "";
+                        data.data.forEach(chat => {
+                            const otherUserName = chat.firstUserId === userId ? chat.secondUserName : chat.firstUserName;
+                            const otherUserId = chat.firstUserId === userId ? chat.secondUserId : chat.firstUserId;
+
+                            const chatDiv = document.createElement("div");
+                            chatDiv.className = "chat-item";
+                            chatDiv.innerHTML = `
+                                    <div><strong>${otherUserName}</strong></div>
+                                    <button class="openChatButton" data-chat-id="${chat.id}" data-receiver-id="${otherUserId}">Open Chat</button>
+                                `;
+                            chatsContainer.appendChild(chatDiv);
+                        });
+
+                        document.querySelectorAll(".openChatButton").forEach(btn => {
+                            btn.addEventListener("click", () => {
+                                openChat(btn.dataset.chatId, btn.dataset.receiverId);
+                            });
+                        });
+                    } else {
+                        alert("Failed to load chats");
+                    }
+                } catch (err) {
+                    console.error("Error fetching chats:", err);
+                }
             }
 
-            // Call API instead of SignalR directly to send the message
-            fetch("/api/Chat/send", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    senderId: myId,
-                    receiverId: receiverId,
-                    content: messageContent
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to send message.");
-                    }
-                    // If message sent successfully, clear the input
-                    document.getElementById("messageInput").value = '';
-                })
-                .catch(err => {
-                    console.error("Error sending message:", err);
-                });
-        }
+            function openChat(chatId, receiverId) {
+                currentChatId = chatId;
+                currentReceiverId = receiverId;
+                document.getElementById("chatWindow").style.display = "flex";
+                loadMessages(chatId);
+            }
 
-        function appendMessage(senderId, content, myUserId) {
-            const chatBox = document.getElementById("chatBox");
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("message");
-            messageDiv.classList.add(senderId === myUserId ? "sent" : "received");
-            messageDiv.innerHTML = `<strong>${senderId}:</strong> ${content}`;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            async function loadMessages(chatId) {
+                try {
+                    const res = await fetch(`http://localhost:5271/api/Chat/GetMessagesForChatOfUser/${chatId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await res.json();
+                    const messagesContainer = document.getElementById("chatMessages");
+                    messagesContainer.innerHTML = "";
+
+                    if (data.status === "success") {
+                        data.data.forEach(message => {
+                            displayMessage(message.senderId, message.content);
+                        });
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                } catch (err) {
+                    console.error("Error loading messages:", err);
+                }
+            }
+
+            function displayMessage(senderId, content) {
+                const message = document.createElement("div");
+                message.className = "message";
+                message.textContent = content;
+                message.classList.add(senderId === userId ? "right" : "left");
+
+                const messagesContainer = document.getElementById("chatMessages");
+                messagesContainer.appendChild(message);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            document.getElementById("sendMessageButton").addEventListener("click", async () => {
+                const input = document.getElementById("chatInput");
+                const content = input.value.trim();
+                if (!content) return;
+
+                
+
+                try {
+                   // await connection.invoke("SendMessage", currentReceiverId, content);
+                    await sendMessageToBackend(currentReceiverId, content);
+                    input.value = "";
+                } catch (err) {
+                    console.error("Error sending message:", err);
+                    alert("Error sending message. Try again.");
+                }
+            });
+
+            async function sendMessageToBackend(receiverId, content) {
+                try {
+                    const res = await fetch("http://localhost:5271/api/Chat/SendMessage", {
+                        method: "POST",
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            ChatId: currentChatId,
+                            ReceiverId: receiverId,
+                            Content: content
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.status !== "success") {
+                        alert("Failed to send message to backend");
+                    }
+                } catch (err) {
+                    console.error("Backend error:", err);
+                    alert("Error sending message to backend");
+                }
+            }
         }
     </script>
-
 </body>
 </html>
