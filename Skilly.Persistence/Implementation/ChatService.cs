@@ -7,7 +7,6 @@ using Skilly.Application.DTOs;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
-using Skilly.Persistence.Hubs;
 using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
