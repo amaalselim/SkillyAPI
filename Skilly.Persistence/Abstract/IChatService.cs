@@ -14,6 +14,6 @@ namespace Skilly.Persistence.Abstract
         Task<MessageDTO> SendMessageAsync(MessageDTO dto);
         Task<List<ChatDTO>> GetChatsForUserAsync(string userId);
         Task<List<MessageResponseDto>> GetMessagesForChatAsync(string chatId, string userId);
-        Task<Chat> MarkChatMessagesAsReadAsync(string chatId, string userId);
+        Task<string> MarkChatMessagesAsReadAsync(string messageId, string userId);
     }
 }
