@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.SignalR;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
-using Skilly.Persistence.Hubs;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers
@@ -32,7 +31,7 @@ namespace Skilly.API.Controllers
         {
             try
             {
-                var senderId= GetUserId();
+                var senderId = GetUserId();
                 if (string.IsNullOrEmpty(senderId))
                 {
                     return Unauthorized("User not authenticated");
@@ -41,17 +40,12 @@ namespace Skilly.API.Controllers
                 var message = await _chatService.SendMessageAsync(messageDTO);
                 if (message != null)
                 {
-                    if (ChatHub.Users.TryGetValue(messageDTO.receiverId, out var receiverConnectionId))
-                    {
-                        await _hubContext.Clients.Client(receiverConnectionId)
-                            .SendAsync("ReceiveMessage", senderId, messageDTO.content);
-                    }
+                    // استخدم User وليس Client
+                    await _hubContext.Clients.User(messageDTO.receiverId)
+                        .SendAsync("ReceiveMessage", senderId, messageDTO.content);
 
-                    if (ChatHub.Users.TryGetValue(senderId, out var senderConnectionId))
-                    {
-                        await _hubContext.Clients.Client(senderConnectionId)
-                            .SendAsync("ReceiveMessage",senderId, messageDTO.content);
-                    }
+                    await _hubContext.Clients.User(senderId)
+                        .SendAsync("ReceiveMessage", senderId, messageDTO.content);
 
                     return Ok(new { status = "success", message = "Message sent successfully.", data = message });
                 }
@@ -63,6 +57,8 @@ namespace Skilly.API.Controllers
                 return BadRequest(new { status = "error", message = ex.Message });
             }
         }
+
+
 
         [HttpGet("GetChatsForUser")]
         public async Task<IActionResult> GetChatsForUser()
@@ -136,7 +132,7 @@ namespace Skilly.API.Controllers
                 return BadRequest(new { status = "error", message = ex.Message });
             }
         }
-
+        
 
     }
 }
