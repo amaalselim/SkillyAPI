@@ -22,10 +22,15 @@ namespace Skilly.Core.Entities
         public string Age { get; set; }
         public Gender Gender { get; set; }
         public string Img { get; set; }
+        [NotMapped]
         public string profession {  get; set; }
         public string NumberOfYearExperience { get; set; }
         public string BriefSummary { get; set; }
         public string NationalNumberPDF { get; set; }
+        [NotMapped]
+        public decimal Review { get; set; }
+        [NotMapped]
+        public int numberOfEndedservices { get; set; }
         [ForeignKey("User")]
         public string UserId { get; set; }
         [JsonIgnore]

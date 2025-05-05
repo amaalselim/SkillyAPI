@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Skilly.Persistence.Implementation
 {
@@ -97,31 +98,62 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<ServiceProvider> GetByIdAsync(string id)
         {
-            return await _context.serviceProviders
-                .Include(p => p.providerServices)
-                .ThenInclude(p => p.ServicesImages)
-                .Include(p => p.servicesgalleries)
-                .ThenInclude(p => p.galleryImages)
-                .Include(p => p.Reviews)
-                .FirstOrDefaultAsync(p => p.UserId ==id);
-        }
+            var provider = await _context.serviceProviders
+                .FirstOrDefaultAsync(c => c.UserId == id);
 
+                var reviews = await _context.reviews
+                    .Where(r => r.ServiceProvider.UserId == provider.UserId)
+                    .ToListAsync();
+
+                provider.Review = reviews.Any()
+                     ? Math.Round(reviews.Average(r => r.Rating), 2)
+                     : 0;
+
+                provider.numberOfEndedservices = 3;
+
+                var category = await _context.categories
+                .FirstOrDefaultAsync(c => c.Id == provider.categoryId);
+
+                provider.profession= category?.ProfessionName ?? "غير محدد";
+
+            return provider;
+        }
         public async Task<List<ServiceProvider>> GetAllServiceProviderAsync()
         {
-            var users = await _context.serviceProviders
-                //.Include(p=>p.providerServices)
-                //.ThenInclude(p=>p.ServicesImages)
-                //.Include(p=>p.servicesgalleries)
-                //.ThenInclude(p=>p.Images)
-                //.Include(p=>p.Reviews)
-                .ToListAsync();
+            var providers = await _context.serviceProviders.ToListAsync();
 
-            if (users == null || !users.Any())
-            {
+            if (!providers.Any())
                 return new List<ServiceProvider>();
+
+            // جيب كل الكاتيجوريز مرة واحدة
+            var categories = await _context.categories.ToListAsync();
+            var categoryMap = categories.ToDictionary(c => c.Id, c => c.ProfessionName);
+
+            foreach (var provider in providers)
+            {
+                // حساب الريفيو
+                var reviews = await _context.reviews
+                    .Where(r => r.ServiceProvider.UserId == provider.UserId)
+                    .ToListAsync();
+
+                provider.Review = reviews.Any()
+                    ? Math.Round(reviews.Average(r => r.Rating), 2)
+                    : 0;
+
+                provider.numberOfEndedservices = 3;
+
+ 
+                provider.profession = categoryMap.ContainsKey(provider.categoryId)
+                    ? categoryMap[provider.categoryId]
+                    : "غير محدد";
             }
-            return users;
+
+            return providers;
         }
+
+
+
+
 
         public async Task DeleteServiceProviderAsync(string Id)
         {
@@ -137,13 +169,34 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<List<ServiceProvider>> GetAllserviceProvidersbyCategoryId(string categoryId)
         {
-            return await _context.serviceProviders.Where(c => c.categoryId == categoryId)
-                //.Include(p => p.providerServices)
-                //.ThenInclude(p => p.ServicesImages)
-                //.Include(p => p.servicesgalleries)
-                //.ThenInclude(p => p.Images)
-                //.Include(p => p.Reviews)
+            var providers = await _context.serviceProviders
+                .Where(c => c.categoryId == categoryId)
                 .ToListAsync();
+
+            if (!providers.Any())
+                return new List<ServiceProvider>();
+            var category = await _context.categories
+                .FirstOrDefaultAsync(c => c.Id == categoryId);
+            var professionName = category?.ProfessionName ?? "غير محدد";
+
+            foreach (var provider in providers)
+            {
+                var reviews = await _context.reviews
+                    .Where(r => r.ServiceProvider.UserId == provider.UserId)
+                    .ToListAsync();
+
+                provider.Review = reviews.Any()
+                    ? Math.Round(reviews.Average(r => r.Rating), 2)
+                    : 0;
+
+                provider.numberOfEndedservices = 3;
+
+                provider.profession = professionName;
+            }
+
+            return providers;
         }
+
+
     }
 }
