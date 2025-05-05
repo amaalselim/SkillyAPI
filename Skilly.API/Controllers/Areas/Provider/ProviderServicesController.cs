@@ -52,7 +52,24 @@ namespace Skilly.API.Controllers.Areas.Provider
         public async Task<IActionResult> GetservicesbyuserId()
         {
             string userId = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
             var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
+            if (service == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
+            }
+            return StatusCode(StatusCodes.Status200OK, new { service });
+        }
+
+
+        [HttpGet("GetAllServicesByAnother/{providerId}")]
+        public async Task<IActionResult> GetservicesbyuserId(string providerId)
+        {
+            
+            var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(providerId);
             if (service == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
@@ -96,6 +113,10 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 string userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User not authorized.");
+                }
                 await _unitOfWork.providerServiceRepository.AddProviderService(providerservicesDTO, userId);
 
                 return StatusCode(StatusCodes.Status200OK, new { message = "Service added successfully.", data = providerservicesDTO });
@@ -117,6 +138,10 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 string userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User not authorized.");
+                }
                 await _unitOfWork.providerServiceRepository.EditProviderService(providerservicesDTO, userId, serviceId);
 
                 return StatusCode(StatusCodes.Status200OK, new { message = "Service updated successfully.", data = providerservicesDTO });

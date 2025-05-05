@@ -24,8 +24,6 @@ namespace Skilly.Core.Entities
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
 
-
-
         public ICollection<Chat> ChatsOfUser { get; set; }
         public ICollection<Chat> ChatsOfProvider { get; set; }
 

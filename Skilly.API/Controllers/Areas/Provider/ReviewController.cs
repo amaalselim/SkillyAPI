@@ -16,7 +16,6 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             _unitOfWork = unitOfWork;
         }
-
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -26,6 +25,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return userId;
         }
+
 
         [HttpPost("AddReview")]
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDTO)
@@ -48,16 +48,19 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
         }
 
-        [HttpGet("GetReviewsBy/{providerId}")]
-        public async Task<IActionResult> GetAllReviewsByProvider([FromRoute] string providerId)
-        {
-            if (string.IsNullOrEmpty(providerId))
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Provider ID is required." });
-            }
 
+        [HttpGet("GetReviewsByproviderId")]
+        public async Task<IActionResult> GetAllReviewsByProvider()
+        {
+            
             try
             {
+                var providerId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(providerId))
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+                }
+
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByProviderIdAsync(providerId);
                 return StatusCode(StatusCodes.Status200OK, new { reviews });
             }
@@ -65,6 +68,17 @@ namespace Skilly.API.Controllers.Areas.Provider
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
+        }
+        [HttpGet("average-ratingByproviderId")]
+        public async Task<IActionResult> GetAverageRating()
+        {
+            var providerId = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(providerId))
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+            }
+            var averageRating = await _unitOfWork.reviewRepository.GetAverageRatingByProviderIdAsync(providerId);
+            return Ok(new { averageRating });
         }
     }
 }

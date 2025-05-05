@@ -11,6 +11,7 @@ namespace Skilly.Persistence.Abstract
     public interface IReviewRepository
     {
         Task AddReviewAsync(string userId,ReviewDTO reviewDTO);
-        Task<IEnumerable<ReviewDTO>> GetAllReviewsByProviderIdAsync(string ProviderId);  
+        Task<IEnumerable<ReviewDisplayDTO>> GetAllReviewsByProviderIdAsync(string providerId);
+        Task<decimal> GetAverageRatingByProviderIdAsync(string providerId);
     }
 }

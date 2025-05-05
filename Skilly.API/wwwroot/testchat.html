@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -223,9 +224,9 @@
                             const chatDiv = document.createElement("div");
                             chatDiv.className = "chat-item";
                             chatDiv.innerHTML = `
-                                    <div><strong>${otherUserName}</strong></div>
-                                    <button class="openChatButton" data-chat-id="${chat.id}" data-receiver-id="${otherUserId}">Open Chat</button>
-                                `;
+                                        <div><strong>${otherUserName}</strong></div>
+                                        <button class="openChatButton" data-chat-id="${chat.id}" data-receiver-id="${otherUserId}">Open Chat</button>
+                                    `;
                             chatsContainer.appendChild(chatDiv);
                         });
 
@@ -287,10 +288,10 @@
                 const content = input.value.trim();
                 if (!content) return;
 
-                
+
 
                 try {
-                   // await connection.invoke("SendMessage", currentReceiverId, content);
+                    // await connection.invoke("SendMessage", currentReceiverId, content);
                     await sendMessageToBackend(currentReceiverId, content);
                     input.value = "";
                 } catch (err) {

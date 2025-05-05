@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,6 +22,8 @@ namespace Skilly.Core.Entities
         public string ProviderId { get; set; }
         [JsonIgnore]
         public virtual ServiceProvider? ServiceProvider { get; set; }
+        //public virtual UserProfile? UserProfile { get; set; }
+        
 
     }
 }
