@@ -154,10 +154,9 @@ namespace Skilly.Persistence.Implementation
                     ,Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
-                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id: null,
-                    RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
+                    serviceId = o.ProviderServices !=null ? o.ProviderServices.Id: o.requestserviceId,
+                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
+                        o.RequestService != null ? o.RequestService.Name : null
                 })
                 .ToListAsync();
         }
@@ -178,12 +177,11 @@ namespace Skilly.Persistence.Implementation
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
-                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
-                    RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
+                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
+                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
+                        o.RequestService != null ? o.RequestService.Name : null
                 })
-                .Where(x => x.serviceId == serviceId || x.requestserviceId == serviceId)
+                .Where(x => x.serviceId == serviceId)
                 .ToListAsync();
         }
 
@@ -203,10 +201,9 @@ namespace Skilly.Persistence.Implementation
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
-                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
-                    RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
+                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
+                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
+                        o.RequestService != null ? o.RequestService.Name : null
                 })
                 .FirstOrDefaultAsync(x => x.ID == id);
         }
@@ -226,12 +223,11 @@ namespace Skilly.Persistence.Implementation
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
-                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : null,
-                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name : null,
-                    requestserviceId = o.RequestService != null ? o.RequestService.Id : null,
-                    RequestServiceName = o.RequestService != null ? o.RequestService.Name : null
+                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
+                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
+                        o.RequestService != null ? o.RequestService.Name : null
                 })
-                .FirstOrDefaultAsync(x => x.serviceId == serviceId || x.requestserviceId==serviceId);
+                .FirstOrDefaultAsync(x => x.serviceId == serviceId);
         }
 
         public async Task<int> GetOffersCountByServiceIdAsync(string serviceId)

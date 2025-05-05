@@ -78,9 +78,10 @@ namespace Skilly.Persistence.Implementation
                 .Where(u => u.categoryId == service.categoryId && u.User.FcmToken != null)
                 .Include(p => p.User)
                 .ToListAsync();
+            var cat=await _context.categories.FirstOrDefaultAsync(c => c.Id == service.categoryId);
 
             string title = "طلب خدمة جديد";
-            string body = $"تم نشر طلب جديد في قسم {service.Category?.Name?? "خدمات"}، يمكنك مشاهدته الآن.";
+            string body = $"تم نشر طلب جديد في قسم {cat?.Name?? "القسم الخاص بك"}، يمكنك مشاهدته الآن.";
 
             foreach (var provider in providers)
             {

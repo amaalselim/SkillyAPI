@@ -187,31 +187,26 @@ namespace Skilly.Persistence.Implementation
             return messageDtos;
         }
 
-        public async Task<Chat> MarkChatMessagesAsReadAsync(string chatId, string userId)
+        public async Task<string> MarkChatMessagesAsReadAsync(string messageId, string userId)
         {
-            var messages = await _context.Messages
-                .Where(m => m.ChatId == chatId && m.ReceiverId == userId && !m.IsRead)
-                .ToListAsync();
-
-            if (!messages.Any())
-            {
-                return null; 
-            }
-
-            foreach (var message in messages)
-            {
-                message.IsRead = true;
-                message.ReadAt = DateTime.Now;
-            }
-
-            await _context.SaveChangesAsync();
-
-            var chat = await _context.chats
-                .Where(c => c.Id == chatId)
+           
+            var message = await _context.Messages
+                .Where(m => m.Id == messageId && m.ReceiverId == userId && !m.IsRead)
                 .FirstOrDefaultAsync();
 
-            return chat;
+            if (message == null)
+            {
+                return null;
+            }
+            message.IsRead = true;
+            message.ReadAt = DateTime.Now;
+
+           
+            await _context.SaveChangesAsync();
+
+            return message.Id;
         }
+
 
 
     }
