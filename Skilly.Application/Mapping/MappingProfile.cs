@@ -83,7 +83,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.serviceId, opt => opt.MapFrom(src =>
                 string.IsNullOrWhiteSpace(src.serviceId) ? null : src.serviceId))
             .ForMember(dest => dest.requestserviceId, opt => opt.MapFrom(src =>
-                string.IsNullOrWhiteSpace(src.requestserviceId) ? null : src.requestserviceId));
+                string.IsNullOrWhiteSpace(src.serviceId) ? null : src.serviceId));
 
 
         CreateMap<Chat, ChatDTO>()

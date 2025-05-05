@@ -142,7 +142,7 @@ namespace Skilly.API.Controllers
 
                 await _unitOfWork._OfferSalaryRepository.AddOfferAsync(offerSalaryDTO, userId);
 
-                return Ok(new { message = "Offer added successfully.", data = offerSalaryDTO });
+                return Ok(new { message = "Offer added successfully." });
             }
             catch (Exception ex)
             {
@@ -168,7 +168,7 @@ namespace Skilly.API.Controllers
 
                 await _unitOfWork._OfferSalaryRepository.UpdateOfferAsync(offerSalaryDTO, offerId);
 
-                return Ok(new { message = "Offer updated successfully.", data = offerSalaryDTO });
+                return Ok(new { message = "Offer updated successfully." });
             }
             catch (Exception ex)
             {

@@ -17,9 +17,7 @@ namespace Skilly.Application.DTOs
         public string Deliverytime { get; set; }
         public string? Notes { get; set; }
         public string? serviceId { get; set; }
-        public string? requestserviceId { get; set; }
         public string? ServiceName { get; set; }
-        public string? RequestServiceName { get; set; }
 
     }
 }
