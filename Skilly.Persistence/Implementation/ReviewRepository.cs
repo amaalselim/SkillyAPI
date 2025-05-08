@@ -22,7 +22,7 @@ namespace Skilly.Persistence.Implementation
             _context = context;
             _mapper = mapper;
         }
-        public async Task AddReviewAsync(string userId, ReviewDTO reviewDTO)
+        public async Task AddReviewproviderAsync(string userId, ReviewDTO reviewDTO)
         {
             var review = _mapper.Map<Review>(reviewDTO);
             review.UserId = userId;
@@ -32,27 +32,61 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddReviewserviceAsync(string userId, ReviewServiceDTO reviewDTO)
+        {
+            var review = _mapper.Map<Review>(reviewDTO);
+            review.UserId = userId;
+            review.UserName = _context.users.Where(u => u.Id == userId).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault();
+            review.serviceId= reviewDTO.serviceId;
+            await _context.reviews.AddAsync(review);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<ReviewDisplayDTO>> GetAllReviewsByProviderIdAsync(string providerId)
         {
-            // جلب جميع UserIds من المراجعات المرتبطة بمزود الخدمة المحدد
             var reviews = await _context.reviews
                 .Where(r => r.ServiceProvider.UserId == providerId)
                 .ToListAsync();
 
-            // جلب المستخدمين الذين كتبوا هذه المراجعات
-            var userIds = reviews.Select(r => r.UserId).Distinct().ToList(); // التأكد من أن معرفات المستخدمين مميزة
+            var userIds = reviews.Select(r => r.UserId).Distinct().ToList(); 
             var users = await _context.userProfiles
                 .Where(u => userIds.Contains(u.UserId))
                 .ToListAsync();
 
-            // إنشاء الـ DTO للمراجعات
+         
             var reviewDisplayDTOs = reviews.Select(r => new ReviewDisplayDTO
             {
-                providerId = providerId, // تحديد providerId بشكل صحيح
-                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName, // ربط اسم المستخدم بـ UserId
-                userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img, // ربط صورة المستخدم بـ UserId
+                providerId = providerId, 
+                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName+' '+
+                users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName, 
+                userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
                 Feedback = r.Feedback, 
                 Rating = r.Rating     
+            }).ToList();
+
+            return reviewDisplayDTOs;
+        }
+
+        public async Task<IEnumerable<ReviewserviceDisplayDTO>> GetAllReviewsByserviceIdAsync(string serviceId)
+        {
+            var reviews = await _context.reviews
+                .Where(r => r.serviceId ==serviceId)
+                .ToListAsync();
+
+            var userIds = reviews.Select(r => r.UserId).Distinct().ToList();
+            var users = await _context.userProfiles
+                .Where(u => userIds.Contains(u.UserId))
+                .ToListAsync();
+
+
+            var reviewDisplayDTOs = reviews.Select(r => new ReviewserviceDisplayDTO
+            {
+               serviceId = serviceId,
+                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName + ' ' +
+                users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
+                userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
+                Feedback = r.Feedback,
+                Rating = r.Rating
             }).ToList();
 
             return reviewDisplayDTOs;
@@ -65,6 +99,18 @@ namespace Skilly.Persistence.Implementation
         {
             var reviews = await _context.reviews
                 .Where(r => r.ServiceProvider.UserId == providerId)
+                .ToListAsync();
+
+            if (reviews == null || !reviews.Any())
+                return 0;
+
+            return Math.Round(reviews.Average(r => r.Rating), 2);
+        }
+
+        public async Task<decimal> GetAverageRatingByserviceIdAsync(string serviceId)
+        {
+            var reviews = await _context.reviews
+                .Where(r => r.serviceId == serviceId)
                 .ToListAsync();
 
             if (reviews == null || !reviews.Any())

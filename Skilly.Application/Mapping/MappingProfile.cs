@@ -62,6 +62,9 @@ public class MappingProfile : Profile
         CreateMap<Review, ReviewDTO>();
         CreateMap<ReviewDTO, Review>();
 
+        CreateMap<Review, ReviewServiceDTO>();
+        CreateMap<ReviewServiceDTO, Review>();
+
         // Category
         CreateMap<Category, CategoryDTO>()
             .ForMember(dest => dest.Img, opt => opt.Ignore());

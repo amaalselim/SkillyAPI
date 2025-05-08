@@ -27,8 +27,8 @@ namespace Skilly.API.Controllers.Areas.Provider
         }
 
 
-        [HttpPost("AddReview")]
-        public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDTO)
+        [HttpPost("AddProviderReview")]
+        public async Task<IActionResult> AddProviderReview([FromBody] ReviewDTO reviewDTO)
         {
             if (reviewDTO == null)
             {
@@ -38,7 +38,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 string userId = GetUserIdFromClaims();
-                await _unitOfWork.reviewRepository.AddReviewAsync(userId, reviewDTO);
+                await _unitOfWork.reviewRepository.AddReviewproviderAsync(userId, reviewDTO);
 
                 return StatusCode(StatusCodes.Status200OK, new { message = "Review added successfully.", data = new { reviewDTO } });
             }
@@ -48,11 +48,31 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
         }
 
+        [HttpPost("AddServiceReview")]
+        public async Task<IActionResult> AddserviceReview([FromBody] ReviewServiceDTO reviewDTO)
+        {
+            if (reviewDTO == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid review data." });
+            }
 
-        [HttpGet("GetReviewsByproviderId")]
+            try
+            {
+                string userId = GetUserIdFromClaims();
+                await _unitOfWork.reviewRepository.AddReviewserviceAsync(userId, reviewDTO);
+
+                return StatusCode(StatusCodes.Status200OK, new { message = "Review added successfully.", data = new { reviewDTO } });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("GetAllReviewsByproviderId(Token)")]
         public async Task<IActionResult> GetAllReviewsByProvider()
         {
-            
+
             try
             {
                 var providerId = GetUserIdFromClaims();
@@ -69,6 +89,49 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
+
+        [HttpGet("GetAllReviewsBy/{providerId}")]
+        public async Task<IActionResult> GetAllReviewsByProvider([FromQuery] string providerId)
+        {
+            
+            try
+            {
+                //var providerId = GetUserIdFromClaims();
+                //if (string.IsNullOrEmpty(providerId))
+                //{
+                //    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+                //}
+
+                var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByProviderIdAsync(providerId);
+                return StatusCode(StatusCodes.Status200OK, new { reviews });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
+        [HttpGet("GetReviewsBy/{serviceId}")]
+        public async Task<IActionResult> GetAllReviewsByservice(string serviceId)
+        {
+
+            try
+            {
+                //var providerId = GetUserIdFromClaims();
+                //if (string.IsNullOrEmpty(providerId))
+                //{
+                //    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+                //}
+
+                var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByserviceIdAsync(serviceId);
+                return StatusCode(StatusCodes.Status200OK, new { reviews });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
+
         [HttpGet("average-ratingByproviderId")]
         public async Task<IActionResult> GetAverageRating()
         {
@@ -78,6 +141,15 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
             }
             var averageRating = await _unitOfWork.reviewRepository.GetAverageRatingByProviderIdAsync(providerId);
+            return Ok(new { averageRating });
+        }
+
+
+        [HttpGet("average-ratingBy/{serviceId}")]
+        public async Task<IActionResult> GetAverageRatingforservice(string serviceId)
+        {
+            
+            var averageRating = await _unitOfWork.reviewRepository.GetAverageRatingByserviceIdAsync(serviceId);
             return Ok(new { averageRating });
         }
     }

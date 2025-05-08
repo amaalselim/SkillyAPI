@@ -19,11 +19,16 @@ namespace Skilly.Core.Entities
         [Range(0.0, 5.0)]
         public decimal Rating { get; set; }
         [ForeignKey("ServiceProvider")]
-        public string ProviderId { get; set; }
+        public string? ProviderId { get; set; }
+        [ForeignKey("ProviderServices")]
+
+        public string? serviceId { get; set; }
         [JsonIgnore]
         public virtual ServiceProvider? ServiceProvider { get; set; }
+        [JsonIgnore]
+        public virtual ProviderServices? ProviderServices { get; set; }
         //public virtual UserProfile? UserProfile { get; set; }
-        
+
 
     }
 }
