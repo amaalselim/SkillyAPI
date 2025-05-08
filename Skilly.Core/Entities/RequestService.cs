@@ -20,6 +20,7 @@ namespace Skilly.Core.Entities
         public string categoryId { get; set; }
         [JsonIgnore]
         public virtual Category? Category { get; set; }
+
         public string? Notes { get; set; }
         [ForeignKey("UserProfile")]
         public string userId { get; set; }
@@ -36,6 +37,11 @@ namespace Skilly.Core.Entities
         public ICollection<requestServiceImage>? requestServiceImages{ get; set; } = new List<requestServiceImage>();
         [JsonIgnore]
         public ICollection<OfferSalary>? offerSalaries{ get; set; } = new List<OfferSalary>();
+        [NotMapped]
+        public int OffersCount { get; set; }
+
+        [NotMapped]
+        public double Distance { get; set; }
 
     }
 }

@@ -144,90 +144,84 @@ namespace Skilly.Persistence.Implementation
                 {
                     ID = o.Id,
                     userId = o.userId,
-                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userName = o.User != null ? o.User.FirstName + " " + o.User.LastName : null,
                     userImg = o.serviceId != null
                         ? o.ProviderServices.providerImg
-                        : o.RequestService.userImg != null
-                            ? o.RequestService.userImg
-                            : null
-
-                    ,Salary = o.Salary,
-                    Deliverytime = o.Deliverytime,
-                    Notes = o.Notes,
-                    serviceId = o.ProviderServices !=null ? o.ProviderServices.Id: o.requestserviceId,
-                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                        o.RequestService != null ? o.RequestService.Name : null
-                })
-                .ToListAsync();
-        }
-
-        public async Task<List<offersalaryDTO>> GetAllOffersByServiceId(string serviceId)
-        {
-            return await _context.offerSalaries
-                .Select(o => new offersalaryDTO
-                {
-                    ID= o.Id,
-                    userId = o.userId,
-                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
-                    userImg = o.serviceId != null
-                        ? o.ProviderServices.providerImg
-                        : o.RequestService.userImg != null
-                            ? o.RequestService.userImg
-                            : null,
+                        : o.RequestService != null ? o.RequestService.userImg : null,
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                        o.RequestService != null ? o.RequestService.Name : null
+                                  o.RequestService != null ? o.RequestService.Name : null
                 })
-                .Where(x => x.serviceId == serviceId)
+                .ToListAsync();
+        }
+
+
+        public async Task<List<offersalaryDTO>> GetAllOffersByServiceId(string serviceId)
+        {
+            return await _context.offerSalaries
+                .Where(o => o.serviceId == serviceId || o.requestserviceId == serviceId)
+                .Select(o => new offersalaryDTO
+                {
+                    ID = o.Id,
+                    userId = o.userId,
+                    userName = o.User != null ? o.User.FirstName + " " + o.User.LastName : null,
+                    userImg = o.serviceId != null
+                        ? o.ProviderServices.providerImg
+                        : o.RequestService != null ? o.RequestService.userImg : null,
+                    Salary = o.Salary,
+                    Deliverytime = o.Deliverytime,
+                    Notes = o.Notes,
+                    serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
+                    ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
+                                  o.RequestService != null ? o.RequestService.Name : null
+                })
                 .ToListAsync();
         }
 
         public async Task<offersalaryDTO> GetOfferByIdAsync(string id)
         {
             return await _context.offerSalaries
+                .Where(o => o.Id == id)
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
                     userId = o.userId,
-                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userName = o.User != null ? o.User.FirstName + " " + o.User.LastName : null,
                     userImg = o.serviceId != null
                         ? o.ProviderServices.providerImg
-                        : o.RequestService.userImg != null
-                            ? o.RequestService.userImg
-                            : null,
+                        : o.RequestService != null ? o.RequestService.userImg : null,
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                        o.RequestService != null ? o.RequestService.Name : null
+                                  o.RequestService != null ? o.RequestService.Name : null
                 })
-                .FirstOrDefaultAsync(x => x.ID == id);
+                .FirstOrDefaultAsync();
         }
         public async Task<offersalaryDTO> GetOfferByserviceIdAsync(string serviceId)
         {
             return await _context.offerSalaries
+                .Where(o => o.serviceId == serviceId || o.requestserviceId == serviceId)
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
                     userId = o.userId,
-                    userName = o.User != null ? o.User.FirstName+" "+o.User.LastName : null,
+                    userName = o.User != null ? o.User.FirstName + " " + o.User.LastName : null,
                     userImg = o.serviceId != null
                         ? o.ProviderServices.providerImg
-                        : o.RequestService.userImg != null
-                            ? o.RequestService.userImg
-                            : null,
+                        : o.RequestService != null ? o.RequestService.userImg : null,
                     Salary = o.Salary,
                     Deliverytime = o.Deliverytime,
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                        o.RequestService != null ? o.RequestService.Name : null
+                                  o.RequestService != null ? o.RequestService.Name : null
                 })
-                .FirstOrDefaultAsync(x => x.serviceId == serviceId);
+                .FirstOrDefaultAsync();
         }
 
         public async Task<int> GetOffersCountByServiceIdAsync(string serviceId)

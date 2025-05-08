@@ -120,12 +120,11 @@ namespace Skilly.Persistence.Implementation
             var services = await _context.providerServices
                 .Include(i => i.ServicesImages)
                 .Include(i => i.serviceProvider)
+                .Include(i => i.offerSalaries)
                 .ToListAsync();
 
             if (services == null || !services.Any())
-            {
                 return new List<ProviderServices>();
-            }
 
             var serviceDtos = services.Select(item => new ProviderServices
             {
@@ -135,23 +134,21 @@ namespace Skilly.Persistence.Implementation
                 ServiceRequestTime = item.ServiceRequestTime,
                 Price = item.Price,
                 Deliverytime = item.Deliverytime,
-                categoryId=item.categoryId,
+                categoryId = item.categoryId,
                 Notes = item.Notes,
                 serviceProviderId = item.serviceProviderId,
                 ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
-                providerImg= item.serviceProvider.Img,
-                Images = item.ServicesImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>()
+                providerImg = item.serviceProvider.Img,
+                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                CountOfOffers = item.offerSalaries?.Count ?? 0
             }).ToList();
 
             return serviceDtos;
         }
 
-
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId)
         {
-            //var provider = await _context.serviceProviders.ToListAsync();
             var service = await _context.providerServices
                 .Include(c => c.serviceProvider)
                 .Include(g => g.ServicesImages)
@@ -159,9 +156,7 @@ namespace Skilly.Persistence.Implementation
                 .FirstOrDefaultAsync(g => g.Id == serviceId);
 
             if (service == null)
-            {
                 throw new ProviderServiceNotFoundException("Service not found.");
-            }
 
             var serviceDto = new ProviderServices
             {
@@ -176,14 +171,14 @@ namespace Skilly.Persistence.Implementation
                 serviceProviderId = service.serviceProviderId,
                 ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName,
                 providerImg = service.serviceProvider.Img,
-                Images = service.ServicesImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
-                offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>()
+                Images = service.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                CountOfOffers = service.offerSalaries?.Count ?? 0
             };
 
             return serviceDto;
         }
+
         public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
         {
             var services = await _context.providerServices
@@ -194,9 +189,7 @@ namespace Skilly.Persistence.Implementation
                 .ToListAsync();
 
             if (services == null || !services.Any())
-            {
                 return new List<ProviderServices>();
-            }
 
             var serviceDtos = services.Select(item => new ProviderServices
             {
@@ -211,25 +204,19 @@ namespace Skilly.Persistence.Implementation
                 serviceProviderId = item.serviceProviderId,
                 ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                 providerImg = item.serviceProvider.Img,
-                Images = item.ServicesImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
-                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>()
+                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                CountOfOffers = item.offerSalaries?.Count ?? 0
             }).ToList();
 
             return serviceDtos;
         }
 
-
-
-
         public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
-            {
                 return new List<ProviderServices>();
-            }
 
             var services = await _context.providerServices
                 .Include(c => c.serviceProvider)
@@ -239,9 +226,7 @@ namespace Skilly.Persistence.Implementation
                 .ToListAsync();
 
             if (services == null || !services.Any())
-            {
                 return new List<ProviderServices>();
-            }
 
             var serviceDtos = services.Select(item => new ProviderServices
             {
@@ -256,14 +241,62 @@ namespace Skilly.Persistence.Implementation
                 serviceProviderId = item.serviceProviderId,
                 ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                 providerImg = item.serviceProvider.Img,
-                Images = item.ServicesImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
-                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>()
+                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                CountOfOffers = item.offerSalaries?.Count ?? 0
             }).ToList();
 
             return serviceDtos;
         }
+
+        public async Task<IEnumerable<ProviderServices>> GetSortedProviderServicesAsync(
+                string sortBy, double? userLat = null, double? userLon = null)
+        {
+            var servicesQuery = _context.providerServices
+                .Include(s => s.serviceProvider)
+                .ThenInclude(sp => sp.User)
+                .Include(s => s.ServicesImages)
+                .Include(s => s.offerSalaries)
+                .AsQueryable();
+
+            var services = await servicesQuery.ToListAsync();
+
+            var serviceDtos = services.Select(item => new ProviderServices
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                ServiceRequestTime = item.ServiceRequestTime,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                Notes = item.Notes,
+                categoryId = item.categoryId,
+                serviceProviderId = item.serviceProviderId,
+                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                providerImg = item.serviceProvider.Img,
+                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                CountOfOffers = item.offerSalaries?.Count ?? 0,
+                Distance = (userLat != null && userLon != null)
+                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.serviceProvider.User?.Latitude, item.serviceProvider.User?.Longitude).GetValueOrDefault()
+                    : 0
+            });
+
+           
+            serviceDtos = string.IsNullOrEmpty(sortBy) || sortBy.ToLower() == "nearest"
+                ? (userLat != null && userLon != null ? serviceDtos.OrderBy(s => s.Distance) : serviceDtos)
+                : sortBy.ToLower() switch
+                {
+                    "price-asc" => serviceDtos.OrderBy(s => s.Price),
+                    "latest" => serviceDtos.OrderByDescending(s => s.ServiceRequestTime),
+                    _ => serviceDtos.OrderBy(s => s.Price)  
+                };
+
+            return serviceDtos.ToList();
+        }
+
+
+
 
     }
 }

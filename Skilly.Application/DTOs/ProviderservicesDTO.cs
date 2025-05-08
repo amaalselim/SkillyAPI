@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,6 +20,5 @@ namespace Skilly.Application.DTOs
         public decimal Price { get; set; }
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
         public string categoryId { get; set; }
-
     }
 }

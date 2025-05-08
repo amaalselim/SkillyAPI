@@ -5,7 +5,7 @@ using Skilly.Application.DTOs;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 
-namespace Skilly.API.Controllers
+namespace Skilly.API.Controllers.Areas.userProfile
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -89,12 +89,12 @@ namespace Skilly.API.Controllers
             }
         }
 
-        [HttpGet("GetOfferBy/{serviceId}")]
+        [HttpGet("GetOffersBy/{serviceId}")]
         public async Task<IActionResult> GetOfferByServiceId([FromRoute] string serviceId)
         {
             try
             {
-                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByIdAsync(serviceId);
+                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByserviceIdAsync(serviceId);
 
                 if (offer == null)
                 {

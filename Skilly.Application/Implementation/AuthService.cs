@@ -50,14 +50,14 @@ namespace Skilly.Application.Implementation
 
             if (user != null)
             {
-                //if (!user.EmailConfirmed)
-                //{
-                //    return new
-                //    {
-                //        Success = false,
-                //        Message = "Email not confirmed. Please verify your email first."
-                //    };
-                //}
+                if (!user.EmailConfirmed)
+                {
+                    return new
+                    {
+                        Success = false,
+                        Message = "Email not confirmed. Please verify your email first."
+                    };
+                }
                 var result = await _manager.PasswordSignInAsync(user.Email, loginDTO.Password, loginDTO.RememberMe, false);
                 if (result.Succeeded)
                 {

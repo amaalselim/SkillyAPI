@@ -4,6 +4,7 @@ using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
+using Skilly.Persistence.Implementation;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers.Areas.Provider
@@ -46,6 +47,20 @@ namespace Skilly.API.Controllers.Areas.Provider
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
+        }
+        [HttpGet("sortService")]
+        public async Task<IActionResult> GetSortedProviderServices(
+        [FromQuery] string sortBy = "nearest")
+        {
+            var userId = GetUserIdFromClaims();
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null || user.Latitude == null || user.Longitude == null)
+                return BadRequest("User location not available.");
+
+           var userLat = user.Latitude.Value;
+           var userLon = user.Longitude.Value;
+            var result = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
+            return Ok(result);
         }
 
         [HttpGet("GetAllServicesByproviderId")]

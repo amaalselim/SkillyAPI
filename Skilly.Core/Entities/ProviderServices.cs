@@ -39,5 +39,9 @@ namespace Skilly.Core.Entities
         public virtual Category? Category { get; set; }
         [JsonIgnore]
         public ICollection<OfferSalary>? offerSalaries { get; set; } = new List<OfferSalary>();
+        [NotMapped]
+        public int CountOfOffers { get; set; }
+        [NotMapped]
+        public double Distance { get; set; }
     }
 }

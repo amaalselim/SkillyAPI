@@ -16,7 +16,6 @@ namespace Skilly.Application.DTOs
         public string Age { get; set; }
         public Gender Gender { get; set; }
         public IFormFile Img { get; set; }
-        public string profession { get; set; }
         public string NumberOfYearExperience { get; set; }
         public string BriefSummary { get; set; }
         public IFormFile NationalNumberPDF { get; set; }

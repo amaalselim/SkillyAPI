@@ -20,29 +20,6 @@ namespace Skilly.API.Controllers
             _authService = authService;
         }
 
-
-        //[HttpPost("verify-email")]
-        //public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
-        //{
-        //    var token = await _authService.VerifyEmailCodeAsync(verificationDTO);
-
-        //    if (token != null)
-        //    {
-        //        return Ok(new
-        //        {
-        //            Success = true,
-        //            Message = "Email confirmed successfully.",
-        //            Token = token
-        //        });
-        //    }
-
-        //    return BadRequest(new
-        //    {
-        //        Success = false,
-        //        Message = "Invalid verification code."
-        //    });
-        //}
-
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
@@ -60,6 +37,31 @@ namespace Skilly.API.Controllers
                 Errors = result.Errors.Select(e => e.Description)
             });
         }
+
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
+        {
+            var token = await _authService.VerifyEmailCodeAsync(verificationDTO);
+
+            if (token != null)
+            {
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Email confirmed successfully.",
+                    Token = token
+                });
+            }
+
+            return BadRequest(new
+            {
+                Success = false,
+                Message = "Invalid verification code."
+            });
+        }
+
+       
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)

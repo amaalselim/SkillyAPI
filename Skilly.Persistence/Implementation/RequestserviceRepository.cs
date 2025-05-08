@@ -183,6 +183,16 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
+            // جيب كل الـ service IDs مرة وحدة
+            var serviceIds = services.Select(s => s.Id).ToList();
+
+            // جيب عدد العروض لكل خدمة
+            var offerCounts = await _context.offerSalaries
+                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
+                .GroupBy(o => o.serviceId ?? o.requestserviceId)
+                .ToDictionaryAsync(g => g.Key, g => g.Count());
+
+            // رجع الـ DTOs مع عدد العروض
             var serviceDtos = services.Select(item => new RequestService
             {
                 Id = item.Id,
@@ -198,15 +208,12 @@ namespace Skilly.Persistence.Implementation
                 userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
-                    .ToList()
+                    .ToList(),
+                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0
             }).ToList();
 
             return serviceDtos;
         }
-
-
-
-        
         public async Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId)
         {
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -221,6 +228,13 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
+            var serviceIds = services.Select(s => s.Id).ToList();
+
+            var offerCounts = await _context.offerSalaries
+                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
+                .GroupBy(o => o.serviceId ?? o.requestserviceId)
+                .ToDictionaryAsync(g => g.Key, g => g.Count());
+
             var serviceDtos = services.Select(item => new RequestService
             {
                 Id = item.Id,
@@ -236,21 +250,14 @@ namespace Skilly.Persistence.Implementation
                 userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
-                    .ToList()
+                    .ToList(),
+                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0
             }).ToList();
 
             return serviceDtos;
         }
-
-
         public async Task<RequestService> GetRequestById(string requestId)
         {
-            //var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
-            //if (user == null)
-            //{
-            //    throw new Exception("User not found.");
-            //}
-
             var service = await _context.requestServices
                 .Include(g => g.requestServiceImages)
                 .Include(g => g.UserProfile)
@@ -269,20 +276,79 @@ namespace Skilly.Persistence.Implementation
                 Name = service.Name,
                 Price = service.Price,
                 Deliverytime = service.Deliverytime,
-                startDate= service.startDate,
+                startDate = service.startDate,
                 categoryId = service.categoryId,
                 Notes = service.Notes,
-                userId= service.userId,
+                userId = service.userId,
                 userName = service.UserProfile.FirstName + " " + service.UserProfile.LastName,
                 userImg = service.UserProfile.Img,
                 Images = service.requestServiceImages?
                     .Select(img => img.Img)
                     .ToList() ?? new List<string>(),
-                offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>()
+                offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = service.offerSalaries?.Count ?? 0
             };
 
             return serviceDto;
         }
+        public async Task<IEnumerable<RequestService>> GetSortedUserAsync(
+                string sortBy, double? userLat = null, double? userLon = null)
+        {
+            var services = await _context.requestServices
+                .Include(c => c.UserProfile)
+                .Include(c => c.requestServiceImages)
+                .ToListAsync();
+
+            if (services == null || !services.Any())
+            {
+                return new List<RequestService>();
+            }
+
+            // جيب كل الـ service IDs مرة وحدة
+            var serviceIds = services.Select(s => s.Id).ToList();
+
+            // جيب عدد العروض لكل خدمة
+            var offerCounts = await _context.offerSalaries
+                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
+                .GroupBy(o => o.serviceId ?? o.requestserviceId)
+                .ToDictionaryAsync(g => g.Key, g => g.Count());
+
+            // رجع الـ DTOs مع عدد العروض
+            var serviceDtos = services.Select(item => new RequestService
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                startDate = item.startDate,
+                categoryId = item.categoryId,
+                Notes = item.Notes,
+                ServiceRequestTime = item.ServiceRequestTime,
+                userId = item.userId,
+                userImg = item.UserProfile.Img,
+                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                Images = item.requestServiceImages
+                    .Select(img => img.Img)
+                    .ToList(),
+                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0,
+                Distance = (userLat != null && userLon != null)
+                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
+                    : 0
+
+            });
+
+            serviceDtos = string.IsNullOrEmpty(sortBy) || sortBy.ToLower() == "nearest"
+                ? (userLat != null && userLon != null ? serviceDtos.OrderBy(s => s.Distance) : serviceDtos)
+                : sortBy.ToLower() switch
+                {
+                    "price-asc" => serviceDtos.OrderBy(s => s.Price),
+                    "latest" => serviceDtos.OrderByDescending(s => s.ServiceRequestTime),
+                    _ => serviceDtos.OrderBy(s => s.Price)
+                };
+
+            return serviceDtos.ToList();
+        }
+
 
     }
 }

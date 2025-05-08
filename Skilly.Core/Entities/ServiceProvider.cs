@@ -47,6 +47,7 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
 
         public ICollection<Review>? Reviews { get; set; } = new List<Review>();
+        
 
     }
 }
