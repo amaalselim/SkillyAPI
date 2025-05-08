@@ -10,7 +10,7 @@ namespace Skilly.Persistence.Abstract
 {
     public interface IProviderServicesRepository
     {
-        Task<IEnumerable<ProviderServices>> GetAllProviderService();
+        Task<IEnumerable<ProviderServices>> GetAllProviderService(double? userLat = null, double? userLng = null);
         Task<IEnumerable<ProviderServices>> GetSortedProviderServicesAsync(
     string sortBy, double? userLat = null, double? userLon = null);
         Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId);

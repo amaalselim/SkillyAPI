@@ -35,7 +35,11 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             try
             {
-                var Services = await _unitOfWork.providerServiceRepository.GetAllProviderService();
+                string userId = GetUserIdFromClaims();
+                var user= await _unitOfWork.Users.GetByIdAsync(userId);
+                var lat=user.Latitude;
+                var lon = user.Longitude;
+                var Services = await _unitOfWork.providerServiceRepository.GetAllProviderService(lat,lon);
                 if (Services == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });

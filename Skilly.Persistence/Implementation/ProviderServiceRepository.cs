@@ -115,7 +115,7 @@ namespace Skilly.Persistence.Implementation
             }
             await _context.SaveChangesAsync();
         }
-        public async Task<IEnumerable<ProviderServices>> GetAllProviderService()
+        public async Task<IEnumerable<ProviderServices>> GetAllProviderService(double? userLat = null, double? userLng = null)
         {
             var services = await _context.providerServices
                 .Include(i => i.ServicesImages)
@@ -141,11 +141,23 @@ namespace Skilly.Persistence.Implementation
                 providerImg = item.serviceProvider.Img,
                 Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                CountOfOffers = item.offerSalaries?.Count ?? 0
+                CountOfOffers = item.offerSalaries?.Count ?? 0,
+                Distance = (userLat != null && userLng != null)
+                    ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.serviceProvider.User?.Latitude, item?.serviceProvider.User?.Longitude).GetValueOrDefault()
+                    : 0
             }).ToList();
+
+            
+            if (userLat != null && userLng != null)
+            {
+                serviceDtos = serviceDtos
+                    .OrderBy(s => s.Distance)
+                    .ToList();
+            }
 
             return serviceDtos;
         }
+
 
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId)
         {
@@ -278,7 +290,7 @@ namespace Skilly.Persistence.Implementation
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
                 CountOfOffers = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLon != null)
-                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.serviceProvider.User?.Latitude, item.serviceProvider.User?.Longitude).GetValueOrDefault()
+                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.serviceProvider.User?.Latitude, item?.serviceProvider.User?.Longitude).GetValueOrDefault()
                     : 0
             });
 
