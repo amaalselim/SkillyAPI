@@ -10,7 +10,7 @@ namespace Skilly.Persistence.Abstract
 {
     public interface IRequestserviceRepository
     {
-        Task<IEnumerable<RequestService>> GetAllRequests();
+        Task<IEnumerable<RequestService>> GetAllRequests(double? userLat = null, double? userLng = null);
         Task<IEnumerable<RequestService>> GetSortedUserAsync(
                 string sortBy, double? userLat = null, double? userLon = null);
         Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId);

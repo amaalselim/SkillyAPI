@@ -171,10 +171,11 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<RequestService>> GetAllRequests()
+        public async Task<IEnumerable<RequestService>> GetAllRequests(double? userLat = null, double? userLng = null)
         {
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
+                .ThenInclude(sp => sp.User)
                 .Include(c => c.requestServiceImages)
                 .ToListAsync();
 
@@ -209,8 +210,18 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
-                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0
+                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0,
+                Distance = (userLat != null && userLng != null)
+                    ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.UserProfile.User?.Latitude, item?.UserProfile.User?.Longitude).GetValueOrDefault()
+                    : 0
             }).ToList();
+
+            if (userLat != null && userLng != null)
+            {
+                serviceDtos = serviceDtos
+                    .OrderBy(s => s.Distance)
+                    .ToList();
+            }
 
             return serviceDtos;
         }
