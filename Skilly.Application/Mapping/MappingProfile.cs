@@ -96,8 +96,8 @@ public class MappingProfile : Profile
         CreateMap<Message,MessageResponseDto>()
             .ForMember(dest => dest.SentAt, opt => opt.MapFrom(src => src.SentAt));
 
-        CreateMap<Message, MessageDTO>();
         CreateMap<MessageDTO, Message>();
+        CreateMap<Message, MessageDTO>();
 
         CreateMap<CreateChatDTO, Chat>();
         CreateMap<ChatDTO, Chat>(); 

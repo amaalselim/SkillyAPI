@@ -20,5 +20,6 @@ namespace Skilly.Application.DTOs
         public string ReceiverName { get; set; }
 
         public DateTime SentAt { get; set; }
+        public string? Img { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Skilly.Application.DTOs;
 using Skilly.Application.DTOs.chat;
 using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
+using Skilly.Persistence.Migrations;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers
@@ -28,7 +29,7 @@ namespace Skilly.API.Controllers
         }
 
         [HttpPost("SendMessage")]
-        public async Task<IActionResult> SendMessage([FromBody] MessageDTO messageDTO)
+        public async Task<IActionResult> SendMessage([FromForm] MessageDTO messageDTO)
         {
             try
             {
@@ -47,7 +48,12 @@ namespace Skilly.API.Controllers
                     await _hubContext.Clients.User(senderId)
                         .SendAsync("ReceiveMessage", senderId, messageDTO.content);
 
-                    return StatusCode(201, new { status = "success", message = "Message sent successfully.", data = message });
+                    return StatusCode(201, new { status = "success", message = "Message sent successfully.",
+                        data = new
+                        {
+                            receiverId = message.receiverId,
+                            content=message.content
+                        }});
                 }
 
                 return BadRequest(new { status = "error", message = "Failed to send message." });
