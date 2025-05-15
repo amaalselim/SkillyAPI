@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Skilly.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
@@ -27,5 +28,7 @@ namespace Skilly.Core.Entities
         public string? userId { get; set; }
         [JsonIgnore]
         public virtual User? User { get; set; }
+        public OfferStatus Status { get; set; } = OfferStatus.Pending;
+
     }
 }
