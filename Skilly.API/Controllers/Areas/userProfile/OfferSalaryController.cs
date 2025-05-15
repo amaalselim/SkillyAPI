@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Skilly.Application.DTOs;
+using Skilly.Core.Enums;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 
@@ -132,23 +134,27 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return BadRequest(new { message = "Invalid offer data." });
             }
 
+            var userId = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "User not authorized." });
+            }
+
             try
             {
-                var userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { message = "User not authorized." });
-                }
-
                 await _unitOfWork._OfferSalaryRepository.AddOfferAsync(offerSalaryDTO, userId);
-
                 return Ok(new { message = "Offer added successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
 
         [HttpPut("EditOfferBy/{offerId}")]
         public async Task<IActionResult> EditOffer([FromBody] offersalaryDTO offerSalaryDTO, [FromRoute] string offerId)
@@ -196,5 +202,25 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+        [HttpPost("AcceptOffer/{id}")]
+        public async Task<IActionResult> AcceptOffer(string id)
+        {
+            var result = await _unitOfWork._OfferSalaryRepository.AcceptOfferAsync(id);
+            if (!result)
+                return NotFound(new { message = "Offer not found." });
+
+            return Ok(new { message = "Offer accepted successfully." });
+        }
+
+        [HttpPost("RejectOffer/{id}")]
+        public async Task<IActionResult> RejectOffer(string id)
+        {
+            var result = await _unitOfWork._OfferSalaryRepository.RejectOfferAsync(id);
+            if (!result)
+                return NotFound(new { message = "Offer not found." });
+
+            return Ok(new { message = "Offer rejected successfully." });
+        }
+
     }
 }
