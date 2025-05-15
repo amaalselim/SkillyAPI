@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
+using Skilly.Application.Implementation;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -23,13 +25,15 @@ namespace Skilly.Persistence.Implementation
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IImageService _imageService;
 
-        public ChatService(ApplicationDbContext context, IHubContext<ChatHub> hubContext,IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public ChatService(ApplicationDbContext context, IHubContext<ChatHub> hubContext,IMapper mapper, IHttpContextAccessor httpContextAccessor,IImageService imageService)
         {
             _context = context;
             _hubContext = hubContext;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _imageService = imageService;
         }
 
         public async Task<ChatDTO> CreateChatAsync(CreateChatDTO dto)
@@ -90,6 +94,7 @@ namespace Skilly.Persistence.Implementation
                 }
                 chat = _mapper.Map<Chat>(createdChat); 
             }
+            
 
             var message = new Message
             {
@@ -101,6 +106,11 @@ namespace Skilly.Persistence.Implementation
                 Timestamp = DateTime.Now,
                 IsRead = false
             };
+            var path = @"Images/Chat/Messages/";
+            if (dto.Img != null)
+            {
+                message.Img = await _imageService.SaveFileAsync(dto.Img, path);
+            }
 
 
             _context.Messages.Add(message);
@@ -123,7 +133,11 @@ namespace Skilly.Persistence.Implementation
                     .SendAsync("ReceiveMessage", senderId, dto.content);
             }
 
-            return _mapper.Map<MessageDTO>(message);
+            return new MessageDTO
+            {
+                receiverId = message.ReceiverId,
+                content = message.Content
+            };
         }
         public async Task<List<ChatDTO>> GetChatsForUserAsync(string userId)
         {
