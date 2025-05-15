@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vonage.Users;
 
 namespace Skilly.Persistence.Implementation
 {
@@ -267,6 +268,69 @@ namespace Skilly.Persistence.Implementation
                 return false;
 
             offer.Status = OfferStatus.Accepted;
+
+
+            var user = await _context.users.FirstOrDefaultAsync(u => u.Id == offer.userId);
+            if (offer.serviceId != null)
+            {
+                var providerService = await _context.providerServices
+                    .Include(p => p.serviceProvider)
+                    .FirstOrDefaultAsync(p => p.Id == offer.serviceId && p.serviceProvider.User.FcmToken != null);
+
+                string title = "قبول عرض سعر";
+                string body = $" تمت الموافقه على السعر النهائي من  موفر الخدمة {user.FirstName + " " + user.LastName}";
+
+                var provviderr = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.serviceProvider.UserId);
+                if (providerService?.serviceProvider != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        provviderr.FcmToken,
+                        title,
+                        body
+                    );
+
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = providerService.serviceProvider.UserId,
+                        Title = title,
+                        Body = body,
+                        userImg = providerService.serviceProvider.Img,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+            else if (offer.requestserviceId != null)
+            {
+                var requestService = await _context.requestServices
+                    .Include(r => r.UserProfile)
+                    .FirstOrDefaultAsync(r => r.Id == offer.requestserviceId && r.UserProfile.User.FcmToken != null);
+
+                string title = "قبول عرض سعر";
+                string body = $"تم تأكيد طلبك من قِبل المستخدم {user.FirstName + " " + user.LastName}. برجاء البدء في تنفيذ الخدمة.";
+
+
+                var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
+                if (requestService?.UserProfile != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        userr.FcmToken,
+                        title,
+                        body
+                    );
+
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = requestService.UserProfile.UserId,
+                        Title = title,
+                        Body = body,
+                        userImg = requestService.UserProfile.Img,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+
             _context.offerSalaries.Update(offer);
             await _context.SaveChangesAsync();
             return true;
