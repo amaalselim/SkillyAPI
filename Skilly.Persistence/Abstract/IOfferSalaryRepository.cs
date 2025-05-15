@@ -19,6 +19,8 @@ namespace Skilly.Persistence.Abstract
         Task UpdateOfferAsync(offersalaryDTO offersalaryDTO, string id);
         Task DeleteOfferAsync(string id);
         Task<int> GetOffersCountByServiceIdAsync(string serviceId);
+        Task<bool> AcceptOfferAsync(string id);
+        Task<bool> RejectOfferAsync(string id);
 
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Skilly.Application.DTOs;
 using Skilly.Core.Entities;
+using Skilly.Core.Enums;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Migrations;
@@ -31,6 +32,14 @@ namespace Skilly.Persistence.Implementation
             if (!string.IsNullOrEmpty(offersalaryDTO.serviceId))
             {
                 var id = offersalaryDTO.serviceId;
+
+                bool offerExists = await _context.offerSalaries
+                    .AnyAsync(o => (o.serviceId == id || o.requestserviceId == id) && o.Status == OfferStatus.Pending);
+
+                if (offerExists)
+                {
+                    throw new InvalidOperationException("لا يمكن إضافة عرض ثاني على نفس الخدمة قبل إنهاء العرض السابق أو رفضه.");
+                }
 
                 if (await _context.providerServices.AnyAsync(s => s.Id == id))
                 {
@@ -140,12 +149,16 @@ namespace Skilly.Persistence.Implementation
         public async Task<List<offersalaryDTO>> GetAllOffersAsync()
         {
             return await _context.offerSalaries
+                .Where(o => o.Status == OfferStatus.Pending)
+                .Include(o => o.User)
+                .Include(o => o.ProviderServices)
+                .Include(o => o.RequestService)
                 .Select(o => new offersalaryDTO
                 {
-                    ID = o.Id,
+                    ID= o.Id,
                     userId = o.userId,
                     userName = o.User != null ? o.User.FirstName + " " + o.User.LastName : null,
-                    userImg = o.serviceId != null
+                    userImg = o.ProviderServices != null
                         ? o.ProviderServices.providerImg
                         : o.RequestService != null ? o.RequestService.userImg : null,
                     Salary = o.Salary,
@@ -159,16 +172,20 @@ namespace Skilly.Persistence.Implementation
         }
 
 
+
         public async Task<List<offersalaryDTO>> GetAllOffersByServiceId(string serviceId)
         {
             return await _context.offerSalaries
-                .Where(o => o.serviceId == serviceId || o.requestserviceId == serviceId)
+                .Where(o => (o.serviceId == serviceId || o.requestserviceId == serviceId) && o.Status == OfferStatus.Pending)
+                .Include(o => o.User)
+                .Include(o => o.ProviderServices)
+                .Include(o => o.RequestService)
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
                     userId = o.userId,
                     userName = o.User != null ? o.User.FirstName + " " + o.User.LastName : null,
-                    userImg = o.serviceId != null
+                    userImg = o.ProviderServices != null
                         ? o.ProviderServices.providerImg
                         : o.RequestService != null ? o.RequestService.userImg : null,
                     Salary = o.Salary,
@@ -176,7 +193,7 @@ namespace Skilly.Persistence.Implementation
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                                  o.RequestService != null ? o.RequestService.Name : null
+                                  o.RequestService != null ? o.RequestService.Name : null,
                 })
                 .ToListAsync();
         }
@@ -184,7 +201,7 @@ namespace Skilly.Persistence.Implementation
         public async Task<offersalaryDTO> GetOfferByIdAsync(string id)
         {
             return await _context.offerSalaries
-                .Where(o => o.Id == id)
+                .Where(o => o.Id == id && o.Status == OfferStatus.Pending)
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
@@ -198,14 +215,15 @@ namespace Skilly.Persistence.Implementation
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                                  o.RequestService != null ? o.RequestService.Name : null
+                                  o.RequestService != null ? o.RequestService.Name : null,
+                    Status = o.Status.ToString()
                 })
                 .FirstOrDefaultAsync();
         }
         public async Task<offersalaryDTO> GetOfferByserviceIdAsync(string serviceId)
         {
             return await _context.offerSalaries
-                .Where(o => o.serviceId == serviceId || o.requestserviceId == serviceId)
+                .Where(o => (o.serviceId == serviceId || o.requestserviceId == serviceId) && o.Status == OfferStatus.Pending)
                 .Select(o => new offersalaryDTO
                 {
                     ID = o.Id,
@@ -219,15 +237,18 @@ namespace Skilly.Persistence.Implementation
                     Notes = o.Notes,
                     serviceId = o.ProviderServices != null ? o.ProviderServices.Id : o.requestserviceId,
                     ServiceName = o.ProviderServices != null ? o.ProviderServices.Name :
-                                  o.RequestService != null ? o.RequestService.Name : null
+                                  o.RequestService != null ? o.RequestService.Name : null,
+                    Status = o.Status.ToString()
                 })
                 .FirstOrDefaultAsync();
         }
 
+
+
         public async Task<int> GetOffersCountByServiceIdAsync(string serviceId)
         {
             return await _context.offerSalaries
-            .Where(o => o.serviceId == serviceId || o.requestserviceId==serviceId)
+            .Where(o => (o.serviceId == serviceId || o.requestserviceId==serviceId) && o.Status==OfferStatus.Pending)
             .CountAsync();
         }
 
@@ -238,5 +259,32 @@ namespace Skilly.Persistence.Implementation
             _context.offerSalaries.Update(offer);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> AcceptOfferAsync(string id)
+        {
+            var offer = await _context.offerSalaries.FindAsync(id);
+            if (offer == null)
+                return false;
+
+            offer.Status = OfferStatus.Accepted;
+            _context.offerSalaries.Update(offer);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RejectOfferAsync(string id)
+        {
+            var offer = await _context.offerSalaries.FindAsync(id);
+            if (offer == null)
+                return false;
+
+            offer.Status = OfferStatus.Rejected;
+            _context.offerSalaries.Update(offer);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
     }
 }
