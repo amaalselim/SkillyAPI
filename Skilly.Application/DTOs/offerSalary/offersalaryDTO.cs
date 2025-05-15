@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Skilly.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ namespace Skilly.Application.DTOs
         public string? Notes { get; set; }
         public string? serviceId { get; set; }
         public string? ServiceName { get; set; }
+        public string Status { get; set; } 
 
     }
 }
