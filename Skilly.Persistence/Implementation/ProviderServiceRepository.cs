@@ -39,6 +39,7 @@ namespace Skilly.Persistence.Implementation
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
             service.uId = user.UserId;
+            service.categoryId = user.categoryId;
 
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
@@ -89,6 +90,11 @@ namespace Skilly.Persistence.Implementation
                 throw new ProviderServiceNotFoundException("Provider not found.");
             }
             _mapper.Map(providerservicesDTO, service);
+            service.serviceProviderId = user.Id;
+            service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
+            service.providerImg = user.Img;
+            service.uId = user.UserId;
+            service.categoryId = user.categoryId;
             var path = @"Images/ServiceProvider/MyServices/";
 
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
