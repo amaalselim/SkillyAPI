@@ -43,5 +43,8 @@ namespace Skilly.Core.Entities
         public int CountOfOffers { get; set; }
         [NotMapped]
         public double Distance { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }

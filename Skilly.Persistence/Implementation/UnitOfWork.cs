@@ -12,6 +12,7 @@ namespace Skilly.Persistence.Implementation
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
+        public IPaymentRepository _paymentRepository { get; private set; }
 
         public IGenericRepository<User> Users { get; private set; }
 
@@ -40,7 +41,8 @@ namespace Skilly.Persistence.Implementation
            ICategoryRepository categoryRepository,
            IRequestserviceRepository requestserviceRepository,
            IOfferSalaryRepository OfferSalaryRepository,
-           IBannerService bannerService
+           IBannerService bannerService,
+           IPaymentRepository paymentRepository
 
            )
         {
@@ -55,6 +57,7 @@ namespace Skilly.Persistence.Implementation
             _requestserviceRepository = requestserviceRepository;
             _OfferSalaryRepository = OfferSalaryRepository;
             _BannerService = bannerService;
+            _paymentRepository = paymentRepository;
         }
 
         public async Task<int> CompleteAsync()

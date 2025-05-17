@@ -36,6 +36,10 @@ namespace Skilly.API
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
 
+
+
+            builder.Services.Configure<PaymobSettings>(builder.Configuration.GetSection("Paymob"));
+
             builder.Services.AddIdentity<User, IdentityRole>()
                            .AddEntityFrameworkStores<ApplicationDbContext>()
                            .AddDefaultTokenProviders();
@@ -87,10 +91,10 @@ namespace Skilly.API
             builder.Services.AddScoped<IChatService,ChatService>(); 
             builder.Services.AddScoped<IBannerService,BannerService>();
             builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
-
-            //builder.Services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
-            builder.Services.AddScoped<FirebaseV1Service>(); 
+            builder.Services.AddScoped<FirebaseV1Service>();
+            builder.Services.AddScoped<PaymobService>();
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
            // builder.Services.AddTransient<ExceptionMiddleware>();

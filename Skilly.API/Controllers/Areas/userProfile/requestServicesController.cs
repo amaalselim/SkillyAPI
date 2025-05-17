@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Exchange.WebServices.Data;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
@@ -30,36 +31,28 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpGet("GetAllRequests")]
-        public async Task<IActionResult> GetAllServices()
+        public async Task<IActionResult> GetAllServices([FromQuery] string sortBy = "nearest")
         {
             try
             {
-                var services = await _unitOfWork._requestserviceRepository.GetAllRequests();
+                var userId = GetUserIdFromClaims();
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null || user.Latitude == null || user.Longitude == null)
+                    return BadRequest("User location not available.");
+
+                var userLat = user.Latitude.Value;
+                var userLon = user.Longitude.Value;
+                var services = await _unitOfWork._requestserviceRepository.GetSortedUserAsync(sortBy, userLat, userLon);
                 if (services == null || !services.Any())
                 {
                     return NotFound(new { message = "No services found." });
                 }
-
-                return Ok(new { services });
+                return StatusCode(StatusCodes.Status200OK, new { services });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
-        }
-        [HttpGet("sortService")]
-        public async Task<IActionResult> GetSortedRequestServices(
-        [FromQuery] string sortBy = "nearest")
-        {
-            var userId = GetUserIdFromClaims();
-            var user = await _unitOfWork.Users.GetByIdAsync(userId);
-            if (user == null || user.Latitude == null || user.Longitude == null)
-                return BadRequest("User location not available.");
-
-            var userLat = user.Latitude.Value;
-            var userLon = user.Longitude.Value;
-            var result = await _unitOfWork._requestserviceRepository.GetSortedUserAsync(sortBy, userLat, userLon);
-            return Ok(result);
         }
 
         [HttpGet("GetAllRequestsByuserId")]

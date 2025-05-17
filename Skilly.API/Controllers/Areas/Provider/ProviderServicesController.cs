@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Exchange.WebServices.Data;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
@@ -31,41 +32,43 @@ namespace Skilly.API.Controllers.Areas.Provider
         }
 
         [HttpGet("getAllServices")]
-        public async Task<IActionResult> GetAllServices()
+        public async Task<IActionResult> GetAllServices([FromQuery] string sortBy = "nearest")
         {
             try
             {
-                string userId = GetUserIdFromClaims();
-                var user= await _unitOfWork.Users.GetByIdAsync(userId);
-                var lat=user.Latitude;
-                var lon = user.Longitude;
-                var Services = await _unitOfWork.providerServiceRepository.GetAllProviderService(lat,lon);
-                if (Services == null)
+                var userId = GetUserIdFromClaims();
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null || user.Latitude == null || user.Longitude == null)
+                    return BadRequest("User location not available.");
+
+                var userLat = user.Latitude.Value;
+                var userLon = user.Longitude.Value;
+                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
+                if (services == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
                 }
-
-                return StatusCode(StatusCodes.Status200OK, new { Services });
+                return StatusCode(StatusCodes.Status200OK, new { services });
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-        [HttpGet("sortService")]
-        public async Task<IActionResult> GetSortedProviderServices(
-        [FromQuery] string sortBy = "nearest")
-        {
-            var userId = GetUserIdFromClaims();
-            var user = await _unitOfWork.Users.GetByIdAsync(userId);
-            if (user == null || user.Latitude == null || user.Longitude == null)
-                return BadRequest("User location not available.");
+        //[HttpGet("sortService")]
+        //public async Task<IActionResult> GetSortedProviderServices(
+        //[FromQuery] string sortBy = "nearest")
+        //{
+        //    var userId = GetUserIdFromClaims();
+        //    var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        //    if (user == null || user.Latitude == null || user.Longitude == null)
+        //        return BadRequest("User location not available.");
 
-           var userLat = user.Latitude.Value;
-           var userLon = user.Longitude.Value;
-            var result = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
-            return Ok(result);
-        }
+        //   var userLat = user.Latitude.Value;
+        //   var userLon = user.Longitude.Value;
+        //    var result = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
+        //    return Ok(result);
+        //}
 
         [HttpGet("GetAllServicesByproviderId")]
         public async Task<IActionResult> GetservicesbyuserId()

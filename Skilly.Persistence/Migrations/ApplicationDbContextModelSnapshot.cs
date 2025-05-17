@@ -236,7 +236,7 @@ namespace Skilly.Persistence.Migrations
 
                     b.HasIndex("UserId1");
 
-                    b.ToTable("chats");
+                    b.ToTable("Chat", (string)null);
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.Message", b =>
@@ -283,7 +283,7 @@ namespace Skilly.Persistence.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Message", (string)null);
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.Notifications", b =>
@@ -352,6 +352,55 @@ namespace Skilly.Persistence.Migrations
                     b.HasIndex("userId");
 
                     b.ToTable("offerSalaries");
+                });
+
+            modelBuilder.Entity("Skilly.Core.Entities.Payment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymobOrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderServiceId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RequestServiceId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserProfile")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProviderServiceId");
+
+                    b.HasIndex("RequestServiceId");
+
+                    b.HasIndex("UserProfile");
+
+                    b.ToTable("payments");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
@@ -507,7 +556,7 @@ namespace Skilly.Persistence.Migrations
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("reviews");
+                    b.ToTable("Review", (string)null);
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.ServiceProvider", b =>
@@ -724,7 +773,7 @@ namespace Skilly.Persistence.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.UserProfile", b =>
@@ -935,6 +984,27 @@ namespace Skilly.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Skilly.Core.Entities.Payment", b =>
+                {
+                    b.HasOne("Skilly.Core.Entities.ProviderServices", "ProviderService")
+                        .WithMany("Payments")
+                        .HasForeignKey("ProviderServiceId");
+
+                    b.HasOne("Skilly.Core.Entities.RequestService", "RequestService")
+                        .WithMany("Payments")
+                        .HasForeignKey("RequestServiceId");
+
+                    b.HasOne("Skilly.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserProfile");
+
+                    b.Navigation("ProviderService");
+
+                    b.Navigation("RequestService");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
                 {
                     b.HasOne("Skilly.Core.Entities.Category", "Category")
@@ -1076,6 +1146,8 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("ServicesImages");
 
                     b.Navigation("offerSalaries");
@@ -1083,6 +1155,8 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.RequestService", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("offerSalaries");
 
                     b.Navigation("requestServiceImages");

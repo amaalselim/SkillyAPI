@@ -20,7 +20,8 @@ namespace Skilly.Persistence.Abstract
         IOfferSalaryRepository _OfferSalaryRepository { get; }
 
         IBannerService _BannerService { get; }
-        
+        IPaymentRepository _paymentRepository { get; }
+
         Task<int> CompleteAsync();
     }
 }
