@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Skilly.Core.Entities;
+using Skilly.Persistence.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,8 @@ namespace Skilly.Persistence.DataContext
         public DbSet<Message> Messages { get; set; }
         public DbSet<Chat> chats { get; set; }
         public DbSet<Banner> banners{ get; set; }
+        public DbSet<Payment> payments{ get; set; }
+
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -40,42 +43,14 @@ namespace Skilly.Persistence.DataContext
             //optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=GraduationProject-Skilly;Integrated Security=True;Encrypt=True;TrustServerCertificate=True");
             optionsBuilder.UseSqlServer("Server=db10869.public.databaseasp.net; Database=db10869; User Id=db10869; Password=Cq7@f4-A=H8e; Encrypt=False; MultipleActiveResultSets=True;");
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.PhoneNumber)
-                .IsUnique();
-            modelBuilder.Entity<Review>()
-                .HasOne(r => r.ServiceProvider)
-                .WithMany(sp => sp.Reviews)
-                .HasForeignKey(r => r.ProviderId);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.Sender)
-                .WithMany()
-                .HasForeignKey(m => m.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.Receiver)
-                .WithMany()
-                .HasForeignKey(m => m.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Chat>()
-               .HasOne(c => c.FirstUser)
-               .WithMany()
-               .HasForeignKey(c => c.FirstUserId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Chat>()
-                .HasOne(c => c.SecondUser)
-                .WithMany()
-                .HasForeignKey(c => c.SecondUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new ChatConfiguration());
+            modelBuilder.ApplyConfiguration(new ReviewConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageConfiguration());
         }
     }
 }
