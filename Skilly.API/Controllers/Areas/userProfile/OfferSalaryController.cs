@@ -91,25 +91,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
         }
 
-        [HttpGet("GetOffersBy/{serviceId}")]
-        public async Task<IActionResult> GetOfferByServiceId([FromRoute] string serviceId)
-        {
-            try
-            {
-                var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByserviceIdAsync(serviceId);
-
-                if (offer == null)
-                {
-                    return NotFound(new { message = "Offer not found for the specified service." });
-                }
-
-                return Ok(new { offer });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-            }
-        }
+        
 
         [HttpGet("GetOffersCountBy/{serviceId}")]
         public async Task<IActionResult> GetOffersCountByServiceId([FromRoute] string serviceId)

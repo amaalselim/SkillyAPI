@@ -13,6 +13,7 @@ namespace Skilly.Core.Entities
         public string SenderId { get; set; }
         public string ReceiverId { get; set; }
         public string Content { get; set; }
+        public string? Img { get; set; }
         public DateTime Timestamp { get; set; }= DateTime.UtcNow;
         public bool IsRead { get; set; } = false;
         public DateTime? ReadAt { get; set; }

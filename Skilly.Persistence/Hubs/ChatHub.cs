@@ -10,20 +10,23 @@ public class ChatHub : Hub
     public ChatHub()
     {
     }
-    public async Task SendMessage(string receiverId, string messageContent)
+    public async Task SendMessage(string receiverId, string messageContent, string? imageUrl)
     {
         var senderId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (!string.IsNullOrEmpty(receiverId) && Users.TryGetValue(receiverId, out var receiverConnectionId))
         {
-            await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderId, messageContent);
+            await Clients.Client(receiverConnectionId)
+                .SendAsync("ReceiveMessage", senderId, messageContent, imageUrl);
         }
 
         if (!string.IsNullOrEmpty(senderId) && Users.TryGetValue(senderId, out var senderConnectionId))
         {
-            await Clients.Client(senderConnectionId).SendAsync("ReceiveMessage", senderId, messageContent);
+            await Clients.Client(senderConnectionId)
+                .SendAsync("ReceiveMessage", senderId, messageContent, imageUrl);
         }
-        Console.WriteLine($"Message sent from {senderId} to {receiverId}: {messageContent}");
+
+        Console.WriteLine($"Message sent from {senderId} to {receiverId}: {messageContent} - {imageUrl}");
     }
 
 

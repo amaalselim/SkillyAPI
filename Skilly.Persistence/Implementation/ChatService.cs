@@ -120,17 +120,18 @@ namespace Skilly.Persistence.Implementation
             chat.LastUpdatedAt = DateTime.Now;
             _context.chats.Update(chat);
             await _context.SaveChangesAsync();
+            var imageUrl = message.Img;
 
             if (ChatHub.Users.TryGetValue(dto.receiverId, out var receiverConnectionId))
             {
                 await _hubContext.Clients.Client(receiverConnectionId)
-                    .SendAsync("ReceiveMessage", senderId, dto.content);
+                    .SendAsync("ReceiveMessage", senderId, dto.content,imageUrl);
             }
 
             if (ChatHub.Users.TryGetValue(senderId, out var senderConnectionId))
             {
                 await _hubContext.Clients.Client(senderConnectionId)
-                    .SendAsync("ReceiveMessage", senderId, dto.content);
+                    .SendAsync("ReceiveMessage", senderId, dto.content,imageUrl);
             }
 
             return new MessageDTO
