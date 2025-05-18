@@ -72,6 +72,7 @@ namespace Skilly.Persistence.Implementation
                 decimal finalPrice = service.Price* 0.85m;
                 service.PriceDiscount = finalPrice;
                 user.Points -= 100;
+                user.useDiscount = true;
             }
             else
             {

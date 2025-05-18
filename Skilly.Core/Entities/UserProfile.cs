@@ -27,6 +27,8 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public virtual User? User { get; set; }
         public int Points { get; set; } = 0;
+        [JsonIgnore]
+        public bool? useDiscount { get; set; } = false;
 
     }
 }

@@ -32,14 +32,17 @@ namespace Skilly.Persistence.Implementation
         {
             var payment = await _context.payments.FirstOrDefaultAsync(p=>p.PaymobOrderId == id);
             var user=await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
+            var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
+
             if (payment == null)
                 payment.PaymentStatus = "failed";
 
             payment.PaymentStatus = "paid";
             user.Points += 20;
-            
-            
-            
+            userprofile.useDiscount = false;
+
+
+
 
             await _context.SaveChangesAsync();
             return "Success";
@@ -53,6 +56,8 @@ namespace Skilly.Persistence.Implementation
                 throw new Exception("User is not authenticated");
 
             var user = await _context.Users.FindAsync(userId);
+            var userprofile=await _context.userProfiles.FirstOrDefaultAsync(u=>u.UserId== userId);
+
             if (user == null)
                 throw new Exception("User not found");
 
@@ -64,7 +69,7 @@ namespace Skilly.Persistence.Implementation
 
             if (providerService != null)
             {
-                if (providerService.PriceDiscount != null)
+                if (providerService.PriceDiscount != null && userprofile.useDiscount==true)
                 {
                     amount = (decimal)providerService.PriceDiscount;
                 }
