@@ -17,6 +17,7 @@ namespace Skilly.Core.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public decimal? PriceDiscount { get; set; }
         public string Deliverytime { get; set; }
         public string? Notes { get; set; }
         [JsonIgnore]

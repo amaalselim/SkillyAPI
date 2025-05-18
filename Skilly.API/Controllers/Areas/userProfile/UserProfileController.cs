@@ -39,13 +39,13 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
                 if (users == null || !users.Any())
                 {
-                    return NotFound(new { message = "No user profiles found." }); // 404 Not Found
+                    return NotFound(new { message = "No user profiles found." });
                 }
                 return Ok(new { users }); 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" }); // 500 Internal Server Error
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" }); 
             }
         }
 
@@ -58,13 +58,13 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 var user = await _unitOfWork.ProfileRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return NotFound(new { message = "User profile not found." }); // 404 Not Found
+                    return NotFound(new { message = "User profile not found." }); 
                 }
                 return Ok(new { user }); 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" }); // 500 Internal Server Error
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" }); 
             }
         }
 
@@ -77,7 +77,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized(new { message = "User not authenticated." }); // 401 Unauthorized
+                    return Unauthorized(new { message = "User not authenticated." });
                 }
 
                 await _unitOfWork.ProfileRepository.AddUserProfileAsync(userProfileDTO, userId);
@@ -94,7 +94,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred.", error = ex.Message }); // 500 Internal Server Error
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
             }
         }
 
@@ -107,7 +107,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized(new { message = "User not authenticated." }); // 401 Unauthorized
+                    return Unauthorized(new { message = "User not authenticated." }); 
                 }
 
                 await _unitOfWork.ProfileRepository.EditUserProfileAsync(userProfileDTO, userId);
@@ -140,7 +140,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 var userId = GetUserIdFromClaims();
                 await _unitOfWork.ProfileRepository.DeleteUserProfileAsync(userId);
 
-                return Ok(new { message = "User profile deleted successfully." }); // 200 OK
+                return Ok(new { message = "User profile deleted successfully." }); 
             }
             catch (UserNotFoundException ex)
             {

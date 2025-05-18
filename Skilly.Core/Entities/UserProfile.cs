@@ -20,13 +20,13 @@ namespace Skilly.Core.Entities
         public string Governorate { get; set; }
         public string City { get; set; }
         public string StreetName { get; set; }
-        //public string Age {  get; set; }
         public Gender Gender { get; set; }
         public string Img { get; set; }
         [ForeignKey("User")]
         public string UserId { get; set; }
         [JsonIgnore]
         public virtual User? User { get; set; }
+        public int Points { get; set; } = 0;
 
     }
 }

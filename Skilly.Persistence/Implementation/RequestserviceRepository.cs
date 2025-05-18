@@ -71,8 +71,9 @@ namespace Skilly.Persistence.Implementation
                     requestServiceId = service.Id
                 }).ToList();
             }
-
+            user.Points += 20;
             await _context.SaveChangesAsync();
+
 
             var providers = await _context.serviceProviders
                 .Where(u => u.categoryId == service.categoryId && u.User.FcmToken != null)
@@ -198,6 +199,7 @@ namespace Skilly.Persistence.Implementation
             {
                 Id = item.Id,
                 Name = item.Name,
+        
                 Price = item.Price,
                 Deliverytime = item.Deliverytime,
                 startDate = item.startDate,

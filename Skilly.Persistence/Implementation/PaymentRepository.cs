@@ -31,10 +31,16 @@ namespace Skilly.Persistence.Implementation
         public async Task<string> HandlePaymentCallbackAsync(string id)
         {
             var payment = await _context.payments.FirstOrDefaultAsync(p=>p.PaymobOrderId == id);
+            var user=await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
             if (payment == null)
                 payment.PaymentStatus = "failed";
 
             payment.PaymentStatus = "paid";
+            user.Points += 20;
+            
+            
+            
+
             await _context.SaveChangesAsync();
             return "Success";
 
@@ -58,7 +64,14 @@ namespace Skilly.Persistence.Implementation
 
             if (providerService != null)
             {
-                amount = providerService.Price;
+                if (providerService.PriceDiscount != null)
+                {
+                    amount = (decimal)providerService.PriceDiscount;
+                }
+                else
+                {
+                    amount = providerService.Price;
+                }
                 relatedId = providerService.Id;
                 serviceType = "provider";
             }

@@ -19,5 +19,7 @@ namespace Skilly.Persistence.Abstract
         Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId);
         Task DeleteProviderServiceAsync(string serviceId, string userId);
         Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId);
+        Task<IEnumerable<ProviderServices>> GetAllProviderServiceDiscounted(double? userLat = null, double? userLng = null);
+        Task UseServiceDiscount(string serviceId, string userId);
     }
 }

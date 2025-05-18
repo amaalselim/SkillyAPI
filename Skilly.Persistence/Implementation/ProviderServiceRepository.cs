@@ -26,6 +26,59 @@ namespace Skilly.Persistence.Implementation
             _mapper = mapper;
             _imageService = imageService;
         }
+        public async Task<IEnumerable<ProviderServices>> GetAllProviderServiceDiscounted(double? userLat = null, double? userLng = null)
+        {
+            var services = await _context.providerServices
+                .Include(i => i.ServicesImages)
+                .Include(i => i.serviceProvider)
+                .ThenInclude(sp => sp.User)
+                .Where(p=>p.PriceDiscount != null && p.PriceDiscount > 0)   
+                .ToListAsync();
+
+            if (services == null || !services.Any())
+                return new List<ProviderServices>();
+
+            var serviceDtos = services.Select(item => new ProviderServices
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                ServiceRequestTime = item.ServiceRequestTime,
+                Price = item.Price,
+                PriceDiscount=item.PriceDiscount,
+                Deliverytime = item.Deliverytime,
+                categoryId = item.categoryId,
+                Notes = item.Notes,
+                serviceProviderId = item.serviceProviderId,
+                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                providerImg = item.serviceProvider.Img,
+                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>()
+            }).ToList();
+
+            return serviceDtos;
+
+        }
+        public async Task UseServiceDiscount(string serviceId,string userId)
+        {
+            var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (provider == null)
+            {
+                throw new ServiceProviderNotFoundException("Service Provider not found.");
+            }
+            var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
+            var service=await _context.providerServices.FirstOrDefaultAsync(u => u.Id == serviceId);
+            if (user.Points >= 100)
+            {
+                decimal finalPrice = service.Price* 0.85m;
+                service.PriceDiscount = finalPrice;
+                user.Points -= 100;
+            }
+            else
+            {
+                throw new ServiceProviderNotFoundException("You don't have enough points to use the discount.");
+            }
+            await _context.SaveChangesAsync();
+        }
         public async Task AddProviderService(ProviderservicesDTO providerservicesDTO, string userId)
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -140,6 +193,7 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 ServiceRequestTime = item.ServiceRequestTime,
                 Price = item.Price,
+                PriceDiscount = item.PriceDiscount,
                 Deliverytime = item.Deliverytime,
                 categoryId = item.categoryId,
                 Notes = item.Notes,
@@ -184,6 +238,7 @@ namespace Skilly.Persistence.Implementation
                 Description = service.Description,
                 ServiceRequestTime = service.ServiceRequestTime,
                 Price = service.Price,
+                PriceDiscount = service.PriceDiscount,
                 Deliverytime = service.Deliverytime,
                 categoryId = service.categoryId,
                 Notes = service.Notes,
@@ -217,6 +272,7 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 ServiceRequestTime = item.ServiceRequestTime,
                 Price = item.Price,
+                PriceDiscount = item.PriceDiscount,
                 Deliverytime = item.Deliverytime,
                 Notes = item.Notes,
                 categoryId = item.categoryId,
@@ -254,6 +310,7 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 ServiceRequestTime = item.ServiceRequestTime,
                 Price = item.Price,
+                PriceDiscount = item.PriceDiscount,
                 Deliverytime = item.Deliverytime,
                 Notes = item.Notes,
                 categoryId = item.categoryId,
@@ -287,6 +344,7 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 ServiceRequestTime = item.ServiceRequestTime,
                 Price = item.Price,
+                PriceDiscount = item.PriceDiscount,
                 Deliverytime = item.Deliverytime,
                 Notes = item.Notes,
                 categoryId = item.categoryId,

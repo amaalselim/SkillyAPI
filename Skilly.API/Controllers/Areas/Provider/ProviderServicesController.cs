@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Exchange.WebServices.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
-using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
-using Skilly.Persistence.Implementation;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers.Areas.Provider
@@ -43,7 +40,7 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
-                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
+                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy,userLat, userLon);
                 if (services == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
@@ -55,20 +52,16 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-        //[HttpGet("sortService")]
-        //public async Task<IActionResult> GetSortedProviderServices(
-        //[FromQuery] string sortBy = "nearest")
-        //{
-        //    var userId = GetUserIdFromClaims();
-        //    var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        //    if (user == null || user.Latitude == null || user.Longitude == null)
-        //        return BadRequest("User location not available.");
-
-        //   var userLat = user.Latitude.Value;
-        //   var userLon = user.Longitude.Value;
-        //    var result = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
-        //    return Ok(result);
-        //}
+        [HttpGet("GetAllServicesBy/{categoryId}")]
+        public async Task<IActionResult> GetservicesbycategoryId(string categoryId)
+        {
+            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
+            if (service == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this category." });
+            }
+            return StatusCode(StatusCodes.Status200OK, new { service });
+        }
 
         [HttpGet("GetAllServicesByproviderId")]
         public async Task<IActionResult> GetservicesbyuserId()
@@ -95,17 +88,6 @@ namespace Skilly.API.Controllers.Areas.Provider
             if (service == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
-            }
-            return StatusCode(StatusCodes.Status200OK, new { service });
-        }
-
-        [HttpGet("GetAllServicesBy/{categoryId}")]
-        public async Task<IActionResult> GetservicesbycategoryId(string categoryId)
-        {
-            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
-            if (service == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this category." });
             }
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
@@ -189,5 +171,62 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
+
+        [HttpGet("get-all-DiscountServices")]
+        public async Task<IActionResult> GetAllDiscountedServices()
+        {
+            try
+            {
+                var userId = GetUserIdFromClaims();
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null || user.Latitude == null || user.Longitude == null)
+                    return BadRequest("User location not available.");
+
+                var userLat = user.Latitude.Value;
+                var userLon = user.Longitude.Value;
+                var services = await _unitOfWork.providerServiceRepository.GetAllProviderServiceDiscounted(userLat, userLon);
+                if (services == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
+                }
+                return StatusCode(StatusCodes.Status200OK, new { services });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
+
+
+        [HttpPost("apply-Discount")]
+        public async Task<IActionResult> ApplyDiscount([FromQuery] string serviceId)
+        {
+            if (serviceId == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
+            }
+
+            try
+            {
+                string userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User not authorized.");
+                }
+
+                await _unitOfWork.providerServiceRepository.UseServiceDiscount(serviceId, userId);
+
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service Discounted successfully.", serviceID = serviceId });
+            }
+            catch (ProviderServiceNotFoundException ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
+            }
+        }
+
     }
 }
