@@ -269,6 +269,51 @@ namespace Skilly.Persistence.Implementation
 
             return serviceDtos;
         }
+
+        public async Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId)
+        {
+            var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            var services = await _context.requestServices
+                .Include(c => c.UserProfile)
+                .Include(c => c.requestServiceImages)
+                .Where(g => g.categoryId==provider.categoryId)
+                .ToListAsync();
+
+            if (services == null || !services.Any())
+            {
+                return new List<RequestService>();
+            }
+
+            var serviceIds = services.Select(s => s.Id).ToList();
+
+            var offerCounts = await _context.offerSalaries
+                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
+                .GroupBy(o => o.serviceId ?? o.requestserviceId)
+                .ToDictionaryAsync(g => g.Key, g => g.Count());
+
+            var serviceDtos = services.Select(item => new RequestService
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                startDate = item.startDate,
+                categoryId = item.categoryId,
+                Notes = item.Notes,
+                ServiceRequestTime = item.ServiceRequestTime,
+                userId = item.userId,
+                userImg = item.UserProfile.Img,
+                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                Images = item.requestServiceImages
+                    .Select(img => img.Img)
+                    .ToList(),
+                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0
+            }).ToList();
+
+            return serviceDtos;
+        }
+
+
         public async Task<RequestService> GetRequestById(string requestId)
         {
             var service = await _context.requestServices

@@ -18,6 +18,7 @@ namespace Skilly.Persistence.Abstract
         Task AddRequestService(requestServiceDTO requestServiceDTO, string userId);
         Task EditRequestService(requestServiceDTO requestServiceDTO, string userId, string requestId);
         Task DeleteRequestServiceAsync(string requestId, string userId);
+        Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId);
 
 
     }

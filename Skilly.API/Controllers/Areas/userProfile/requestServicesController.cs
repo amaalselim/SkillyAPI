@@ -54,6 +54,24 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+        [HttpGet("GetAllRequestsByCategoryId")]
+        public async Task<IActionResult> GetServicesBycategoryId()
+        {
+            try
+            {
+                string userId = GetUserIdFromClaims();
+                var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByCategoryId(userId);
+                if (services == null || !services.Any())
+                {
+                    return NotFound(new { message = "No services found for this user." });
+                }
+                return Ok(new { services });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
 
         [HttpGet("GetAllRequestsByuserId")]
         public async Task<IActionResult> GetServicesByUserId()
