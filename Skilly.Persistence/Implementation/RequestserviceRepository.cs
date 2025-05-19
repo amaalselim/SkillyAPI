@@ -6,13 +6,13 @@ using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
+using Skilly.Core.Enums;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Skilly.Persistence.Implementation
 {
@@ -45,12 +45,13 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new UserProfileNotFoundException("User not found.");
             }
-                        var path = @"Images/UserProfile/RequestServices/";
+            var path = @"Images/UserProfile/RequestServices/";
             var service = _mapper.Map<RequestService>(requestServiceDTO);
             service.userId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.userImg = user.Img;
             service.uId = user.UserId;
+            service.ServiceStatus = ServiceStatus.Posted;
 
             await _context.requestServices.AddAsync(service);
             await _context.SaveChangesAsync();
@@ -79,10 +80,10 @@ namespace Skilly.Persistence.Implementation
                 .Where(u => u.categoryId == service.categoryId && u.User.FcmToken != null)
                 .Include(p => p.User)
                 .ToListAsync();
-            var cat=await _context.categories.FirstOrDefaultAsync(c => c.Id == service.categoryId);
+            var cat = await _context.categories.FirstOrDefaultAsync(c => c.Id == service.categoryId);
 
             string title = "طلب خدمة جديد";
-            string body = $"تم نشر طلب جديد في قسم {cat?.Name?? "القسم الخاص بك"}، يمكنك مشاهدته الآن.";
+            string body = $"تم نشر طلب جديد في قسم {cat?.Name ?? "القسم الخاص بك"}، يمكنك مشاهدته الآن.";
 
             foreach (var provider in providers)
             {
@@ -97,9 +98,9 @@ namespace Skilly.Persistence.Implementation
                     _context.notifications.Add(new Notifications
                     {
                         UserId = provider.UserId,
-                        Title =title,
+                        Title = title,
                         Body = body,
-                        userImg=provider.Img,
+                        userImg = provider.Img,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
@@ -110,8 +111,6 @@ namespace Skilly.Persistence.Implementation
             }
             await _context.SaveChangesAsync();
         }
-
-
         public async Task DeleteRequestServiceAsync(string requestId, string userId)
         {
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -185,21 +184,11 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            // جيب كل الـ service IDs مرة وحدة
-            var serviceIds = services.Select(s => s.Id).ToList();
-
-            // جيب عدد العروض لكل خدمة
-            var offerCounts = await _context.offerSalaries
-                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
-                .GroupBy(o => o.serviceId ?? o.requestserviceId)
-                .ToDictionaryAsync(g => g.Key, g => g.Count());
-
-            // رجع الـ DTOs مع عدد العروض
             var serviceDtos = services.Select(item => new RequestService
             {
                 Id = item.Id,
                 Name = item.Name,
-        
+
                 Price = item.Price,
                 Deliverytime = item.Deliverytime,
                 startDate = item.startDate,
@@ -212,7 +201,8 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
-                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0,
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLng != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.UserProfile.User?.Latitude, item?.UserProfile.User?.Longitude).GetValueOrDefault()
                     : 0
@@ -241,13 +231,6 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            var serviceIds = services.Select(s => s.Id).ToList();
-
-            var offerCounts = await _context.offerSalaries
-                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
-                .GroupBy(o => o.serviceId ?? o.requestserviceId)
-                .ToDictionaryAsync(g => g.Key, g => g.Count());
-
             var serviceDtos = services.Select(item => new RequestService
             {
                 Id = item.Id,
@@ -264,7 +247,8 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
-                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count ?? 0
             }).ToList();
 
             return serviceDtos;
@@ -276,20 +260,13 @@ namespace Skilly.Persistence.Implementation
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
                 .Include(c => c.requestServiceImages)
-                .Where(g => g.categoryId==provider.categoryId)
+                .Where(g => g.categoryId == provider.categoryId && g.ServiceStatus == ServiceStatus.Posted)
                 .ToListAsync();
 
             if (services == null || !services.Any())
             {
                 return new List<RequestService>();
             }
-
-            var serviceIds = services.Select(s => s.Id).ToList();
-
-            var offerCounts = await _context.offerSalaries
-                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
-                .GroupBy(o => o.serviceId ?? o.requestserviceId)
-                .ToDictionaryAsync(g => g.Key, g => g.Count());
 
             var serviceDtos = services.Select(item => new RequestService
             {
@@ -307,7 +284,8 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
-                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count ?? 0
             }).ToList();
 
             return serviceDtos;
@@ -362,16 +340,6 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            // جيب كل الـ service IDs مرة وحدة
-            var serviceIds = services.Select(s => s.Id).ToList();
-
-            // جيب عدد العروض لكل خدمة
-            var offerCounts = await _context.offerSalaries
-                .Where(o => serviceIds.Contains(o.serviceId) || serviceIds.Contains(o.requestserviceId))
-                .GroupBy(o => o.serviceId ?? o.requestserviceId)
-                .ToDictionaryAsync(g => g.Key, g => g.Count());
-
-            // رجع الـ DTOs مع عدد العروض
             var serviceDtos = services.Select(item => new RequestService
             {
                 Id = item.Id,
@@ -388,7 +356,8 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
-                OffersCount = offerCounts.ContainsKey(item.Id) ? offerCounts[item.Id] : 0,
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLon != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
                     : 0
@@ -406,7 +375,6 @@ namespace Skilly.Persistence.Implementation
 
             return serviceDtos.ToList();
         }
-
 
     }
 }

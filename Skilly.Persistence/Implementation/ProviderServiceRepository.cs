@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
+using Skilly.Core.Enums;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
+using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,6 +97,7 @@ namespace Skilly.Persistence.Implementation
             service.providerImg = user.Img;
             service.uId = user.UserId;
             service.categoryId = user.categoryId;
+            service.ServiceStatus = ServiceStatus.Posted;
 
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
@@ -376,5 +380,98 @@ namespace Skilly.Persistence.Implementation
 
 
 
+        public async Task<object> GetAllServicesInProgress(string userId)
+        {
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+                return new { ProviderServices = new List<ProviderServices>(), RequestServices = new List<RequestService>() };
+
+            var services = await _context.providerServices
+                .Include(c => c.serviceProvider)
+                .Include(c => c.ServicesImages)
+                .Include(c => c.offerSalaries)
+                .Where(c => c.serviceProviderId == user.Id && c.ServiceStatus == ServiceStatus.Paid)
+                .ToListAsync();
+
+            var serviceDtos = services.Select(item => new ProviderServices
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                ServiceRequestTime = item.ServiceRequestTime,
+                Price = item.Price,
+                PriceDiscount = item.PriceDiscount,
+                Deliverytime = item.Deliverytime,
+                Notes = item.Notes,
+                categoryId = item.categoryId,
+                serviceProviderId = item.serviceProviderId,
+                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                providerImg = item.serviceProvider.Img,
+                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                CountOfOffers = item.offerSalaries?.Count ?? 0
+            });
+
+            var requests = await _context.requestServices
+                .Include(c => c.UserProfile)
+                .Include(c => c.requestServiceImages)
+                .Include(c => c.offerSalaries)
+                .Where(c =>c.providerId== user.UserId && c.ServiceStatus == ServiceStatus.Paid)
+                .ToListAsync();
+
+            var requestserviceDtos = requests.Select(item => new RequestService
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Price = item.Price,
+                Deliverytime = item.Deliverytime,
+                startDate = item.startDate,
+                categoryId = item.categoryId,
+                Notes = item.Notes,
+                ServiceRequestTime = item.ServiceRequestTime,
+                userId = item.userId,
+                userImg = item.UserProfile.Img,
+                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                Images = item.requestServiceImages
+                    .Select(img => img.Img)
+                    .ToList(),
+                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
+                OffersCount= item.offerSalaries?.Count ?? 0
+            }).ToList();
+
+            return new
+            {
+                ProviderServices = serviceDtos,
+                RequestServices =requestserviceDtos
+            };
+        }
+
+        public async Task CompleteAsync(string serviceId,string userId)
+        {
+            var service = await _context.providerServices
+                .Include(c => c.serviceProvider)
+                .Include(g => g.ServicesImages)
+                .Include(g => g.offerSalaries)
+                .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.Paid);
+            if(service != null)
+            {
+                service.ServiceStatus = ServiceStatus.Completed;
+            }
+            else
+            {
+                var request = await _context.requestServices
+                   .Include(g => g.requestServiceImages)
+                   .Include(g => g.UserProfile)
+                   .Include(g => g.offerSalaries)
+                   .FirstOrDefaultAsync(g => g.Id == serviceId && g.providerId==userId && g.ServiceStatus == ServiceStatus.Paid);
+
+                if (request != null)
+                {
+                  request.ServiceStatus = ServiceStatus.Completed;
+                }
+
+            }
+            await _context.SaveChangesAsync();
+        }
     }
 }

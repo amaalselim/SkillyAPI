@@ -63,6 +63,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
 
+
         [HttpGet("GetAllServicesByproviderId")]
         public async Task<IActionResult> GetservicesbyuserId()
         {
@@ -198,8 +199,8 @@ namespace Skilly.API.Controllers.Areas.Provider
         }
 
 
-        [HttpPost("apply-Discount")]
-        public async Task<IActionResult> ApplyDiscount([FromQuery] string serviceId)
+        [HttpPost("apply-Discount/{serviceId}")]
+        public async Task<IActionResult> ApplyDiscount(string serviceId)
         {
             if (serviceId == null)
             {
@@ -227,6 +228,49 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
             }
         }
+
+        [HttpGet("Get-Services-InProgress")]
+        public async Task<IActionResult> GetservicesInProgress()
+        {
+            string userId = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
+            var service = await _unitOfWork.providerServiceRepository.GetAllServicesInProgress(userId);
+            if (service == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
+            }
+            return StatusCode(StatusCodes.Status200OK, new { service });
+        }
+
+        [HttpPost("Complete-Service/{serviceId}")]
+        public async Task<IActionResult> CompleteService(string serviceId)
+        {
+            if (serviceId == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
+            }
+
+            try
+            {
+                string userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User not authorized.");
+                }
+
+                await _unitOfWork.providerServiceRepository.CompleteAsync(serviceId,userId);
+
+                return StatusCode(StatusCodes.Status200OK, new { message = "Service Completed successfully."});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
+            }
+        }
+
 
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Exchange.WebServices.Data;
 using Skilly.Application.DTOs;
 using Skilly.Core.Entities;
+using Skilly.Core.Enums;
 using Skilly.Infrastructure.Implementation;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
@@ -41,8 +43,21 @@ namespace Skilly.Persistence.Implementation
             user.Points += 20;
             userprofile.useDiscount = false;
 
+            var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
 
 
+            if (providerService != null)
+            {
+                providerService.ServiceStatus = ServiceStatus.Paid;    
+            }
+            else
+            {
+                var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == payment.RequestServiceId);
+                if (service != null)
+                {
+                    service.ServiceStatus = ServiceStatus.Paid;
+                }
+            }
 
             await _context.SaveChangesAsync();
             return "Success";
@@ -118,14 +133,7 @@ namespace Skilly.Persistence.Implementation
 
             return new
             {
-                iframeUrl,
-                message = "Redirect to this URL to complete payment",
-                user = new
-                {
-                    user.Id,
-                    user.Email,
-                    user.PhoneNumber
-                }
+                iframeUrl
             };
         }
 

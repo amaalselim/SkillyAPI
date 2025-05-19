@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Skilly.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -48,5 +49,9 @@ namespace Skilly.Core.Entities
 
         [JsonIgnore]
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        [JsonIgnore]
+        public ServiceStatus ServiceStatus { get; set; } = ServiceStatus.Posted;
+
+
     }
 }

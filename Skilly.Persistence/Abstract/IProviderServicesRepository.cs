@@ -21,5 +21,7 @@ namespace Skilly.Persistence.Abstract
         Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId);
         Task<IEnumerable<ProviderServices>> GetAllProviderServiceDiscounted(double? userLat = null, double? userLng = null);
         Task UseServiceDiscount(string serviceId, string userId);
+        Task<object> GetAllServicesInProgress(string userId);
+        Task CompleteAsync(string serviceId,string userId);
     }
 }

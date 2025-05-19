@@ -270,12 +270,14 @@ namespace Skilly.Persistence.Implementation
             offer.Status = OfferStatus.Accepted;
 
 
+
             var user = await _context.users.FirstOrDefaultAsync(u => u.Id == offer.userId);
             if (offer.serviceId != null)
             {
                 var providerService = await _context.providerServices
                     .Include(p => p.serviceProvider)
                     .FirstOrDefaultAsync(p => p.Id == offer.serviceId && p.serviceProvider.User.FcmToken != null);
+
 
                 string title = "قبول عرض سعر";
                 string body = $" تمت الموافقه على السعر النهائي من  موفر الخدمة {user.FirstName + " " + user.LastName}";
@@ -305,6 +307,9 @@ namespace Skilly.Persistence.Implementation
                 var requestService = await _context.requestServices
                     .Include(r => r.UserProfile)
                     .FirstOrDefaultAsync(r => r.Id == offer.requestserviceId && r.UserProfile.User.FcmToken != null);
+
+                requestService.providerId = offer.userId;
+
 
                 string title = "قبول عرض سعر";
                 string body = $"تم تأكيد طلبك من قِبل المستخدم {user.FirstName + " " + user.LastName}. برجاء البدء في تنفيذ الخدمة.";

@@ -54,46 +54,46 @@ namespace Skilly.API.Controllers
 
         }
 
-        [HttpGet("payment-callback")]
-        public async Task<IActionResult> HandlePaymentCallback()
-        {
-            
-
-            var orderId = Request.Query["order"].ToString();
-
-            if (string.IsNullOrEmpty(orderId))
-            {
-                return BadRequest(new { message = "Payment ID is missing in the query parameters." });
-            }
-
-            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId);
-
-            if (result == null)
-            {
-                return NotFound(new { message = "Payment not found." });
-            }
-
-            return Redirect("https://skilly.runasp.net/thank-you.html");
-        }
         //[HttpGet("payment-callback")]
         //public async Task<IActionResult> HandlePaymentCallback()
         //{
+            
+
         //    var orderId = Request.Query["order"].ToString();
 
         //    if (string.IsNullOrEmpty(orderId))
         //    {
-        //        return BadRequest(new { success = false, message = "Order ID is missing." });
+        //        return BadRequest(new { message = "Payment ID is missing in the query parameters." });
         //    }
 
         //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId);
 
         //    if (result == null)
         //    {
-        //        return NotFound(new { success = false, message = "Payment not found." });
+        //        return NotFound(new { message = "Payment not found." });
         //    }
 
-        //    return Ok(new { success = true });
+        //    return Redirect("https://skilly.runasp.net/thank-you.html");
         //}
+        [HttpGet("payment-callback")]
+        public async Task<IActionResult> HandlePaymentCallback()
+        {
+            var orderId = Request.Query["order"].ToString();
+
+            if (string.IsNullOrEmpty(orderId))
+            {
+                return BadRequest(new { success = false, message = "Order ID is missing." });
+            }
+
+            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId);
+
+            if (result == null)
+            {
+                return NotFound(new { success = false, message = "Payment not found." });
+            }
+
+            return Ok(new { success = true });
+        }
 
 
 

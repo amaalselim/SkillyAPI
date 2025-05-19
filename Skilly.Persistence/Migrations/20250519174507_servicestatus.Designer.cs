@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Skilly.Persistence.DataContext;
 
@@ -11,9 +12,11 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250519174507_servicestatus")]
+    partial class servicestatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -499,9 +502,6 @@ namespace Skilly.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("ServiceProviderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateOnly?>("ServiceRequestTime")
                         .HasColumnType("date");
 
@@ -511,9 +511,6 @@ namespace Skilly.Persistence.Migrations
                     b.Property<string>("categoryId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("providerId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly?>("startDate")
                         .HasColumnType("date");
@@ -531,8 +528,6 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ServiceProviderId");
 
                     b.HasIndex("categoryId");
 
@@ -1060,10 +1055,6 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.RequestService", b =>
                 {
-                    b.HasOne("Skilly.Core.Entities.ServiceProvider", "ServiceProvider")
-                        .WithMany()
-                        .HasForeignKey("ServiceProviderId");
-
                     b.HasOne("Skilly.Core.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("categoryId")
@@ -1077,8 +1068,6 @@ namespace Skilly.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-
-                    b.Navigation("ServiceProvider");
 
                     b.Navigation("UserProfile");
                 });

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Skilly.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -45,6 +46,13 @@ namespace Skilly.Core.Entities
 
         [JsonIgnore]
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+        [JsonIgnore]
+        public ServiceStatus ServiceStatus { get; set; } = ServiceStatus.Posted;
+        [JsonIgnore]
+        public string? providerId {  get; set; }
+        [JsonIgnore]
+        public virtual ServiceProvider? ServiceProvider { get; set; }
 
     }
 }
