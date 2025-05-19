@@ -97,7 +97,7 @@ namespace Skilly.Persistence.Implementation
 
             var authToken = await _paymobService.GetAuthTokenAsync();
             var orderId = await _paymobService.CreateOrderAsync(authToken, amount);
-            var paymentToken = await _paymobService.CreatePaymentKeyAsync(authToken, orderId, amount);
+            var paymentToken = await _paymobService.CreatePaymentKeyAsync(authToken, orderId, amount,userprofile);
 
             var payment = new Payment
             {

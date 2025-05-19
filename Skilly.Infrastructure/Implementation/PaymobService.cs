@@ -65,8 +65,9 @@ namespace Skilly.Infrastructure.Implementation
             var orderId = result.GetProperty("id").GetInt32();
             return orderId;
         }
-        public async Task<string> CreatePaymentKeyAsync(string authToken, int orderId, decimal amountCents)
+        public async Task<string> CreatePaymentKeyAsync(string authToken, int orderId, decimal amountCents,UserProfile userProfile)
         {
+
             var payload = new
             {
                 auth_token = authToken,
@@ -77,21 +78,20 @@ namespace Skilly.Infrastructure.Implementation
 
                 billing_data = new
                 {
-                    apartment = "12B",
-                    email = "amaal@example.com",
-                    floor = "2",
-                    first_name = "Amaal",
-                    street = "Tahrir Street",
-                    building = "12",
-                    phone_number = "01029762604",
+                    apartment = "NA", 
+                    email = userProfile.Email,
+                    floor = "NA",
+                    first_name = userProfile.FirstName,
+                    street = "NA",
+                    building = "NA",
+                    phone_number = userProfile.PhoneNumber,
                     shipping_method = "PKG",
-                    postal_code = "11511",
-                    city = "Cairo",
-                    country = "EG",
-                    last_name = "Selim",
-                    state = "Cairo"
+                    postal_code = "NA",
+                    city = userProfile.City ?? "Cairo",
+                    country = userProfile.Governorate,
+                    last_name = userProfile.LastName,
+                    state = userProfile.StreetName ?? "Cairo"
                 }
-              
             };
 
             var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
