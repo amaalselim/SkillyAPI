@@ -62,6 +62,17 @@ namespace Skilly.API.Controllers.Areas.Provider
             return StatusCode(200, new { provider });
         }
 
+        [HttpGet("GetServiceProviderBy/{UserId}")]
+        public async Task<ActionResult<ServiceProvider>> GetUserById(string UserId)
+        {
+            var provider = await _unitOfWork.ServiceProviderRepository.GetproviderByIdAsync(UserId);
+            if (provider == null)
+            {
+                return StatusCode(404);
+            }
+            return StatusCode(200, new { provider });
+        }
+
         [HttpGet("GetAllServiceProvidersBy/{categoryId}")]
         public async Task<ActionResult<ServiceProvider>> GetserviceProviderbycategoryId(string categoryId)
         {
