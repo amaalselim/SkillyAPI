@@ -5,6 +5,7 @@ using Skilly.Application.DTOs;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Security.Claims;
+using System.Web;
 
 namespace Skilly.API.Controllers
 {
@@ -53,51 +54,61 @@ namespace Skilly.API.Controllers
             }
 
         }
-
         //[HttpGet("payment-callback")]
-        //public async Task<IActionResult> HandlePaymentCallback()
+        //public async Task<IActionResult> HandlePaymentCallback(string order, string url)
         //{
-            
-
-        //    var orderId = Request.Query["order"].ToString();
-
-        //    if (string.IsNullOrEmpty(orderId))
+        //    if (string.IsNullOrEmpty(order))
         //    {
-        //        return BadRequest(new { message = "Payment ID is missing in the query parameters." });
+        //        return BadRequest(new { success = false, message = "Order ID is missing." });
         //    }
 
-        //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId);
+        //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(order);
 
         //    if (result == null)
         //    {
-        //        return NotFound(new { message = "Payment not found." });
+        //        return NotFound(new { success = false, message = "Payment not found." });
         //    }
 
-        //    return Redirect("https://skilly.runasp.net/thank-you.html");
+        //    return Redirect($"{url}");
         //}
-        [HttpGet("payment-callback")]
-        public async Task<IActionResult> HandlePaymentCallback()
+        [HttpPost("payment-callback")]
+        public async Task<IActionResult> PaymentCallback([FromBody] PaymobCallbackDTO callbackData)
         {
-            var orderId = Request.Query["order"].ToString();
-
-            if (string.IsNullOrEmpty(orderId))
+            if (callbackData == null || string.IsNullOrEmpty(callbackData.OrderId) || string.IsNullOrEmpty(callbackData.Url))
             {
-                return BadRequest(new { success = false, message = "Order ID is missing." });
+                return BadRequest(new
+                {
+                    url = string.IsNullOrEmpty(callbackData?.Url) ? new[] { "The url field is required." } : null,
+                    order = string.IsNullOrEmpty(callbackData?.OrderId) ? new[] { "The order field is required." } : null,
+                });
             }
 
-            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId);
+            var success = callbackData.Success;
 
+            if (!success)
+            {
+                return BadRequest(new { success = false, message = "Payment was not successful." });
+            }
+
+            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(callbackData.OrderId, success);
             if (result == null)
             {
                 return NotFound(new { success = false, message = "Payment not found." });
             }
 
-            return Ok(new { success = true });
+            var uriBuilder = new UriBuilder(callbackData.Url);
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+            query["order"] = callbackData.OrderId;
+            uriBuilder.Query = query.ToString();
+
+            string fullUrl = uriBuilder.ToString();
+
+            return Ok(new { success = true, endpointfullPath = fullUrl });
         }
 
 
 
 
-
     }
+
 }

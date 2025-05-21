@@ -12,7 +12,7 @@ namespace Skilly.Core.Entities
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public decimal Amount { get; set; }
         public string PaymentStatus { get; set; }  // pending, paid, failed
-        public string PaymentMethod { get; set; }  // card, wallet, cash
+        public string PaymentMethod { get; set; }  
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [ForeignKey("ProviderService")]
         public string? ProviderServiceId { get; set; }
@@ -26,7 +26,7 @@ namespace Skilly.Core.Entities
         public string? TransactionId { get; set; }
 
         public string UserId { get; set; }
-        [ForeignKey("UserProfile")]
+
         public virtual User User { get; set; }
     }
 }
