@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Skilly.Persistence.DataContext;
 
@@ -11,9 +12,11 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520122247_updateeeeeeeeeee")]
+    partial class updateeeeeeeeeee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -387,6 +390,9 @@ namespace Skilly.Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserProfile")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -395,9 +401,9 @@ namespace Skilly.Persistence.Migrations
 
                     b.HasIndex("RequestServiceId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserProfile");
 
-                    b.ToTable("Payment", (string)null);
+                    b.ToTable("payments");
                 });
 
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
@@ -559,10 +565,6 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserImg")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1024,9 +1026,7 @@ namespace Skilly.Persistence.Migrations
 
                     b.HasOne("Skilly.Core.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserProfile");
 
                     b.Navigation("ProviderService");
 
@@ -1103,7 +1103,7 @@ namespace Skilly.Persistence.Migrations
                         .HasForeignKey("ProviderId");
 
                     b.HasOne("Skilly.Core.Entities.ProviderServices", "ProviderServices")
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("serviceId");
 
                     b.Navigation("ProviderServices");
@@ -1189,8 +1189,6 @@ namespace Skilly.Persistence.Migrations
             modelBuilder.Entity("Skilly.Core.Entities.ProviderServices", b =>
                 {
                     b.Navigation("Payments");
-
-                    b.Navigation("Reviews");
 
                     b.Navigation("ServicesImages");
 
