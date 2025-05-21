@@ -179,5 +179,24 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+        [HttpPost("AcceptService/{requestId}")]
+        public async Task<IActionResult> AcceptService(string requestId)
+        {
+            try
+            {
+                string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(requestId);
+                if (service == null)
+                {
+                    return NotFound(new { message = "Service not found." });
+                }
+                await _unitOfWork._requestserviceRepository.AcceptService(requestId, userId);
+                return Ok(new { message = "Service accepted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
     }
 }
