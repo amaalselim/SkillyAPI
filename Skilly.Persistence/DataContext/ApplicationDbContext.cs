@@ -51,6 +51,7 @@ namespace Skilly.Persistence.DataContext
             modelBuilder.ApplyConfiguration(new ChatConfiguration());
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
             modelBuilder.ApplyConfiguration(new MessageConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentConfiguration());
         }
     }
 }
