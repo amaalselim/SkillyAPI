@@ -11,6 +11,7 @@ using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +23,14 @@ namespace Skilly.Persistence.Implementation
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IImageService _imageService;
+        private readonly FirebaseV1Service _firebase;
 
-        public ProviderServiceRepository(ApplicationDbContext context,IMapper mapper,IImageService imageService)
+        public ProviderServiceRepository(ApplicationDbContext context,IMapper mapper,IImageService imageService, FirebaseV1Service firebase)
         {
             _context = context;
             _mapper = mapper;
             _imageService = imageService;
+            _firebase = firebase;
         }
         public async Task<IEnumerable<ProviderServices>> GetAllProviderServiceDiscounted(double? userLat = null, double? userLng = null)
         {
@@ -63,11 +66,6 @@ namespace Skilly.Persistence.Implementation
         }
         public async Task UseServiceDiscount(string serviceId,string userId)
         {
-            var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (provider == null)
-            {
-                throw new ServiceProviderNotFoundException("Service Provider not found.");
-            }
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
             var service=await _context.providerServices.FirstOrDefaultAsync(u => u.Id == serviceId);
             if (user.Points >= 100)
@@ -184,12 +182,18 @@ namespace Skilly.Persistence.Implementation
             var services = await _context.providerServices
                 .Include(i => i.ServicesImages)
                 .Include(i => i.serviceProvider)
-                .ThenInclude(sp => sp.User)
+                    .ThenInclude(sp => sp.User)
                 .Include(i => i.offerSalaries)
+                .Include(i => i.Reviews)
                 .ToListAsync();
 
             if (services == null || !services.Any())
                 return new List<ProviderServices>();
+
+            var allUserIds = services.SelectMany(s => s.Reviews.Select(r => r.UserId)).Distinct().ToList();
+            var allUsers = await _context.userProfiles
+                .Where(u => allUserIds.Contains(u.UserId))
+                .ToListAsync();
 
             var serviceDtos = services.Select(item => new ProviderServices
             {
@@ -210,19 +214,32 @@ namespace Skilly.Persistence.Implementation
                 CountOfOffers = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLng != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.serviceProvider.User?.Latitude, item?.serviceProvider.User?.Longitude).GetValueOrDefault()
-                    : 0
+                    : 0,
+                Reviews = item.Reviews.Select(r =>
+                {
+                    var user = allUsers.FirstOrDefault(u => u.UserId == r.UserId);
+                    return new Review
+                    {
+                        Id = r.Id,
+                        serviceId = r.serviceId,
+                        Feedback = r.Feedback,
+                        Rating = r.Rating,
+                        UserId = r.UserId,
+                        UserName = user != null ? user.FirstName + " " + user.LastName : null,
+                        UserImg = user != null ? user.Img : null
+                    };
+                }).ToList()
             }).ToList();
 
-            
             if (userLat != null && userLng != null)
             {
-                serviceDtos = serviceDtos
-                    .OrderBy(s => s.Distance)
-                    .ToList();
+                serviceDtos = serviceDtos.OrderBy(s => s.Distance).ToList();
             }
 
             return serviceDtos;
         }
+
+
 
 
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string serviceId)
@@ -338,7 +355,13 @@ namespace Skilly.Persistence.Implementation
                 .ThenInclude(sp => sp.User)
                 .Include(s => s.ServicesImages)
                 .Include(s => s.offerSalaries)
+                .Include(s => s.Reviews)
+
                 .AsQueryable();
+            var allUserIds = servicesQuery.SelectMany(s => s.Reviews.Select(r => r.UserId)).Distinct().ToList();
+            var allUsers = await _context.userProfiles
+                .Where(u => allUserIds.Contains(u.UserId))
+                .ToListAsync();
 
             var services = await servicesQuery.ToListAsync();
 
@@ -361,7 +384,21 @@ namespace Skilly.Persistence.Implementation
                 CountOfOffers = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLon != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.serviceProvider.User?.Latitude, item?.serviceProvider.User?.Longitude).GetValueOrDefault()
-                    : 0
+                    : 0,
+                Reviews = item.Reviews.Select(r =>
+                {
+                    var user = allUsers.FirstOrDefault(u => u.UserId == r.UserId);
+                    return new Review
+                    {
+                        Id = r.Id,
+                        serviceId = r.serviceId,
+                        Feedback = r.Feedback,
+                        Rating = r.Rating,
+                        UserId = r.UserId,
+                        UserName = user != null ? user.FirstName + " " + user.LastName : null,
+                        UserImg = user != null ? user.Img : null
+                    };
+                }).ToList()
             });
 
            
@@ -453,9 +490,62 @@ namespace Skilly.Persistence.Implementation
                 .Include(g => g.ServicesImages)
                 .Include(g => g.offerSalaries)
                 .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.Paid);
-            if(service != null)
+            var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (service != null)
             {
                 service.ServiceStatus = ServiceStatus.Completed;
+                
+                string title = "تم تنفيذ الخدمة";
+                string body = $"تم تنفيذ خدمتك {service.Name} من قبل موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء تأكيد الاستلام.";
+
+
+
+                //if (service?.serviceProvider != null)
+                //{
+                //    await _firebase.SendNotificationAsync(
+                //        service.userprofileId,
+                //        title,
+                //        body
+                //    );
+
+                //    _context.notifications.Add(new Notifications
+                //    {
+                //        UserId = provviderr.UserId,
+                //        Title = title,
+                //        Body = body,
+                //        userImg = provviderr.Img,
+                //        CreatedAt = ateOnly.FromDateTime(DateTime.Now)
+                //    });
+                //}
+                var images = service.ServicesImages?.Select(si => si.Img).ToList() ?? new List<string>();
+
+                var gallery = new Servicesgallery
+                {
+                    galleryName = service.Name,
+                    Description = service.Description,
+                    Deliverytime = service.Deliverytime,
+                    Img = images.Any() ? images.First() : "", 
+                    serviceProviderId = service.serviceProviderId,
+                    serviceProvider = service.serviceProvider,
+                    Images = images
+                };
+
+                gallery.galleryImages = images
+                    .Skip(1)
+                    .Select(img => new ServicesgalleryImage
+                    {
+                        Img = img,
+                        galleryId = gallery.Id
+                    })
+                    .ToList();
+
+
+
+                provviderr.servicesgalleries.Add(gallery);
+
+                await _context.SaveChangesAsync();
+
+
             }
             else
             {
@@ -464,14 +554,60 @@ namespace Skilly.Persistence.Implementation
                    .Include(g => g.UserProfile)
                    .Include(g => g.offerSalaries)
                    .FirstOrDefaultAsync(g => g.Id == serviceId && g.providerId==userId && g.ServiceStatus == ServiceStatus.Paid);
-
                 if (request != null)
                 {
                   request.ServiceStatus = ServiceStatus.Completed;
-                }
+                    string title = "تم تنفيذ الخدمة";
+                    string body = $"تم تنفيذ خدمتك {request.Name} من قبل موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء تأكيد الاستلام.";
 
+
+                    //if (request?.UserProfile != null)
+                    //{
+                    //    await _firebase.SendNotificationAsync(
+                    //        request.userId,
+                    //        title,
+                    //        body
+                    //    );
+
+                    //    _context.notifications.Add(new Notifications
+                    //    {
+                    //        UserId = provviderr.UserId,
+                    //        Title = title,
+                    //        Body = body,
+                    //        userImg = provviderr.Img,
+                    //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    //    });
+                    //}
+                    var imagess = request.requestServiceImages?.Select(si => si.Img).ToList() ?? new List<string>();
+
+                    var gallery = new Servicesgallery
+                    {
+                        galleryName = request.Name,
+                        Description = request.Notes,
+                        Deliverytime = request.Deliverytime,
+                        Img = imagess.Any() ? imagess.First() : "",
+                        serviceProviderId = request.providerId,
+                        Images = imagess
+                    };
+
+                    gallery.galleryImages = imagess
+                        .Skip(1)
+                        .Select(img => new ServicesgalleryImage
+                        {
+                            Img = img,
+                            galleryId = gallery.Id
+                        })
+                        .ToList();
+
+
+
+                    provviderr.servicesgalleries.Add(gallery);
+
+                    await _context.SaveChangesAsync();
+                }
             }
             await _context.SaveChangesAsync();
         }
+
     }
 }

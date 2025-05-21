@@ -11,6 +11,7 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 
@@ -23,19 +24,22 @@ namespace Skilly.Persistence.Implementation
         private readonly IMapper _mapper;
         private readonly FirebaseV1Service _firebaseV1Service;
         private readonly ILogger<RequestserviceRepository> _logger;
+        private readonly FirebaseV1Service _firebase;
 
         public RequestserviceRepository(
             ApplicationDbContext context,
             IImageService imageService,
             IMapper mapper,
             FirebaseV1Service firebaseV1Service,
-            ILogger<RequestserviceRepository> logger)
+            ILogger<RequestserviceRepository> logger,
+            FirebaseV1Service firebase)
         {
             _context = context;
             _imageService = imageService;
             _mapper = mapper;
             _firebaseV1Service = firebaseV1Service;
             _logger = logger;
+            _firebase = firebase;
         }
 
         public async Task AddRequestService(requestServiceDTO requestServiceDTO, string userId)
@@ -97,10 +101,10 @@ namespace Skilly.Persistence.Implementation
 
                     _context.notifications.Add(new Notifications
                     {
-                        UserId = provider.UserId,
+                        UserId = user.UserId,
                         Title = title,
                         Body = body,
-                        userImg = provider.Img,
+                        userImg = user.Img,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
@@ -375,6 +379,42 @@ namespace Skilly.Persistence.Implementation
 
             return serviceDtos.ToList();
         }
+        public async Task AcceptService(string requestId, string userId)
+        {
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            var service = await _context.requestServices
+                .Include(c => c.UserProfile)
+                .Include(c => c.requestServiceImages)
+                .FirstOrDefaultAsync(g => g.Id == requestId);
+            if (service == null)
+            {
+                throw new Exception("Service not found.");
+            }
+            service.providerId = user.UserId; //asssign provider who accept service
 
+            var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
+            string title = "قبول خدمة";
+            string body = $"تم قبول خدمتك {service.Name} من قبل موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء الذهاب للدفع.";
+
+
+            if (service != null)
+            {
+                await _firebase.SendNotificationAsync(
+                    service.UserProfile.UserId,
+                    title,
+                    body
+                );
+
+                _context.notifications.Add(new Notifications
+                {
+                    UserId = provviderr.UserId,
+                    Title = title,
+                    Body = body,
+                    userImg = provviderr.Img,
+                    CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                });
+            }
+            await _context.SaveChangesAsync();
+        }
     }
 }

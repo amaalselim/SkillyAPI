@@ -4,6 +4,7 @@ using Skilly.Application.DTOs;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
+using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,101 +23,81 @@ namespace Skilly.Persistence.Implementation
             _context = context;
             _mapper = mapper;
         }
-        public async Task AddReviewproviderAsync(string userId, ReviewDTO reviewDTO)
-        {
-            var review = _mapper.Map<Review>(reviewDTO);
-            review.UserId = userId;
-            review.UserName = _context.users.Where(u => u.Id == userId).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault();
-            review.ProviderId = reviewDTO.providerId;
-            await _context.reviews.AddAsync(review);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task AddReviewserviceAsync(string userId, ReviewServiceDTO reviewDTO)
         {
             var review = _mapper.Map<Review>(reviewDTO);
             review.UserId = userId;
             review.UserName = _context.users.Where(u => u.Id == userId).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault();
             review.serviceId= reviewDTO.serviceId;
+            review.UserImg = _context.userProfiles.Where(u => u.UserId == userId).Select(u => u.Img).FirstOrDefault();  
             await _context.reviews.AddAsync(review);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ReviewDisplayDTO>> GetAllReviewsByProviderIdAsync(string providerId)
+        public async Task<ReviewsWithAverageDTO> GetAllReviewsByproviderIdAsync(string providerId)
         {
             var reviews = await _context.reviews
-                .Where(r => r.ServiceProvider.UserId == providerId)
+                .Include(p=>p.ProviderServices)
+                .Where(r => r.ProviderServices.serviceProviderId == providerId)
                 .ToListAsync();
 
-            var userIds = reviews.Select(r => r.UserId).Distinct().ToList(); 
-            var users = await _context.userProfiles
-                .Where(u => userIds.Contains(u.UserId))
-                .ToListAsync();
-
-         
-            var reviewDisplayDTOs = reviews.Select(r => new ReviewDisplayDTO
-            {
-                providerId = providerId, 
-                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName+' '+
-                users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName, 
-                userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
-                Feedback = r.Feedback, 
-                Rating = r.Rating     
-            }).ToList();
-
-            return reviewDisplayDTOs;
-        }
-
-        public async Task<IEnumerable<ReviewserviceDisplayDTO>> GetAllReviewsByserviceIdAsync(string serviceId)
-        {
-            var reviews = await _context.reviews
-                .Where(r => r.serviceId ==serviceId)
-                .ToListAsync();
 
             var userIds = reviews.Select(r => r.UserId).Distinct().ToList();
+
             var users = await _context.userProfiles
                 .Where(u => userIds.Contains(u.UserId))
                 .ToListAsync();
-
 
             var reviewDisplayDTOs = reviews.Select(r => new ReviewserviceDisplayDTO
             {
-               serviceId = serviceId,
-                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName + ' ' +
-                users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
+                serviceId=r.ProviderServices.Id,
+                serviceName=r.ProviderServices.Name,
+                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName + " " +
+                           users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
                 userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
                 Feedback = r.Feedback,
                 Rating = r.Rating
             }).ToList();
 
-            return reviewDisplayDTOs;
+            var avgRate = Math.Round(reviews.Any() ? reviews.Average(r => r.Rating) : 0, 2);
+
+            return new ReviewsWithAverageDTO
+            {
+                AverageRating = avgRate,
+                Reviews = reviewDisplayDTOs
+            };
         }
-
-
-
-
-        public async Task<decimal> GetAverageRatingByProviderIdAsync(string providerId)
+        public async Task<ReviewsWithAverageDTO> GetAllReviewsByserviceIdAsync(string serviceId)
         {
             var reviews = await _context.reviews
-                .Where(r => r.ServiceProvider.UserId == providerId)
-                .ToListAsync();
-
-            if (reviews == null || !reviews.Any())
-                return 0;
-
-            return Math.Round(reviews.Average(r => r.Rating), 2);
-        }
-
-        public async Task<decimal> GetAverageRatingByserviceIdAsync(string serviceId)
-        {
-            var reviews = await _context.reviews
+                .Include(p => p.ProviderServices)
                 .Where(r => r.serviceId == serviceId)
                 .ToListAsync();
 
-            if (reviews == null || !reviews.Any())
-                return 0;
+            var userIds = reviews.Select(r => r.UserId).Distinct().ToList();
 
-            return Math.Round(reviews.Average(r => r.Rating), 2);
+            var users = await _context.userProfiles
+                .Where(u => userIds.Contains(u.UserId))
+                .ToListAsync();
+
+            var reviewDisplayDTOs = reviews.Select(r => new ReviewserviceDisplayDTO
+            {
+                serviceId = serviceId,
+                serviceName = r.ProviderServices.Name,
+                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName + " " +
+                           users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
+                userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
+                Feedback = r.Feedback,
+                Rating = r.Rating
+            }).ToList();
+
+            var avgRate = Math.Round(reviews.Any() ? reviews.Average(r => r.Rating) : 0, 2);
+
+            return new ReviewsWithAverageDTO
+            {
+                AverageRating = avgRate,
+                Reviews = reviewDisplayDTOs
+            };
         }
 
     }

@@ -102,7 +102,7 @@ namespace Skilly.Persistence.Implementation
                 .FirstOrDefaultAsync(c => c.UserId == id);
 
                 var reviews = await _context.reviews
-                    .Where(r => r.ServiceProvider.UserId == provider.UserId)
+                    .Where(r => r.ProviderServices.serviceProviderId == provider.UserId)
                     .ToListAsync();
 
                 provider.Review = reviews.Any()
@@ -118,6 +118,28 @@ namespace Skilly.Persistence.Implementation
 
             return provider;
         }
+        public async Task<ServiceProvider> GetproviderByIdAsync(string id)
+        {
+            var provider = await _context.serviceProviders
+                .FirstOrDefaultAsync(c => c.Id== id);
+
+            var reviews = await _context.reviews
+                .Where(r => r.ProviderServices.serviceProviderId == provider.UserId)
+                .ToListAsync();
+
+            provider.Review = reviews.Any()
+                 ? Math.Round(reviews.Average(r => r.Rating), 2)
+                 : 0;
+
+            provider.numberOfEndedservices = 3;
+
+            var category = await _context.categories
+            .FirstOrDefaultAsync(c => c.Id == provider.categoryId);
+
+            provider.profession = category?.ProfessionName ?? "غير محدد";
+
+            return provider;
+        }
         public async Task<List<ServiceProvider>> GetAllServiceProviderAsync()
         {
             var providers = await _context.serviceProviders.ToListAsync();
@@ -125,7 +147,6 @@ namespace Skilly.Persistence.Implementation
             if (!providers.Any())
                 return new List<ServiceProvider>();
 
-            // جيب كل الكاتيجوريز مرة واحدة
             var categories = await _context.categories.ToListAsync();
             var categoryMap = categories.ToDictionary(c => c.Id, c => c.ProfessionName);
 
@@ -133,7 +154,7 @@ namespace Skilly.Persistence.Implementation
             {
                 // حساب الريفيو
                 var reviews = await _context.reviews
-                    .Where(r => r.ServiceProvider.UserId == provider.UserId)
+                    .Where(r => r.ProviderServices.serviceProviderId== provider.UserId)
                     .ToListAsync();
 
                 provider.Review = reviews.Any()
@@ -182,7 +203,7 @@ namespace Skilly.Persistence.Implementation
             foreach (var provider in providers)
             {
                 var reviews = await _context.reviews
-                    .Where(r => r.ServiceProvider.UserId == provider.UserId)
+                    .Where(r => r.ProviderServices.serviceProviderId == provider.UserId)
                     .ToListAsync();
 
                 provider.Review = reviews.Any()

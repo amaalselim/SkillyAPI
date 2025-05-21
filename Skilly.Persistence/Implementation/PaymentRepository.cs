@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Exchange.WebServices.Data;
+using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Core.Entities;
 using Skilly.Core.Enums;
@@ -9,6 +11,7 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -22,22 +25,28 @@ namespace Skilly.Persistence.Implementation
         private readonly ApplicationDbContext _context;
         private readonly PaymobService _paymobService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly FirebaseV1Service _firebase;
 
-        public PaymentRepository(ApplicationDbContext context,PaymobService paymobService, IHttpContextAccessor httpContextAccessor)
+        public PaymentRepository(ApplicationDbContext context,PaymobService paymobService, IHttpContextAccessor httpContextAccessor,FirebaseV1Service firebase)
         {
             _context = context;
             _paymobService = paymobService;
             _httpContextAccessor = httpContextAccessor;
+            _firebase = firebase;
         }
 
-        public async Task<string> HandlePaymentCallbackAsync(string id)
+        public async Task<string> HandlePaymentCallbackAsync(string id, bool success)
         {
-            var payment = await _context.payments.FirstOrDefaultAsync(p=>p.PaymobOrderId == id);
-            var user=await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
-            var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
-
+            var payment = await _context.payments.FirstOrDefaultAsync(p => p.PaymobOrderId == id);
             if (payment == null)
-                payment.PaymentStatus = "failed";
+                return "Payment not found";
+            if (!success)
+            {
+                payment.PaymentStatus = "Failed";
+                return "Failed";
+            }
+            var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
+            var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
 
             payment.PaymentStatus = "paid";
             user.Points += 20;
@@ -45,10 +54,32 @@ namespace Skilly.Persistence.Implementation
 
             var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
 
-
             if (providerService != null)
             {
-                providerService.ServiceStatus = ServiceStatus.Paid;    
+                providerService.ServiceStatus = ServiceStatus.Paid;
+                string title = "تم شراء الخدمة";
+                string body = $"تم شراء الخدمة {providerService.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة.";
+
+                // إذا حابب تستخدم إشعارات firebase، شغل الكود تحت
+                /*
+                if (providerService?.UserProfile != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        providerService.serviceProviderId,
+                        title,
+                        body
+                    );
+
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = user.UserId,
+                        Title = title,
+                        Body = body,
+                        userImg = user.Img,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
+                */
             }
             else
             {
@@ -56,13 +87,34 @@ namespace Skilly.Persistence.Implementation
                 if (service != null)
                 {
                     service.ServiceStatus = ServiceStatus.Paid;
+                    string title = "تم شراء الخدمة";
+                    string body = $"تم شراء الخدمة {service.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة.";
+
+                    //if (service?.UserProfile != null)
+                    //{
+                    //    await _firebase.SendNotificationAsync(
+                    //        service.providerId,
+                    //        title,
+                    //        body
+                    //    );
+
+                    //    _context.notifications.Add(new Notifications
+                    //    {
+                    //        UserId = user.UserId,
+                    //        Title = title,
+                    //        Body = body,
+                    //        userImg = user.Img,
+                    //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    //    });
+                    //}
                 }
             }
 
             await _context.SaveChangesAsync();
-            return "Success";
 
+            return "Success";
         }
+
 
         public async Task<object> StartPaymentAsync(string serviceId)
         {
@@ -81,6 +133,7 @@ namespace Skilly.Persistence.Implementation
             decimal amount = 0;
             string relatedId = "";
             string serviceType = "";
+            string providerId = "";
 
             if (providerService != null)
             {
@@ -92,8 +145,10 @@ namespace Skilly.Persistence.Implementation
                 {
                     amount = providerService.Price;
                 }
+                providerService.userprofileId = userId;
                 relatedId = providerService.Id;
                 serviceType = "provider";
+                providerId = providerService.serviceProviderId;
             }
             else
             {
@@ -103,6 +158,7 @@ namespace Skilly.Persistence.Implementation
                     amount = service.Price;
                     relatedId = service.Id;
                     serviceType = "Request";
+                    providerId = service.providerId;
                 }
                 else
                 {
