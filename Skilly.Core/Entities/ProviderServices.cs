@@ -51,6 +51,11 @@ namespace Skilly.Core.Entities
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
         [JsonIgnore]
         public ServiceStatus ServiceStatus { get; set; } = ServiceStatus.Posted;
+        [JsonIgnore]
+        public string? userprofileId { get; set; }
+        [JsonIgnore]
+        public virtual User? UserProfile { get; set; }
+        public ICollection<Review>? Reviews { get; set; } = new List<Review>();
 
 
     }

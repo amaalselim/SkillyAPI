@@ -12,7 +12,7 @@ namespace Skilly.Core.Entities
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string galleryName { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string Deliverytime { get; set; }
         public string Img { get; set; }
         [JsonIgnore]
