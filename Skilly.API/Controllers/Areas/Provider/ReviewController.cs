@@ -25,28 +25,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return userId;
         }
-
-
-        [HttpPost("AddProviderReview")]
-        public async Task<IActionResult> AddProviderReview([FromBody] ReviewDTO reviewDTO)
-        {
-            if (reviewDTO == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid review data." });
-            }
-
-            try
-            {
-                string userId = GetUserIdFromClaims();
-                await _unitOfWork.reviewRepository.AddReviewproviderAsync(userId, reviewDTO);
-
-                return StatusCode(StatusCodes.Status200OK, new { message = "Review added successfully.", data = new { reviewDTO } });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
-            }
-        }
+     
 
         [HttpPost("AddServiceReview")]
         public async Task<IActionResult> AddserviceReview([FromBody] ReviewServiceDTO reviewDTO)
@@ -62,49 +41,6 @@ namespace Skilly.API.Controllers.Areas.Provider
                 await _unitOfWork.reviewRepository.AddReviewserviceAsync(userId, reviewDTO);
 
                 return StatusCode(StatusCodes.Status200OK, new { message = "Review added successfully.", data = new { reviewDTO } });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
-            }
-        }
-
-        [HttpGet("GetAllReviewsByproviderId(Token)")]
-        public async Task<IActionResult> GetAllReviewsByProvider()
-        {
-
-            try
-            {
-                var providerId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(providerId))
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
-                }
-
-                var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByProviderIdAsync(providerId);
-                return StatusCode(StatusCodes.Status200OK, new { reviews });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
-            }
-        }
-
-
-        [HttpGet("GetAllReviewsBy/{providerId}")]
-        public async Task<IActionResult> GetAllReviewsByProvider([FromQuery] string providerId)
-        {
-            
-            try
-            {
-                //var providerId = GetUserIdFromClaims();
-                //if (string.IsNullOrEmpty(providerId))
-                //{
-                //    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
-                //}
-
-                var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByProviderIdAsync(providerId);
-                return StatusCode(StatusCodes.Status200OK, new { reviews });
             }
             catch (Exception ex)
             {
@@ -132,25 +68,48 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
         }
 
-        [HttpGet("average-ratingByproviderId")]
-        public async Task<IActionResult> GetAverageRating()
+        [HttpGet("GetAllReviewsByproviderId")]
+        public async Task<IActionResult> GetAllReviewsByProvider()
         {
-            var providerId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(providerId))
+
+            try
             {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+                var providerId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(providerId))
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+                }
+
+                var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByproviderIdAsync(providerId);
+                return StatusCode(StatusCodes.Status200OK, new { reviews });
             }
-            var averageRating = await _unitOfWork.reviewRepository.GetAverageRatingByProviderIdAsync(providerId);
-            return Ok(new { averageRating });
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
         }
 
 
-        [HttpGet("average-ratingBy/{serviceId}")]
-        public async Task<IActionResult> GetAverageRatingforservice(string serviceId)
+        [HttpGet("GetAllReviewsBy/{providerId}")]
+        public async Task<IActionResult> GetAllReviewsByProvider(string providerId)
         {
             
-            var averageRating = await _unitOfWork.reviewRepository.GetAverageRatingByserviceIdAsync(serviceId);
-            return Ok(new { averageRating });
+            try
+            {
+                //var providerId = GetUserIdFromClaims();
+                //if (string.IsNullOrEmpty(providerId))
+                //{
+                //    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
+                //}
+
+                var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByproviderIdAsync(providerId);
+                return StatusCode(StatusCodes.Status200OK, new { reviews });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
         }
+        
     }
 }
