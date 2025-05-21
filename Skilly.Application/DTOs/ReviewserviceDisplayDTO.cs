@@ -9,9 +9,11 @@ namespace Skilly.Application.DTOs
     public class ReviewserviceDisplayDTO
     {
         public string serviceId { get; set; }
+        public string serviceName { get; set; }
         public string userName { get; set; }
         public string userImage { get; set; }
         public string Feedback { get; set; }
         public decimal Rating { get; set; }
+        //public decimal AvgRate { get; set; }
     }
 }
