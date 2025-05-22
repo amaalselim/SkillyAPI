@@ -29,7 +29,11 @@ namespace Skilly.Persistence.Implementation
             review.UserId = userId;
             review.UserName = _context.users.Where(u => u.Id == userId).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault();
             review.serviceId= reviewDTO.serviceId;
-            review.UserImg = _context.userProfiles.Where(u => u.UserId == userId).Select(u => u.Img).FirstOrDefault();  
+            review.UserImg = _context.userProfiles.Where(u => u.UserId == userId).Select(u => u.Img).FirstOrDefault();
+            var services = await _context.providerServices
+                .Where(s => s.Id == reviewDTO.serviceId)
+                .FirstOrDefaultAsync();
+            review.ProviderId = services.serviceProviderId;
             await _context.reviews.AddAsync(review);
             await _context.SaveChangesAsync();
         }
@@ -38,8 +42,9 @@ namespace Skilly.Persistence.Implementation
         {
             var reviews = await _context.reviews
                 .Include(p=>p.ProviderServices)
-                .Where(r => r.ProviderServices.serviceProviderId == providerId)
+                .Where(r => r.ProviderServices.uId== providerId)
                 .ToListAsync();
+            
 
 
             var userIds = reviews.Select(r => r.UserId).Distinct().ToList();
@@ -56,7 +61,9 @@ namespace Skilly.Persistence.Implementation
                            users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
                 userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
                 Feedback = r.Feedback,
-                Rating = r.Rating
+                Rating = r.Rating,
+                
+
             }).ToList();
 
             var avgRate = Math.Round(reviews.Any() ? reviews.Average(r => r.Rating) : 0, 2);
