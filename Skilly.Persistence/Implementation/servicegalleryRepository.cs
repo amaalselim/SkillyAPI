@@ -38,9 +38,13 @@ namespace Skilly.Persistence.Implementation
             var path = @"Images/ServiceProvider/Servicegallery/";
             var gallery = _mapper.Map<Servicesgallery>(servicegalleryDTO);
             gallery.serviceProviderId = user.Id;
-            if (servicegalleryDTO.Img != null)
+            if (servicegalleryDTO.video != null)
             {
-                gallery.Img = await _imageService.SaveFileAsync(servicegalleryDTO.Img, path);
+                if(servicegalleryDTO.video.ContentType != "video/mp4")
+                {
+                    throw new InvalidOperationException("Invalid file type. Only mp4 files are allowed.");
+                }
+                gallery.video= await _imageService.SaveFileAsync(servicegalleryDTO.video, path);
             }
             if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
             {
@@ -71,20 +75,6 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new ServiceGalleryNotFoundException("Gallery not found.");
             }
-            var path = @"Images/ServiceProvider/Servicegallery/";
-            if (!string.IsNullOrEmpty(gallery.Img))
-            {
-                string imagePath = Path.Combine(path, gallery.Img);
-                await _imageService.DeleteFileAsync(imagePath);
-            }
-
-            foreach (var image in gallery.galleryImages)
-            {
-                string imagePath = Path.Combine(path, gallery.Img);
-                await _imageService.DeleteFileAsync(imagePath);
-            }
-
-            gallery.galleryImages.Clear();
             _context.servicesgalleries.Remove(gallery);
             await _context.SaveChangesAsync();
         }
@@ -101,24 +91,17 @@ namespace Skilly.Persistence.Implementation
             }
             _mapper.Map(servicegalleryDTO, gallery);
             var path = @"Images/ServiceProvider/Servicegallery/";
-
-            if (servicegalleryDTO.Img != null)
+            if (servicegalleryDTO.video != null)
             {
-                if (!string.IsNullOrEmpty(gallery.Img))
+                if (servicegalleryDTO.video.ContentType != "video/mp4")
                 {
-                    string imagePath = Path.Combine(path, gallery.Img);
-                    await _imageService.DeleteFileAsync(gallery.Img);
+                    throw new InvalidOperationException("Invalid file type. Only mp4 files are allowed.");
                 }
-                
-                gallery.Img = await _imageService.SaveFileAsync(servicegalleryDTO.Img, path);
+                gallery.video = await _imageService.SaveFileAsync(servicegalleryDTO.video, path);
             }
             if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
             {
-                foreach (var image in gallery.galleryImages)
-                {
-                    await _imageService.DeleteFileAsync(image.Img);
-                }
-                gallery.galleryImages.Clear();
+                
 
                 if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
                 {
@@ -156,11 +139,12 @@ namespace Skilly.Persistence.Implementation
                 galleryName= item.galleryName,
                 Description = item.Description,
                 Deliverytime = item.Deliverytime,
-                Img = item.Img,
+                
                 serviceProviderId = item.serviceProviderId,
                 Images = item.galleryImages?
                     .Select(img => img.Img)
-                    .ToList() ?? new List<string>()
+                    .ToList() ?? new List<string>(),
+                video = item.video,
             }).ToList();
 
             return galleryDtos;
@@ -185,11 +169,11 @@ namespace Skilly.Persistence.Implementation
                 galleryName = gallery.galleryName,
                 Description = gallery.Description,
                 Deliverytime = gallery.Deliverytime,
-                Img = gallery.Img,
                 serviceProviderId = gallery.serviceProviderId,
                 Images = gallery.galleryImages?
                     .Select(img => img.Img)
-                    .ToList() ?? new List<string>()
+                    .ToList() ?? new List<string>(),
+                video = gallery.video,
             };
 
             return galleryDto;
@@ -214,11 +198,11 @@ namespace Skilly.Persistence.Implementation
                 galleryName = item.galleryName,
                 Description = item.Description,
                 Deliverytime = item.Deliverytime,
-                Img = item.Img,
                 serviceProviderId = item.serviceProviderId,
                 Images = item.galleryImages?
                     .Select(img => img.Img)
-                    .ToList() ?? new List<string>()
+                    .ToList() ?? new List<string>(),
+                video = item.video,
             }).ToList();
 
             return galleryDtos;

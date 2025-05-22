@@ -54,6 +54,10 @@ namespace Skilly.Persistence.Implementation
             }
             if (ServiceProviderDTO.NationalNumberPDF!= null)
             {
+                if(ServiceProviderDTO.NationalNumberPDF.ContentType != "application/pdf")
+                {
+                    throw new InvalidOperationException("File type is not valid. Only PDF files are allowed.");
+                }
                 var path = @"Images/ServiceProvider/File/";
                 ServiceProvider.NationalNumberPDF = await _imageService.SaveFileAsync(ServiceProviderDTO.NationalNumberPDF, path);
             }

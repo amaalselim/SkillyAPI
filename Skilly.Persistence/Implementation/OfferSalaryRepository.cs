@@ -114,7 +114,7 @@ namespace Skilly.Persistence.Implementation
                     .FirstOrDefaultAsync(r => r.Id == offer.requestserviceId && r.UserProfile.User.FcmToken != null);
 
                 string title = "عرض سعر جديد";
-                string body = $"تم تقديم عرض سعر على طلبك من موفر الخدمة {user.FirstName+" "+user.LastName}";
+                string body = $"تم تقديم عرض سعر على طلبك {requestService.Name} من موفر الخدمة {user.FirstName+" "+user.LastName}";
 
                 var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
                 var prov = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
@@ -318,7 +318,7 @@ namespace Skilly.Persistence.Implementation
                 var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
 
                 string title = "قبول عرض سعر";
-                string body = $"تم تأكيد طلبك من قِبل المستخدم {userr.FirstName + " " + userr.LastName}. برجاء البدء في تنفيذ الخدمة.";
+                string body = $"تم تأكيد طلبك من قِبل المستخدم {userr.FirstName + " " + userr.LastName} برجاء الانتظار حتى يتم الدفعٍ";
 
 
 

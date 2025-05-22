@@ -63,6 +63,15 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
 
             List<string> imagePaths = new List<string>();
+            if (requestServiceDTO.video != null)
+            {
+                if(requestServiceDTO.video.ContentType != "video/mp4")
+                {
+                    throw new Exception("Invalid video format. Only mp4 is allowed.");
+                }
+                var videoPath = await _imageService.SaveFileAsync(requestServiceDTO.video, path);
+                service.video = videoPath;
+            }
 
             if (requestServiceDTO.Images != null && requestServiceDTO.Images.Any())
             {
@@ -152,7 +161,15 @@ namespace Skilly.Persistence.Implementation
             }
             _mapper.Map(requestServiceDTO, service);
             var path = @"Images/UserProfile/RequestServices";
-
+            if (requestServiceDTO.video != null)
+            {
+                if (requestServiceDTO.video.ContentType != "video/mp4")
+                {
+                    throw new Exception("Invalid video format. Only mp4 is allowed.");
+                }
+                var videoPath = await _imageService.SaveFileAsync(requestServiceDTO.video, path);
+                service.video = videoPath;
+            }
             if (requestServiceDTO.Images != null && requestServiceDTO.Images.Any())
             {
                 foreach (var image in service.requestServiceImages)
@@ -207,6 +224,7 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
+                video = item.video,
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
                 OffersCount = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLng != null)
@@ -253,6 +271,7 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
+                video = item.video,
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
                 OffersCount = item.offerSalaries?.Count ?? 0
             }).ToList();
@@ -290,6 +309,7 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
+                video = item.video,
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
                 OffersCount = item.offerSalaries?.Count ?? 0,
             Distance = (userLat != null && userLon != null)
@@ -338,6 +358,7 @@ namespace Skilly.Persistence.Implementation
                 Images = service.requestServiceImages?
                     .Select(img => img.Img)
                     .ToList() ?? new List<string>(),
+                video = service.video,
                 offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>(),
                 OffersCount = service.offerSalaries?.Count ?? 0
             };
@@ -373,6 +394,7 @@ namespace Skilly.Persistence.Implementation
                 Images = item.requestServiceImages
                     .Select(img => img.Img)
                     .ToList(),
+                video = item.video,
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
                 OffersCount = item.offerSalaries?.Count ?? 0,
                 Distance = (userLat != null && userLon != null)
