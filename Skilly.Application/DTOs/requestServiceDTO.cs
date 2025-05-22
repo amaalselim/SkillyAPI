@@ -15,9 +15,9 @@ namespace Skilly.Application.DTOs
         public DateOnly startDate { get; set; }
         public string categoryId { get; set; }
         public string? Notes { get; set; }
-        //public DateTime? ServiceRequestTime { get; set; } = DateTime.UtcNow;
         public List<IFormFile>? Images { get; set; } = new List<IFormFile>();
+        public IFormFile? video { get; set; }
 
-        
+
     }
 }

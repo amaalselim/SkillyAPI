@@ -14,8 +14,9 @@ namespace Skilly.Application.DTOs
         public string galleryName { get; set; }
         public string Description { get; set; }
         public string Deliverytime { get; set; }
-        public IFormFile Img { get; set; }
+        
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
+        public IFormFile? video { get; set; }
 
     }
 }
