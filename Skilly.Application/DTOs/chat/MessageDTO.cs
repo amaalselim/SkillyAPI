@@ -12,8 +12,10 @@ namespace Skilly.Application.DTOs
     public class MessageDTO
     {
         public string receiverId {  get; set; } 
-        public string content { get; set; }
+        public string? content { get; set; }
         public IFormFile? Img { get; set; }
+        [JsonIgnore]
+        public string? imageUrl { get; set; }
 
     }
 }

@@ -47,19 +47,21 @@ namespace Skilly.Application.Implementation
 
             var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".mp4", ".mov", ".avi", ".mkv", ".m4v" };
 
-            if (!allowedExtensions.Contains(extension))
+            if (!allowedExtensions.Contains(extension.ToLower()))
             {
                 throw new InvalidOperationException("Only image, video, or PDF files are allowed.");
             }
 
-            string filePath = Path.Combine(fullFolderPath, file.FileName);
+            string uniqueFileName = Guid.NewGuid().ToString() + extension;
+
+            string filePath = Path.Combine(fullFolderPath, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(fileStream);
             }
             string baseUrl = "https://skilly.runasp.net/";
-            string fileUrl = $"{baseUrl}{folderPath.Replace("\\", "/")}{file.FileName}";
+            string fileUrl = $"{baseUrl}{folderPath.Replace("\\", "/")}{uniqueFileName}";
 
             return fileUrl;
         }

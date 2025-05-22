@@ -39,30 +39,42 @@ namespace Skilly.API.Controllers
                     return Unauthorized(new { status = "error", message = "User not authenticated" });
                 }
 
+                if (string.IsNullOrWhiteSpace(messageDTO.content) && messageDTO.Img == null)
+                {
+                    return BadRequest(new { status = "error", message = "Please provide a message or an image." });
+                }
+
                 var message = await _chatService.SendMessageAsync(messageDTO);
                 if (message != null)
                 {
                     await _hubContext.Clients.User(messageDTO.receiverId)
-                        .SendAsync("ReceiveMessage", senderId, messageDTO.content);
+                        .SendAsync("ReceiveMessage", senderId, message.content, message.imageUrl);
 
                     await _hubContext.Clients.User(senderId)
-                        .SendAsync("ReceiveMessage", senderId, messageDTO.content);
+                        .SendAsync("ReceiveMessage", senderId, message.content, message.imageUrl);
 
-                    return StatusCode(201, new { status = "success", message = "Message sent successfully.",
+                    return StatusCode(201, new
+                    {
+                        status = "success",
+                        message = "Message sent successfully.",
                         data = new
                         {
-                            receiverId = message.receiverId,
-                            content=message.content
-                        }});
+                            ReceiverId = message.receiverId,
+                            Content = message.content,
+                            ImageUrl = message.imageUrl
+                        }
+                    });
                 }
 
                 return BadRequest(new { status = "error", message = "Failed to send message." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { status = "error", message = ex.Message });
+                return StatusCode(500, new { status = "error", message = ex.Message, details = ex.InnerException?.Message });
             }
+
         }
+
 
         [HttpGet("GetChatsForUser")]
         public async Task<IActionResult> GetChatsForUser()

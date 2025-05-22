@@ -1,5 +1,4 @@
-﻿﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -110,31 +109,27 @@
             line-height: 1.4;
         }
 
-        .left {
-            background-color: #f1f1f1;
-            align-self: flex-start;
-        }
-
-        .right {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-        }
+        
 
         .chat-input-container {
             display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         #chatInput {
-            flex: 1;
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        #imageInput {
+            padding: 5px;
         }
 
         #sendMessageButton {
-            padding: 10px 16px;
-            margin-left: 10px;
+            padding: 10px;
             background-color: #007bff;
             color: white;
             border: none;
@@ -145,6 +140,68 @@
             #sendMessageButton:hover {
                 background-color: #0056b3;
             }
+
+        /* تحسين مظهر الفيديو */
+        video.chat-image {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* تحسين مظهر روابط ملفات PDF */
+        .pdf-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+            .pdf-link:hover {
+                background-color: #0056b3;
+            }
+
+        /* تحسين مظهر الصور */
+        img.chat-image {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            object-fit: cover;
+        }
+
+    
+        .message > div,
+        .message > a,
+        .message > video,
+        .message > img {
+            display: block;
+        }
+
+        .message div {
+            margin-bottom: 5px;
+        }
+
+  
+        .right {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .left {
+            background-color: #f1f1f1;
+            color: #333;
+            align-self: flex-start;
+        }
+
     </style>
 </head>
 <body>
@@ -162,6 +219,7 @@
         <div id="chatMessages"></div>
         <div class="chat-input-container">
             <input type="text" id="chatInput" placeholder="Type a message">
+            <input type="file" id="fileInput" accept="*/*">
             <button id="sendMessageButton">Send</button>
         </div>
     </div>
@@ -186,31 +244,23 @@
 
         function initializeChat() {
             connection = new signalR.HubConnectionBuilder()
-                .withUrl("http://localhost:5271/chatHub", {
+                .withUrl("https://skilly.runasp.net/chatHub", {
                     accessTokenFactory: () => token
                 })
                 .build();
 
-            connection.on("ReceiveMessage", (senderId, messageContent) => {
-                console.log("Message received:", senderId, messageContent);
-                if (currentChatId) {
-                    displayMessage(senderId, messageContent);
-                }
+            connection.on("ReceiveMessage", (senderId, content, imageUrl) => {
+                displayMessage(senderId, content, imageUrl);
             });
 
             connection.start()
-                .then(() => {
-                    console.log("SignalR connected");
-                    getChats();
-                })
+                .then(() => getChats())
                 .catch(err => console.error("SignalR error:", err));
 
             async function getChats() {
                 try {
-                    const res = await fetch("http://localhost:5271/api/Chat/GetChatsForUser", {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
+                    const res = await fetch("https://skilly.runasp.net/api/Chat/GetChatsForUser", {
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
                     const data = await res.json();
 
@@ -224,9 +274,9 @@
                             const chatDiv = document.createElement("div");
                             chatDiv.className = "chat-item";
                             chatDiv.innerHTML = `
-                                        <div><strong>${otherUserName}</strong></div>
-                                        <button class="openChatButton" data-chat-id="${chat.id}" data-receiver-id="${otherUserId}">Open Chat</button>
-                                    `;
+                                    <div><strong>${otherUserName}</strong></div>
+                                    <button class="openChatButton" data-chat-id="${chat.id}" data-receiver-id="${otherUserId}">Open Chat</button>
+                                `;
                             chatsContainer.appendChild(chatDiv);
                         });
 
@@ -252,10 +302,8 @@
 
             async function loadMessages(chatId) {
                 try {
-                    const res = await fetch(`http://localhost:5271/api/Chat/GetMessagesForChatOfUser/${chatId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
+                    const res = await fetch(`https://skilly.runasp.net/api/Chat/GetMessagesForChatOfUser/${chatId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
                     const data = await res.json();
                     const messagesContainer = document.getElementById("chatMessages");
@@ -263,64 +311,108 @@
 
                     if (data.status === "success") {
                         data.data.forEach(message => {
-                            displayMessage(message.senderId, message.content);
+                            console.log("Message imageUrl:", message.img);
+                            displayMessage(message.senderId, message.content, message.img);
                         });
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     }
                 } catch (err) {
                     console.error("Error loading messages:", err);
                 }
             }
 
-            function displayMessage(senderId, content) {
+
+            function displayMessage(senderId, content, fileUrl) {
                 const message = document.createElement("div");
                 message.className = "message";
-                message.textContent = content;
                 message.classList.add(senderId === userId ? "right" : "left");
+
+                if (content) {
+                    const text = document.createElement("div");
+                    text.textContent = content;
+                    message.appendChild(text);
+                }
+
+                if (fileUrl) {
+                    if (fileUrl.match(/\.(mp4|webm|ogg)$/i)) {
+                        const video = document.createElement("video");
+                        video.classList.add("chat-image");
+                        video.src = fileUrl;
+                        video.controls = true;
+                        message.appendChild(video);
+                    } else if (fileUrl.match(/\.pdf$/i)) {
+                        const pdfLink = document.createElement("a");
+                        pdfLink.href = fileUrl;
+                        pdfLink.textContent = "فتح ملف PDF";
+                        pdfLink.target = "_blank"; // يفتح في تاب جديد
+                        pdfLink.classList.add("pdf-link"); // لو حابب تضيف ستايل خاص
+                        message.appendChild(pdfLink);
+                    } else {
+                        const img = document.createElement("img");
+                        img.classList.add("chat-image");
+                        img.src = fileUrl;
+                        message.appendChild(img);
+                    }
+                }
 
                 const messagesContainer = document.getElementById("chatMessages");
                 messagesContainer.appendChild(message);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
 
+
+
             document.getElementById("sendMessageButton").addEventListener("click", async () => {
-                const input = document.getElementById("chatInput");
-                const content = input.value.trim();
-                if (!content) return;
+                const content = document.getElementById("chatInput").value.trim();
+                const image = document.getElementById("fileInput").files[0]; // تم تعديل id هنا
 
-
+                if (!content && !image) {
+                    alert("Please write a message or select an image.");
+                    return;
+                }
 
                 try {
-                    // await connection.invoke("SendMessage", currentReceiverId, content);
-                    await sendMessageToBackend(currentReceiverId, content);
-                    input.value = "";
+                    await sendMessageToBackend(currentReceiverId, content, image);
+                    document.getElementById("chatInput").value = "";
+                    document.getElementById("fileInput").value = ""; // تم تعديل id هنا
                 } catch (err) {
                     console.error("Error sending message:", err);
                     alert("Error sending message. Try again.");
                 }
             });
 
-            async function sendMessageToBackend(receiverId, content) {
+
+            async function sendMessageToBackend(receiverId, content, image) {
+                const formData = new FormData();
+                formData.append("ChatId", currentChatId);
+                formData.append("ReceiverId", receiverId);
+                if (content) formData.append("Content", content);
+                if (image) {
+                    console.log("Appending image:", image.name, image.type, image.size);
+                    formData.append("Img", image);
+                }
+
                 try {
-                    const res = await fetch("http://localhost:5271/api/Chat/SendMessage", {
+                    const res = await fetch("https://skilly.runasp.net/api/Chat/SendMessage", {
                         method: "POST",
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            ChatId: currentChatId,
-                            ReceiverId: receiverId,
-                            Content: content
-                        })
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
                     });
+
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        console.error("Server returned error status:", res.status, errorText);
+                        throw new Error("Failed to send message");
+                    }
+
                     const data = await res.json();
+                    console.log("Server response data:", data);
+
                     if (data.status !== "success") {
-                        alert("Failed to send message to backend");
+                        alert("Failed to send message: " + (data.message || ""));
                     }
                 } catch (err) {
-                    console.error("Backend error:", err);
-                    alert("Error sending message to backend");
+                    console.error("Error sending message:", err);
+                    alert("Error sending message. Try again.");
                 }
             }
         }

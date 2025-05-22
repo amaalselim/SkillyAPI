@@ -94,23 +94,33 @@ namespace Skilly.Persistence.Implementation
                 }
                 chat = _mapper.Map<Chat>(createdChat); 
             }
-            
+
 
             var message = new Message
             {
                 ChatId = chat.Id,
                 SenderId = senderId,
                 ReceiverId = dto.receiverId,
-                Content = dto.content,
+                Content = string.IsNullOrWhiteSpace(dto.content) ? null : dto.content,
                 SentAt = DateTime.Now,
                 Timestamp = DateTime.Now,
                 IsRead = false
             };
+
             var path = @"Images/Chat/Messages/";
             if (dto.Img != null)
             {
-                message.Img = await _imageService.SaveFileAsync(dto.Img, path);
+                try
+                {
+                    message.Img = await _imageService.SaveFileAsync(dto.Img, path);
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
             }
+
+
 
 
             _context.Messages.Add(message);
@@ -137,8 +147,10 @@ namespace Skilly.Persistence.Implementation
             return new MessageDTO
             {
                 receiverId = message.ReceiverId,
-                content = message.Content
+                content = message.Content,
+                imageUrl = message.Img
             };
+
         }
         public async Task<List<ChatDTO>> GetChatsForUserAsync(string userId)
         {
@@ -185,6 +197,7 @@ namespace Skilly.Persistence.Implementation
                 .OrderBy(m => m.SentAt)
                 .Include(m => m.Sender)   
                 .Include(m => m.Receiver) 
+
                 .ToListAsync();
 
             var messageDtos = _mapper.Map<List<MessageResponseDto>>(messages);
@@ -221,8 +234,5 @@ namespace Skilly.Persistence.Implementation
 
             return message.Id;
         }
-
-
-
     }
 }

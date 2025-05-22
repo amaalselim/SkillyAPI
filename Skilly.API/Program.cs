@@ -23,6 +23,7 @@ using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.FileProviders;
 
 namespace Skilly.API
 {
@@ -220,6 +221,7 @@ namespace Skilly.API
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
             app.UseSession();
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
