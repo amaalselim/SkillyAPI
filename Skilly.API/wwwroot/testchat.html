@@ -141,7 +141,7 @@
                 background-color: #0056b3;
             }
 
-        /* تحسين مظهر الفيديو */
+
         video.chat-image {
             max-width: 200px;
             max-height: 150px;
@@ -150,7 +150,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        /* تحسين مظهر روابط ملفات PDF */
+
         .pdf-link {
             display: inline-block;
             margin-top: 10px;
@@ -167,7 +167,7 @@
                 background-color: #0056b3;
             }
 
-        /* تحسين مظهر الصور */
+
         img.chat-image {
             max-width: 200px;
             max-height: 150px;
@@ -343,8 +343,8 @@
                         const pdfLink = document.createElement("a");
                         pdfLink.href = fileUrl;
                         pdfLink.textContent = "فتح ملف PDF";
-                        pdfLink.target = "_blank"; // يفتح في تاب جديد
-                        pdfLink.classList.add("pdf-link"); // لو حابب تضيف ستايل خاص
+                        pdfLink.target = "_blank"; 
+                        pdfLink.classList.add("pdf-link"); 
                         message.appendChild(pdfLink);
                     } else {
                         const img = document.createElement("img");
@@ -363,7 +363,7 @@
 
             document.getElementById("sendMessageButton").addEventListener("click", async () => {
                 const content = document.getElementById("chatInput").value.trim();
-                const image = document.getElementById("fileInput").files[0]; // تم تعديل id هنا
+                const image = document.getElementById("fileInput").files[0];
 
                 if (!content && !image) {
                     alert("Please write a message or select an image.");
@@ -373,7 +373,7 @@
                 try {
                     await sendMessageToBackend(currentReceiverId, content, image);
                     document.getElementById("chatInput").value = "";
-                    document.getElementById("fileInput").value = ""; // تم تعديل id هنا
+                    document.getElementById("fileInput").value = ""; 
                 } catch (err) {
                     console.error("Error sending message:", err);
                     alert("Error sending message. Try again.");
