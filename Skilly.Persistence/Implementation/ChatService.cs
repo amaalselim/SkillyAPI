@@ -69,7 +69,7 @@ namespace Skilly.Persistence.Implementation
         }
 
 
-        public async Task<MessageDTO> SendMessageAsync(MessageDTO dto)
+        public async Task<Message> SendMessageAsync(MessageDTO dto)
         {
             var senderId = GetUserId();
 
@@ -144,11 +144,13 @@ namespace Skilly.Persistence.Implementation
                     .SendAsync("ReceiveMessage", senderId, dto.content,imageUrl);
             }
 
-            return new MessageDTO
+            return new Message
             {
-                receiverId = message.ReceiverId,
-                content = message.Content,
-                imageUrl = message.Img
+                SenderId = message.SenderId,
+                ReceiverId = message.ReceiverId,
+                Content = message.Content,
+                Img = message.Img,
+
             };
 
         }
