@@ -48,10 +48,10 @@ namespace Skilly.API.Controllers
                 if (message != null)
                 {
                     await _hubContext.Clients.User(messageDTO.receiverId)
-                        .SendAsync("ReceiveMessage", senderId, message.content, message.imageUrl);
+                        .SendAsync("ReceiveMessage", senderId, message.Content, message.Img);
 
                     await _hubContext.Clients.User(senderId)
-                        .SendAsync("ReceiveMessage", senderId, message.content, message.imageUrl);
+                        .SendAsync("ReceiveMessage", senderId, message.Content, message.Img);
 
                     return StatusCode(201, new
                     {
@@ -59,9 +59,10 @@ namespace Skilly.API.Controllers
                         message = "Message sent successfully.",
                         data = new
                         {
-                            ReceiverId = message.receiverId,
-                            Content = message.content,
-                            ImageUrl = message.imageUrl
+                            SenderId=senderId,
+                            ReceiverId = message.ReceiverId,
+                            Content = message.Content,
+                            Image = message.Img,
                         }
                     });
                 }

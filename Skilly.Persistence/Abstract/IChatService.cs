@@ -11,7 +11,7 @@ namespace Skilly.Persistence.Abstract
     public interface IChatService
     {
         Task<ChatDTO> CreateChatAsync(CreateChatDTO dto);
-        Task<MessageDTO> SendMessageAsync(MessageDTO dto);
+        Task<Message> SendMessageAsync(MessageDTO dto);
         Task<List<ChatDTO>> GetChatsForUserAsync(string userId);
         Task<List<MessageResponseDto>> GetMessagesForChatAsync(string chatId, string userId);
         Task<string> MarkChatMessagesAsReadAsync(string messageId, string userId);

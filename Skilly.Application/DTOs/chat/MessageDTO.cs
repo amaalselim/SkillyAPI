@@ -14,8 +14,6 @@ namespace Skilly.Application.DTOs
         public string receiverId {  get; set; } 
         public string? content { get; set; }
         public IFormFile? Img { get; set; }
-        [JsonIgnore]
-        public string? imageUrl { get; set; }
 
     }
 }
