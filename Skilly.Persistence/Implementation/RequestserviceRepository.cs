@@ -405,25 +405,26 @@ namespace Skilly.Persistence.Implementation
             }
             service.providerId = user.UserId; //asssign provider who accept service
 
-            var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
+            //var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
             string title = "قبول خدمة";
-            string body = $"تم قبول خدمتك {service.Name} من قبل موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء الذهاب للدفع.";
-
-
+            string body = $"تم قبول خدمتك {service.Name} من قبل موفر الخدمة {user.FirstName} {user.LastName}، برجاء الذهاب للدفع.";
+            
+            var users=await _context.userProfiles.FirstOrDefaultAsync(u => u.Id == service.userId);
             if (service != null)
             {
                 await _firebase.SendNotificationAsync(
-                    service.UserProfile.UserId,
+                    users.UserId,
                     title,
                     body
                 );
 
                 _context.notifications.Add(new Notifications
                 {
-                    UserId = provviderr.UserId,
+                    UserId = user.UserId,
                     Title = title,
                     Body = body,
-                    userImg = provviderr.Img,
+                    userImg = users.Img,
+                    serviceId = service.Id,
                     CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                 });
             }
