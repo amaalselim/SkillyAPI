@@ -30,8 +30,10 @@ namespace Skilly.Core.Entities
         [NotMapped]
         public string userName { get; set; }
         public string userImg { get; set; }
+        
         [NotMapped]
         public List<string> Images { get; set; }
+        public string? video { get; set; }
         [JsonIgnore]
         public virtual UserProfile? UserProfile { get; set; }
         [JsonIgnore]

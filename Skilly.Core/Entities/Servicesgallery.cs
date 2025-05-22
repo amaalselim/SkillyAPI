@@ -14,7 +14,7 @@ namespace Skilly.Core.Entities
         public string galleryName { get; set; }
         public string? Description { get; set; }
         public string Deliverytime { get; set; }
-        public string Img { get; set; }
+        
         [JsonIgnore]
         public ICollection<ServicesgalleryImage> galleryImages { get; set; } = new List<ServicesgalleryImage>();
         [ForeignKey("serviceProvider")]
@@ -23,6 +23,7 @@ namespace Skilly.Core.Entities
         public ServiceProvider? serviceProvider { get; set; }
         [NotMapped]
         public List<string> Images { get; set; }
+        public string? video{ get; set; }
 
     }
 }

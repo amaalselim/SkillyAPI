@@ -22,8 +22,9 @@ namespace Skilly.Core.Entities
          
         public string Deliverytime { get; set; }
         public string? Notes { get; set; }
+       
         [JsonIgnore]
-        public ICollection<ProviderServicesImage> ServicesImages { get; set; } = new List<ProviderServicesImage>();
+        public ICollection<ProviderServicesImage>? ServicesImages { get; set; } = new List<ProviderServicesImage>();
         [ForeignKey("serviceProvider")]
         public string serviceProviderId { get; set; }
         [NotMapped]
@@ -35,6 +36,7 @@ namespace Skilly.Core.Entities
         public ServiceProvider? serviceProvider { get; set; }
         [NotMapped]
         public List<string> Images { get; set; }
+        public string? video { get; set; }
 
         [ForeignKey("Category")]
         public string categoryId { get; set; }
@@ -46,6 +48,7 @@ namespace Skilly.Core.Entities
         public int CountOfOffers { get; set; }
         [NotMapped]
         public double Distance { get; set; }
+        
 
         [JsonIgnore]
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
