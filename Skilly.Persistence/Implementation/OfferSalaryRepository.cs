@@ -84,26 +84,27 @@ namespace Skilly.Persistence.Implementation
                     .FirstOrDefaultAsync(p => p.Id == offer.serviceId && p.serviceProvider.User.FcmToken != null);
 
                 string title = "عرض سعر جديد";
-                string body = $"تم تقديم عرض سعر على خدمتك من المستخدم {user.FirstName+" "+user.LastName}";
+                string body = $"تم تقديم عرض سعر على خدمتك {providerService.Name} من المستخدم {user.FirstName+" "+user.LastName}";
 
-                //var provviderr = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.serviceProvider.UserId);
-                //if (providerService?.serviceProvider != null)
-                //{
-                //    await _firebase.SendNotificationAsync(
-                //        provviderr.FcmToken,
-                //        title,
-                //        body
-                //    );
+                var provviderr = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.serviceProvider.UserId);
+                if (providerService?.serviceProvider != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        provviderr.FcmToken,
+                        title,
+                        body
+                    );
 
-                //    _context.notifications.Add(new Notifications
-                //    {
-                //        UserId = userprofile.UserId,
-                //        Title = title,
-                //        Body = body,
-                //        userImg=userprofile.Img,
-                //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                //    }); 
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = provviderr.Id,
+                        Title = title,
+                        Body = body,
+                        userImg = userprofile.Img,
+                        serviceId=providerService.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
                 await _context.SaveChangesAsync();
             }
             else if (offer.requestserviceId != null)
@@ -117,23 +118,24 @@ namespace Skilly.Persistence.Implementation
 
                 var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
                 var prov = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
-                //if (requestService?.UserProfile != null)
-                //{
-                //    await _firebase.SendNotificationAsync(
-                //        userr.FcmToken,
-                //        title,
-                //        body
-                //    );
+                if (requestService?.UserProfile != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        userr.FcmToken,
+                        title,
+                        body
+                    );
 
-                //    _context.notifications.Add(new Notifications
-                //    {
-                //        UserId =prov.UserId,
-                //        Title = title,
-                //        Body = body,
-                //        userImg = prov.Img,
-                //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                //    });
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = userr.Id,
+                        Title = title,
+                        Body = body,
+                        userImg = prov.Img,
+                        serviceId = requestService.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
                 await _context.SaveChangesAsync();
             }
 
@@ -262,7 +264,6 @@ namespace Skilly.Persistence.Implementation
             _context.offerSalaries.Update(offer);
             await _context.SaveChangesAsync();
         }
-
         public async Task<bool> AcceptOfferAsync(string id)
         {
             var offer = await _context.offerSalaries.FindAsync(id);
@@ -270,8 +271,6 @@ namespace Skilly.Persistence.Implementation
                 return false;
 
             offer.Status = OfferStatus.Accepted;
-
-
 
             var user = await _context.users.FirstOrDefaultAsync(u => u.Id == offer.userId);
             if (offer.serviceId != null)
@@ -288,24 +287,24 @@ namespace Skilly.Persistence.Implementation
                 string title = "قبول عرض سعر";
                 string body = $"تمت الموافقة على السعر النهائي لخدمة {service.Name} من موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء الذهاب للدفع.";
 
+                if (providerService?.serviceProvider != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        user.FcmToken,
+                        title,
+                        body
+                    );
 
-                //if (providerService?.serviceProvider != null)
-                //{
-                //    await _firebase.SendNotificationAsync(
-                //        user.FcmToken,
-                //        title,
-                //        body
-                //    );
-
-                //    _context.notifications.Add(new Notifications
-                //    {
-                //        UserId = provviderr.Id,
-                //        Title = title,
-                //        Body = body,
-                //        userImg = providerService.serviceProvider.Img,
-                //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                //    });
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = user.Id,
+                        Title = title,
+                        Body = body,
+                        userImg = providerService.serviceProvider.Img,
+                        serviceId = providerService.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
                 await _context.SaveChangesAsync();
             }
             else if (offer.requestserviceId != null)
@@ -316,32 +315,32 @@ namespace Skilly.Persistence.Implementation
 
                 requestService.providerId = offer.userId;
 
-                //var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
+                var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
 
-                //    string title = "قبول عرض سعر";
-                //    string body = $"تم تأكيد طلبك من قِبل المستخدم {userr.FirstName + " " + userr.LastName}. برجاء البدء في تنفيذ الخدمة.";
+                string title = "قبول عرض سعر";
+                string body = $"تم تأكيد طلبك من قِبل المستخدم {userr.FirstName + " " + userr.LastName}. برجاء البدء في تنفيذ الخدمة.";
 
 
 
-                //    if (requestService?.UserProfile != null)
-                //    {
-                //        await _firebase.SendNotificationAsync(
-                //            user.FcmToken,
-                //            title,
-                //            body
-                //        );
+                if (requestService?.UserProfile != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        user.FcmToken,
+                        title,
+                        body
+                    );
 
-                //        _context.notifications.Add(new Notifications
-                //        {
-                //            UserId = requestService.UserProfile.UserId,
-                //            Title = title,
-                //            Body = body,
-                //            userImg = requestService.UserProfile.Img,
-                //            CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                //        });
-                //    }
-                //    await _context.SaveChangesAsync();
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = user.Id,
+                        Title = title,
+                        Body = body,
+                        userImg = requestService.UserProfile.Img,
+                        serviceId = requestService.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
+                await _context.SaveChangesAsync();
             }
             _context.offerSalaries.Update(offer);
             await _context.SaveChangesAsync();
@@ -372,23 +371,24 @@ namespace Skilly.Persistence.Implementation
 
                 body = $"تم رفض السعر المقترح لخدمة {providerService?.Name ?? "الخدمة"} من قبل موفر الخدمة {provviderr?.FirstName} {provviderr?.LastName}، يمكنك التفاوض مجددًا.";
 
-                //if (providerService?.serviceProvider != null)
-                //{
-                //    await _firebase.SendNotificationAsync(
-                //        user.FcmToken,
-                //        title,
-                //        body
-                //    );
+                if (providerService?.serviceProvider != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        user.FcmToken,
+                        title,
+                        body
+                    );
 
-                //    _context.notifications.Add(new Notifications
-                //    {
-                //        UserId = provviderr.Id,
-                //        Title = title,
-                //        Body = body,
-                //        userImg = providerService.serviceProvider.Img,
-                //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                //    });
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = user.Id,
+                        Title = title,
+                        Body = body,
+                        userImg = providerService.serviceProvider.Img,
+                        serviceId = providerService.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
                 await _context.SaveChangesAsync();
             }
             else if (offer.requestserviceId != null)
@@ -403,23 +403,24 @@ namespace Skilly.Persistence.Implementation
                 body = $"تم رفض السعر المقترح لخدمة {requestService?.Name ?? "الخدمة"} من قبل المستخدم {userr?.FirstName} {userr?.LastName}، يمكنك التفاوض مجددًا.";
 
 
-                //if (requestService?.UserProfile != null)
-                //{
-                //    await _firebase.SendNotificationAsync(
-                //        user.FcmToken,
-                //        title,
-                //        body
-                //    );
+                if (requestService?.UserProfile != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        user.FcmToken,
+                        title,
+                        body
+                    );
 
-                //    _context.notifications.Add(new Notifications
-                //    {
-                //        UserId = requestService.UserProfile.UserId,
-                //        Title = title,
-                //        Body = body,
-                //        userImg = requestService.UserProfile.Img,
-                //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                //    });
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = user.Id,
+                        Title = title,
+                        Body = body,
+                        userImg = requestService.UserProfile.Img,
+                        serviceId = requestService.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
                 await _context.SaveChangesAsync();
             }
             _context.offerSalaries.Update(offer);

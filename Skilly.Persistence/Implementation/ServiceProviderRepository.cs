@@ -114,7 +114,8 @@ namespace Skilly.Persistence.Implementation
                 var category = await _context.categories
                 .FirstOrDefaultAsync(c => c.Id == provider.categoryId);
 
-                provider.profession= category?.ProfessionName ?? "غير محدد";
+            provider.profession= category?.ProfessionName ?? "غير محدد";
+
 
             return provider;
         }
@@ -152,7 +153,6 @@ namespace Skilly.Persistence.Implementation
 
             foreach (var provider in providers)
             {
-                // حساب الريفيو
                 var reviews = await _context.reviews
                     .Where(r => r.ProviderServices.serviceProviderId== provider.UserId)
                     .ToListAsync();

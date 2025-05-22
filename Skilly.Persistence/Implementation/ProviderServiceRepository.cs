@@ -25,7 +25,7 @@ namespace Skilly.Persistence.Implementation
         private readonly IImageService _imageService;
         private readonly FirebaseV1Service _firebase;
 
-        public ProviderServiceRepository(ApplicationDbContext context,IMapper mapper,IImageService imageService, FirebaseV1Service firebase)
+        public ProviderServiceRepository(ApplicationDbContext context, IMapper mapper, IImageService imageService, FirebaseV1Service firebase)
         {
             _context = context;
             _mapper = mapper;
@@ -38,7 +38,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(i => i.ServicesImages)
                 .Include(i => i.serviceProvider)
                 .ThenInclude(sp => sp.User)
-                .Where(p=>p.PriceDiscount != null && p.PriceDiscount > 0)   
+                .Where(p => p.PriceDiscount != null && p.PriceDiscount > 0)
                 .ToListAsync();
 
             if (services == null || !services.Any())
@@ -51,7 +51,7 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 ServiceRequestTime = item.ServiceRequestTime,
                 Price = item.Price,
-                PriceDiscount=item.PriceDiscount,
+                PriceDiscount = item.PriceDiscount,
                 Deliverytime = item.Deliverytime,
                 categoryId = item.categoryId,
                 Notes = item.Notes,
@@ -64,13 +64,13 @@ namespace Skilly.Persistence.Implementation
             return serviceDtos;
 
         }
-        public async Task UseServiceDiscount(string serviceId,string userId)
+        public async Task UseServiceDiscount(string serviceId, string userId)
         {
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
-            var service=await _context.providerServices.FirstOrDefaultAsync(u => u.Id == serviceId);
+            var service = await _context.providerServices.FirstOrDefaultAsync(u => u.Id == serviceId);
             if (user.Points >= 100)
             {
-                decimal finalPrice = service.Price* 0.85m;
+                decimal finalPrice = service.Price * 0.85m;
                 service.PriceDiscount = finalPrice;
                 user.Points -= 100;
                 user.useDiscount = true;
@@ -136,7 +136,7 @@ namespace Skilly.Persistence.Implementation
 
         public async Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId)
         {
-            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId== userId);
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var service = await _context.providerServices
             .Include(g => g.ServicesImages)
             .FirstOrDefaultAsync(g => g.Id == serviceId && g.uId == user.Id);
@@ -275,12 +275,14 @@ namespace Skilly.Persistence.Implementation
             return serviceDto;
         }
 
-        public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId)
+        public async Task<List<ProviderServices>> GetAllservicesbyCategoryId(string categoryId, string sortBy, double? userLat = null, double? userLon = null)
         {
             var services = await _context.providerServices
-                .Include(c => c.serviceProvider)
-                .Include(c => c.ServicesImages)
-                .Include(c => c.offerSalaries)
+                .Include(i => i.ServicesImages)
+                .Include(i => i.serviceProvider)
+                    .ThenInclude(sp => sp.User)
+                .Include(i => i.offerSalaries)
+                .Include(i => i.Reviews)
                 .Where(c => c.categoryId == categoryId)
                 .ToListAsync();
 
@@ -303,10 +305,23 @@ namespace Skilly.Persistence.Implementation
                 providerImg = item.serviceProvider.Img,
                 Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                CountOfOffers = item.offerSalaries?.Count ?? 0
-            }).ToList();
+                CountOfOffers = item.offerSalaries?.Count ?? 0,
+                Distance = (userLat != null && userLon != null)
+                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.serviceProvider.User?.Latitude, item?.serviceProvider.User?.Longitude).GetValueOrDefault()
+                    : 0,
+            });
+       
 
-            return serviceDtos;
+            serviceDtos = string.IsNullOrEmpty(sortBy) || sortBy.ToLower() == "nearest"
+                ? (userLat != null && userLon != null ? serviceDtos.OrderBy(s => s.Distance) : serviceDtos)
+                : sortBy.ToLower() switch
+                {
+                    "price-asc" => serviceDtos.OrderBy(s => s.Price),
+                    "latest" => serviceDtos.OrderByDescending(s => s.ServiceRequestTime),
+                    _ => serviceDtos.OrderBy(s => s.Price)
+                };
+
+            return serviceDtos.ToList();
         }
 
         public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
@@ -491,6 +506,8 @@ namespace Skilly.Persistence.Implementation
                 .Include(g => g.offerSalaries)
                 .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.Paid);
             var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
+            var payment = await _context.payments.FirstOrDefaultAsync(p => p.UserId == userId);
+            var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
             if (service != null)
             {
                 service.ServiceStatus = ServiceStatus.Completed;
@@ -498,25 +515,26 @@ namespace Skilly.Persistence.Implementation
                 string title = "تم تنفيذ الخدمة";
                 string body = $"تم تنفيذ خدمتك {service.Name} من قبل موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء تأكيد الاستلام.";
 
+               
 
+                if (service?.Id != null)
+                {
+                    await _firebase.SendNotificationAsync(
+                        user.FcmToken,
+                        title,
+                        body
+                    );
 
-                //if (service?.serviceProvider != null)
-                //{
-                //    await _firebase.SendNotificationAsync(
-                //        service.userprofileId,
-                //        title,
-                //        body
-                //    );
-
-                //    _context.notifications.Add(new Notifications
-                //    {
-                //        UserId = provviderr.UserId,
-                //        Title = title,
-                //        Body = body,
-                //        userImg = provviderr.Img,
-                //        CreatedAt = ateOnly.FromDateTime(DateTime.Now)
-                //    });
-                //}
+                    _context.notifications.Add(new Notifications
+                    {
+                        UserId = provviderr.UserId,
+                        Title = title,
+                        Body = body,
+                        userImg = provviderr.Img,
+                        serviceId = service.Id,
+                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                    });
+                }
                 var images = service.ServicesImages?.Select(si => si.Img).ToList() ?? new List<string>();
 
                 var gallery = new Servicesgallery
@@ -560,24 +578,24 @@ namespace Skilly.Persistence.Implementation
                     string title = "تم تنفيذ الخدمة";
                     string body = $"تم تنفيذ خدمتك {request.Name} من قبل موفر الخدمة {provviderr.FirstName} {provviderr.LastName}، برجاء تأكيد الاستلام.";
 
+                    if (request?.Id != null)
+                    {
+                        await _firebase.SendNotificationAsync(
+                            user.FcmToken,
+                            title,
+                            body
+                        );
 
-                    //if (request?.UserProfile != null)
-                    //{
-                    //    await _firebase.SendNotificationAsync(
-                    //        request.userId,
-                    //        title,
-                    //        body
-                    //    );
-
-                    //    _context.notifications.Add(new Notifications
-                    //    {
-                    //        UserId = provviderr.UserId,
-                    //        Title = title,
-                    //        Body = body,
-                    //        userImg = provviderr.Img,
-                    //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                    //    });
-                    //}
+                        _context.notifications.Add(new Notifications
+                        {
+                            UserId = provviderr.UserId,
+                            Title = title,
+                            Body = body,
+                            userImg = provviderr.Img,
+                            serviceId = request.Id,
+                            CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                        });
+                    }
                     var imagess = request.requestServiceImages?.Select(si => si.Img).ToList() ?? new List<string>();
 
                     var gallery = new Servicesgallery

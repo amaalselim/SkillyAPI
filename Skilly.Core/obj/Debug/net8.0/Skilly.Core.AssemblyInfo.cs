@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Skilly.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+adbbbdfa491675f62d6f1ba5c27b93c952d11e19")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7e89c92ac32308b6b25ad44b32a2fc883d28a47")]
 [assembly: System.Reflection.AssemblyProductAttribute("Skilly.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Skilly.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

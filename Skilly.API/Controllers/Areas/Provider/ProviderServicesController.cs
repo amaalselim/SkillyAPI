@@ -27,7 +27,6 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return userId;
         }
-
         [HttpGet("getAllServices")]
         public async Task<IActionResult> GetAllServices([FromQuery] string sortBy = "nearest")
         {
@@ -40,7 +39,7 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
-                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy,userLat, userLon);
+                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
                 if (services == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
@@ -52,14 +51,24 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
         [HttpGet("GetAllServicesBy/{categoryId}")]
-        public async Task<IActionResult> GetservicesbycategoryId(string categoryId)
+        public async Task<IActionResult> GetservicesbycategoryId(string categoryId, [FromQuery] string sortBy = "nearest")
         {
-            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId);
-            if (service == null)
+            var userId = GetUserIdFromClaims();
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null || user.Latitude == null || user.Longitude == null)
+                return BadRequest("User location not available.");
+
+            var userLat = user.Latitude.Value;
+            var userLon = user.Longitude.Value;
+
+            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId, sortBy, userLat, userLon);
+            if (service == null || !service.Any())
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this category." });
             }
+
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
 

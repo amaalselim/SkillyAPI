@@ -11,6 +11,7 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
@@ -51,6 +52,7 @@ namespace Skilly.Persistence.Implementation
             }
             var path = @"Images/UserProfile/RequestServices/";
             var service = _mapper.Map<RequestService>(requestServiceDTO);
+            var sid = service.Id;
             service.userId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.userImg = user.Img;
@@ -88,7 +90,7 @@ namespace Skilly.Persistence.Implementation
 
             string title = "طلب خدمة جديد";
             string body = $"تم نشر طلب جديد في قسم {cat?.Name ?? "القسم الخاص بك"}، يمكنك مشاهدته الآن.";
-
+            
             foreach (var provider in providers)
             {
                 try
@@ -101,10 +103,11 @@ namespace Skilly.Persistence.Implementation
 
                     _context.notifications.Add(new Notifications
                     {
-                        UserId = user.UserId,
+                        UserId = provider.UserId,
                         Title = title,
                         Body = body,
-                        userImg = user.Img,
+                        userImg = cat.Img,
+                        serviceId=sid,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
@@ -192,7 +195,6 @@ namespace Skilly.Persistence.Implementation
             {
                 Id = item.Id,
                 Name = item.Name,
-
                 Price = item.Price,
                 Deliverytime = item.Deliverytime,
                 startDate = item.startDate,
@@ -258,7 +260,7 @@ namespace Skilly.Persistence.Implementation
             return serviceDtos;
         }
 
-        public async Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId)
+        public async Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId, string sortBy, double? userLat = null, double? userLon = null)
         {
             var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             var services = await _context.requestServices
@@ -289,10 +291,21 @@ namespace Skilly.Persistence.Implementation
                     .Select(img => img.Img)
                     .ToList(),
                 offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count ?? 0
-            }).ToList();
+                OffersCount = item.offerSalaries?.Count ?? 0,
+            Distance = (userLat != null && userLon != null)
+                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
+                : 0
+            });
+            serviceDtos = string.IsNullOrEmpty(sortBy) || sortBy.ToLower() == "nearest"
+                ? (userLat != null && userLon != null ? serviceDtos.OrderBy(s => s.Distance) : serviceDtos)
+                : sortBy.ToLower() switch
+                {
+                    "price-asc" => serviceDtos.OrderBy(s => s.Price),
+                    "latest" => serviceDtos.OrderByDescending(s => s.ServiceRequestTime),
+                    _ => serviceDtos.OrderBy(s => s.Price)
+                };
 
-            return serviceDtos;
+            return serviceDtos.ToList();
         }
 
 

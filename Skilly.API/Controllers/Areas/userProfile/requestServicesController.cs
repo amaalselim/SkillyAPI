@@ -55,12 +55,19 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
         }
         [HttpGet("GetAllRequestsByCategoryId")]
-        public async Task<IActionResult> GetServicesBycategoryId()
+        public async Task<IActionResult> GetServicesBycategoryId([FromQuery] string sortBy = "nearest")
         {
             try
             {
                 string userId = GetUserIdFromClaims();
-                var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByCategoryId(userId);
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null || user.Latitude == null || user.Longitude == null)
+                    return BadRequest("User location not available.");
+
+
+                var userLat = user.Latitude.Value;
+                var userLon = user.Longitude.Value;
+                var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByCategoryId(userId,sortBy,userLat,userLon);
                 if (services == null || !services.Any())
                 {
                     return NotFound(new { message = "No services found for this user." });

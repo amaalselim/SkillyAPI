@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Vonage.SubAccounts;
 
 namespace Skilly.Persistence.Implementation
 {
@@ -48,67 +49,81 @@ namespace Skilly.Persistence.Implementation
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
             var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
 
-            payment.PaymentStatus = "paid";
-            user.Points += 20;
-            userprofile.useDiscount = false;
+            
 
             var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
-
+            var provider = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.uId);
             if (providerService != null)
             {
                 providerService.ServiceStatus = ServiceStatus.Paid;
                 string title = "تم شراء الخدمة";
-                string body = $"تم شراء الخدمة {providerService.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة.";
+                decimal discountPercentage = 0.20m;
+                decimal totalAmount=payment.Amount;
+                decimal systemShare = totalAmount * discountPercentage;
+                decimal providerAmount = totalAmount - systemShare;
 
-                // إذا حابب تستخدم إشعارات firebase، شغل الكود تحت
-                /*
-                if (providerService?.UserProfile != null)
+                string body = $"تم شراء الخدمة {providerService.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
+
+
+                if (providerService?.Id != null)
                 {
                     await _firebase.SendNotificationAsync(
-                        providerService.serviceProviderId,
+                        provider.FcmToken,
                         title,
                         body
                     );
 
                     _context.notifications.Add(new Notifications
                     {
-                        UserId = user.UserId,
+                        UserId = providerService.uId,
                         Title = title,
                         Body = body,
                         userImg = user.Img,
+                        serviceId = providerService.Id,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
-                */
+                
             }
             else
             {
                 var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == payment.RequestServiceId);
+                var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.userId);
                 if (service != null)
                 {
                     service.ServiceStatus = ServiceStatus.Paid;
                     string title = "تم شراء الخدمة";
-                    string body = $"تم شراء الخدمة {service.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة.";
+                    decimal discountPercentage = 0.20m;
+                    decimal totalAmount = payment.Amount;
+                    decimal systemShare = totalAmount * discountPercentage;
+                    decimal providerAmount = totalAmount - systemShare;
 
-                    //if (service?.UserProfile != null)
-                    //{
-                    //    await _firebase.SendNotificationAsync(
-                    //        service.providerId,
-                    //        title,
-                    //        body
-                    //    );
+                    string body = $"تم شراء الخدمة {service.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
 
-                    //    _context.notifications.Add(new Notifications
-                    //    {
-                    //        UserId = user.UserId,
-                    //        Title = title,
-                    //        Body = body,
-                    //        userImg = user.Img,
-                    //        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
-                    //    });
-                    //}
+
+                    if (service?.Id != null)
+                    {
+                        await _firebase.SendNotificationAsync(
+                            userr.FcmToken,
+                            title,
+                            body
+                        );
+
+                        _context.notifications.Add(new Notifications
+                        {
+                            UserId = service.userId,
+                            Title = title,
+                            Body = body,
+                            userImg = user.Img,
+                            serviceId = service.Id,
+                            CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                        });
+                    }
                 }
             }
+            payment.PaymentStatus = "paid";
+            user.Points += 20;
+            userprofile.useDiscount = false;
 
             await _context.SaveChangesAsync();
 
