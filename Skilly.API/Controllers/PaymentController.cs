@@ -71,6 +71,7 @@ namespace Skilly.API.Controllers
 
         //    return Redirect($"{url}");
         //}
+
         //[HttpPost("payment-callback")]
         //public async Task<IActionResult> PaymentCallback([FromBody] PaymobCallbackDTO callbackData)
         //{
@@ -106,12 +107,41 @@ namespace Skilly.API.Controllers
         //    return Ok(new { success = true, endpointfullPath = fullUrl });
         //}
 
+        //[HttpGet("payment-callback")]
+        //public async Task<IActionResult> PaymentCallback([FromQuery] bool success, [FromQuery] string order)
+        //{
+        //    if (string.IsNullOrEmpty(order))
+        //    {
+        //        return BadRequest(new { success = false, message = "Order ID is required." });
+        //    }
+
+        //    if (!success)
+        //    {
+        //        return BadRequest(new { success = false, message = "Payment was not successful." });
+        //    }
+
+        //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(order, success);
+        //    if (result == null)
+        //    {
+        //        return NotFound(new { success = false, message = "Payment not found." });
+        //    }
+
+        //    return Ok(new { success = true, message = "Payment confirmed successfully." });
+        //}
+
         [HttpGet("payment-callback")]
-        public async Task<IActionResult> PaymentCallback([FromQuery] bool success, [FromQuery] string order)
+        public async Task<IActionResult> PaymentCallbackCheck()
         {
-            if (string.IsNullOrEmpty(order))
+            var orderId = HttpContext.Request.Query["order"].ToString();
+            var successParam = HttpContext.Request.Query["success"].ToString();
+
+            if (string.IsNullOrEmpty(orderId))
             {
                 return BadRequest(new { success = false, message = "Order ID is required." });
+            }
+            if (!bool.TryParse(successParam, out bool success))
+            {
+                return BadRequest(new { success = false, message = "Invalid success value." });
             }
 
             if (!success)
@@ -119,7 +149,7 @@ namespace Skilly.API.Controllers
                 return BadRequest(new { success = false, message = "Payment was not successful." });
             }
 
-            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(order, success);
+            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId, success);
             if (result == null)
             {
                 return NotFound(new { success = false, message = "Payment not found." });
