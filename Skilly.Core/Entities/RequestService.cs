@@ -21,7 +21,6 @@ namespace Skilly.Core.Entities
         public string categoryId { get; set; }
         [JsonIgnore]
         public virtual Category? Category { get; set; }
-
         public string? Notes { get; set; }
         [ForeignKey("UserProfile")]
         public string userId { get; set; }

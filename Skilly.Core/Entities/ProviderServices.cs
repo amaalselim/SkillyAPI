@@ -19,7 +19,6 @@ namespace Skilly.Core.Entities
         public string Description { get; set; }
         public decimal Price { get; set; }
         public decimal? PriceDiscount { get; set; }
-         
         public string Deliverytime { get; set; }
         public string? Notes { get; set; }
        
@@ -48,8 +47,6 @@ namespace Skilly.Core.Entities
         public int CountOfOffers { get; set; }
         [NotMapped]
         public double Distance { get; set; }
-        
-
         [JsonIgnore]
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
         [JsonIgnore]

@@ -56,8 +56,9 @@ namespace Skilly.Persistence.Implementation
             if (providerService != null)
             {
                 providerService.ServiceStatus = ServiceStatus.Paid;
+
                 string title = "تم شراء الخدمة";
-                decimal discountPercentage = 0.20m;
+                decimal discountPercentage = 0.10m;
                 decimal totalAmount=payment.Amount;
                 decimal systemShare = totalAmount * discountPercentage;
                 decimal providerAmount = totalAmount - systemShare;
@@ -84,6 +85,7 @@ namespace Skilly.Persistence.Implementation
                     });
                 }
                 
+
             }
             else
             {
@@ -93,7 +95,7 @@ namespace Skilly.Persistence.Implementation
                 {
                     service.ServiceStatus = ServiceStatus.Paid;
                     string title = "تم شراء الخدمة";
-                    decimal discountPercentage = 0.20m;
+                    decimal discountPercentage = 0.10m;
                     decimal totalAmount = payment.Amount;
                     decimal systemShare = totalAmount * discountPercentage;
                     decimal providerAmount = totalAmount - systemShare;
@@ -119,6 +121,7 @@ namespace Skilly.Persistence.Implementation
                             CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                         });
                     }
+                    
                 }
             }
             payment.PaymentStatus = "paid";
@@ -152,9 +155,13 @@ namespace Skilly.Persistence.Implementation
 
             if (providerService != null)
             {
+                var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.serviceId == providerService.Id && o.Status == OfferStatus.Accepted);
                 if (providerService.PriceDiscount != null && userprofile.useDiscount==true)
                 {
                     amount = (decimal)providerService.PriceDiscount;
+                }else if(offers != null)
+                {
+                    amount = offers.Salary;
                 }
                 else
                 {
@@ -170,7 +177,16 @@ namespace Skilly.Persistence.Implementation
                 var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == serviceId);
                 if (service != null)
                 {
-                    amount = service.Price;
+                    var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.requestserviceId == service.Id && o.Status == OfferStatus.Accepted);
+                    if (offers != null)
+                    {
+                        amount = offers.Salary;
+                    }
+                    else
+                    {
+                        amount = service.Price;
+                    }
+                        
                     relatedId = service.Id;
                     serviceType = "Request";
                     providerId = service.providerId;

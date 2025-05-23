@@ -10,7 +10,8 @@ namespace Skilly.Core.Enums
     {
         Pending,   
         Accepted,   
-        Rejected    
+        Rejected,
+        paidandComplete,
     }
 
 }

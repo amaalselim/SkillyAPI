@@ -39,7 +39,7 @@ namespace Skilly.API.Controllers.Areas.Provider
 
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
-                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon);
+                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon,userId);
                 if (services == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
@@ -63,7 +63,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             var userLat = user.Latitude.Value;
             var userLon = user.Longitude.Value;
 
-            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(categoryId, sortBy, userLat, userLon);
+            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(userId,categoryId, sortBy, userLat, userLon);
             if (service == null || !service.Any())
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this category." });
@@ -101,13 +101,14 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
-
+         
         [HttpGet("GetServiceBy/{serviceId}")]
         public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
         {
             try
             {
-                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId);
+                string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId,userId);
                 return StatusCode(StatusCodes.Status200OK, new { service });
             }
             catch (ProviderServiceNotFoundException ex)
@@ -123,7 +124,6 @@ namespace Skilly.API.Controllers.Areas.Provider
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
             }
-
             try
             {
                 string userId = GetUserIdFromClaims();

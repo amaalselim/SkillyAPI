@@ -282,6 +282,11 @@ namespace Skilly.Persistence.Implementation
 
                 providerService.userprofileId = offer.userId;
 
+                
+                
+                
+                
+
                 var service = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == offer.serviceId);
                 var provviderr = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.serviceProvider.UserId);
                 string title = "قبول عرض سعر";
@@ -314,6 +319,7 @@ namespace Skilly.Persistence.Implementation
                     .FirstOrDefaultAsync(r => r.Id == offer.requestserviceId && r.UserProfile.User.FcmToken != null);
 
                 requestService.providerId = offer.userId;
+
 
                 var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
 
@@ -355,7 +361,6 @@ namespace Skilly.Persistence.Implementation
 
             offer.Status = OfferStatus.Rejected;
 
-           
             string title = "رفض عرض السعر";
             string body = "";
             var user = await _context.users.FirstOrDefaultAsync(u => u.Id == offer.userId);
@@ -365,6 +370,8 @@ namespace Skilly.Persistence.Implementation
                 var providerService = await _context.providerServices
                     .Include(p => p.serviceProvider)
                     .FirstOrDefaultAsync(p => p.Id == offer.serviceId && p.serviceProvider.User.FcmToken != null);
+                
+
 
                 var service = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == offer.serviceId);
                 var provviderr = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.serviceProvider.UserId);

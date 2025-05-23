@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Microsoft.Extensions.Logging;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
@@ -225,8 +226,8 @@ namespace Skilly.Persistence.Implementation
                     .Select(img => img.Img)
                     .ToList(),
                 video = item.video,
-                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count ?? 0,
+                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
                 Distance = (userLat != null && userLng != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.UserProfile.User?.Latitude, item?.UserProfile.User?.Longitude).GetValueOrDefault()
                     : 0
@@ -272,8 +273,8 @@ namespace Skilly.Persistence.Implementation
                     .Select(img => img.Img)
                     .ToList(),
                 video = item.video,
-                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count ?? 0
+                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
             }).ToList();
 
             return serviceDtos;
@@ -310,9 +311,9 @@ namespace Skilly.Persistence.Implementation
                     .Select(img => img.Img)
                     .ToList(),
                 video = item.video,
-                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count ?? 0,
-            Distance = (userLat != null && userLon != null)
+                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
+                Distance = (userLat != null && userLon != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
                 : 0
             });
@@ -359,8 +360,8 @@ namespace Skilly.Persistence.Implementation
                     .Select(img => img.Img)
                     .ToList() ?? new List<string>(),
                 video = service.video,
-                offerSalaries = service.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = service.offerSalaries?.Count ?? 0
+                offerSalaries = service.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                OffersCount =service.offerSalaries?.Count(p => p.Status == 0) ?? 0,
             };
 
             return serviceDto;
@@ -395,8 +396,8 @@ namespace Skilly.Persistence.Implementation
                     .Select(img => img.Img)
                     .ToList(),
                 video = item.video,
-                offerSalaries = item.offerSalaries?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count ?? 0,
+                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
                 Distance = (userLat != null && userLon != null)
                     ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
                     : 0
@@ -431,18 +432,18 @@ namespace Skilly.Persistence.Implementation
             string title = "قبول خدمة";
             string body = $"تم قبول خدمتك {service.Name} من قبل موفر الخدمة {user.FirstName} {user.LastName}، برجاء الذهاب للدفع.";
             
-            var users=await _context.userProfiles.FirstOrDefaultAsync(u => u.Id == service.userId);
+            var users=await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId== service.uId);
             if (service != null)
             {
                 await _firebase.SendNotificationAsync(
-                    users.UserId,
+                    users.User.FcmToken,
                     title,
                     body
                 );
 
                 _context.notifications.Add(new Notifications
                 {
-                    UserId = user.UserId,
+                    UserId = users.UserId,
                     Title = title,
                     Body = body,
                     userImg = users.Img,
