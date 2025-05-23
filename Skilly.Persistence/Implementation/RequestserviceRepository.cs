@@ -196,12 +196,13 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<RequestService>> GetAllRequests(double? userLat = null, double? userLng = null)
+        public async Task<IEnumerable<RequestService>> GetAllRequests(string currentUserId,double? userLat = null, double? userLng = null)
         {
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
                 .ThenInclude(sp => sp.User)
                 .Include(c => c.requestServiceImages)
+                .Include(c => c.offerSalaries)
                 .ToListAsync();
 
             if (services == null || !services.Any())
@@ -209,28 +210,34 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            var serviceDtos = services.Select(item => new RequestService
+            var serviceDtos = services.Select(item =>
             {
-                Id = item.Id,
-                Name = item.Name,
-                Price = item.Price,
-                Deliverytime = item.Deliverytime,
-                startDate = item.startDate,
-                categoryId = item.categoryId,
-                Notes = item.Notes,
-                ServiceRequestTime = item.ServiceRequestTime,
-                userId = item.userId,
-                userImg = item.UserProfile.Img,
-                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
-                Images = item.requestServiceImages
-                    .Select(img => img.Img)
-                    .ToList(),
-                video = item.video,
-                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
-                Distance = (userLat != null && userLng != null)
-                    ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.UserProfile.User?.Latitude, item?.UserProfile.User?.Longitude).GetValueOrDefault()
-                    : 0
+                var acceptedOffer = item.offerSalaries
+                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId==currentUserId);
+
+                return new RequestService
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Price = acceptedOffer != null ? acceptedOffer.Salary : item.Price,
+                    Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
+                    startDate = item.startDate,
+                    categoryId = item.categoryId,
+                    Notes = item.Notes,
+                    ServiceRequestTime = item.ServiceRequestTime,
+                    userId = item.userId,
+                    userImg = item.UserProfile.Img,
+                    userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                    Images = item.requestServiceImages
+                        .Select(img => img.Img)
+                        .ToList(),
+                    video = item.video,
+                    offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                    OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
+                    Distance = (userLat != null && userLng != null)
+                        ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.UserProfile.User?.Latitude, item?.UserProfile.User?.Longitude).GetValueOrDefault()
+                        : 0
+                };
             }).ToList();
 
             if (userLat != null && userLng != null)
@@ -242,12 +249,15 @@ namespace Skilly.Persistence.Implementation
 
             return serviceDtos;
         }
+
         public async Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId)
         {
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
+
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
                 .Include(c => c.requestServiceImages)
+                .Include(c => c.offerSalaries)
                 .Where(g => g.userId == user.Id)
                 .ToListAsync();
 
@@ -256,36 +266,46 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            var serviceDtos = services.Select(item => new RequestService
+            var serviceDtos = services.Select(item =>
             {
-                Id = item.Id,
-                Name = item.Name,
-                Price = item.Price,
-                Deliverytime = item.Deliverytime,
-                startDate = item.startDate,
-                categoryId = item.categoryId,
-                Notes = item.Notes,
-                ServiceRequestTime = item.ServiceRequestTime,
-                userId = item.userId,
-                userImg = item.UserProfile.Img,
-                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
-                Images = item.requestServiceImages
-                    .Select(img => img.Img)
-                    .ToList(),
-                video = item.video,
-                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
+                var acceptedOffer = item.offerSalaries
+                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId==userId);
+
+                return new RequestService
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Price = acceptedOffer != null ? acceptedOffer.Salary : item.Price,
+                    Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
+                    startDate = item.startDate,
+                    categoryId = item.categoryId,
+                    Notes = item.Notes,
+                    ServiceRequestTime = item.ServiceRequestTime,
+                    userId = item.userId,
+                    userImg = item.UserProfile.Img,
+                    userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                    Images = item.requestServiceImages
+                        .Select(img => img.Img)
+                        .ToList(),
+                    video = item.video,
+                    offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                    OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
+                };
             }).ToList();
 
             return serviceDtos;
         }
 
+
         public async Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId, string sortBy, double? userLat = null, double? userLon = null)
         {
             var provider = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
+                    .ThenInclude(u => u.User)
                 .Include(c => c.requestServiceImages)
+                .Include(c => c.offerSalaries)
                 .Where(g => g.categoryId == provider.categoryId && g.ServiceStatus == ServiceStatus.Posted)
                 .ToListAsync();
 
@@ -294,29 +314,36 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            var serviceDtos = services.Select(item => new RequestService
+            var serviceDtos = services.Select(item =>
             {
-                Id = item.Id,
-                Name = item.Name,
-                Price = item.Price,
-                Deliverytime = item.Deliverytime,
-                startDate = item.startDate,
-                categoryId = item.categoryId,
-                Notes = item.Notes,
-                ServiceRequestTime = item.ServiceRequestTime,
-                userId = item.userId,
-                userImg = item.UserProfile.Img,
-                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
-                Images = item.requestServiceImages
-                    .Select(img => img.Img)
-                    .ToList(),
-                video = item.video,
-                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
-                Distance = (userLat != null && userLon != null)
-                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
-                : 0
+                var acceptedOffer = item.offerSalaries
+                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == userId);
+
+                return new RequestService
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Price = acceptedOffer != null ? acceptedOffer.Salary : item.Price,
+                    Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
+                    startDate = item.startDate,
+                    categoryId = item.categoryId,
+                    Notes = item.Notes,
+                    ServiceRequestTime = item.ServiceRequestTime,
+                    userId = item.userId,
+                    userImg = item.UserProfile.Img,
+                    userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                    Images = item.requestServiceImages
+                        .Select(img => img.Img)
+                        .ToList(),
+                    video = item.video,
+                    offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                    OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
+                    Distance = (userLat != null && userLon != null)
+                        ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile?.User?.Latitude, item?.UserProfile?.User?.Longitude).GetValueOrDefault()
+                        : 0
+                };
             });
+
             serviceDtos = string.IsNullOrEmpty(sortBy) || sortBy.ToLower() == "nearest"
                 ? (userLat != null && userLon != null ? serviceDtos.OrderBy(s => s.Distance) : serviceDtos)
                 : sortBy.ToLower() switch
@@ -330,7 +357,7 @@ namespace Skilly.Persistence.Implementation
         }
 
 
-        public async Task<RequestService> GetRequestById(string requestId)
+        public async Task<RequestService> GetRequestById(string requestId,string currentUserId)
         {
             var service = await _context.requestServices
                 .Include(g => g.requestServiceImages)
@@ -342,14 +369,16 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new Exception("Service not found.");
             }
+            var acceptedOffer = service.offerSalaries
+                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId);
 
             var serviceDto = new RequestService
             {
                 Id = service.Id,
                 ServiceRequestTime = service.ServiceRequestTime,
                 Name = service.Name,
-                Price = service.Price,
-                Deliverytime = service.Deliverytime,
+                Price = acceptedOffer!=null? acceptedOffer.Salary : service.Price,
+                Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : service.Deliverytime,
                 startDate = service.startDate,
                 categoryId = service.categoryId,
                 Notes = service.Notes,
@@ -367,11 +396,13 @@ namespace Skilly.Persistence.Implementation
             return serviceDto;
         }
         public async Task<IEnumerable<RequestService>> GetSortedUserAsync(
-                string sortBy, double? userLat = null, double? userLon = null)
+     string sortBy, string currentUserId, double? userLat = null, double? userLon = null)
         {
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
+                    .ThenInclude(u => u.User)
                 .Include(c => c.requestServiceImages)
+                .Include(c => c.offerSalaries)
                 .ToListAsync();
 
             if (services == null || !services.Any())
@@ -379,29 +410,34 @@ namespace Skilly.Persistence.Implementation
                 return new List<RequestService>();
             }
 
-            var serviceDtos = services.Select(item => new RequestService
+            var serviceDtos = services.Select(item =>
             {
-                Id = item.Id,
-                Name = item.Name,
-                Price = item.Price,
-                Deliverytime = item.Deliverytime,
-                startDate = item.startDate,
-                categoryId = item.categoryId,
-                Notes = item.Notes,
-                ServiceRequestTime = item.ServiceRequestTime,
-                userId = item.userId,
-                userImg = item.UserProfile.Img,
-                userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
-                Images = item.requestServiceImages
-                    .Select(img => img.Img)
-                    .ToList(),
-                video = item.video,
-                offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
-                OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
-                Distance = (userLat != null && userLon != null)
-                    ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile.User?.Latitude, item.UserProfile.User?.Longitude).GetValueOrDefault()
-                    : 0
+                var acceptedOffer = item.offerSalaries
+                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId);
 
+                return new RequestService
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Price = acceptedOffer != null ? acceptedOffer.Salary : item.Price,
+                    Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
+                    startDate = item.startDate,
+                    categoryId = item.categoryId,
+                    Notes = item.Notes,
+                    ServiceRequestTime = item.ServiceRequestTime,
+                    userId = item.userId,
+                    userImg = item.UserProfile.Img,
+                    userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
+                    Images = item.requestServiceImages
+                        .Select(img => img.Img)
+                        .ToList(),
+                    video = item.video,
+                    offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
+                    OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
+                    Distance = (userLat != null && userLon != null)
+                        ? GeoHelper.GetDistance(userLat.Value, userLon.Value, item?.UserProfile?.User?.Latitude, item?.UserProfile?.User?.Longitude).GetValueOrDefault()
+                        : 0
+                };
             });
 
             serviceDtos = string.IsNullOrEmpty(sortBy) || sortBy.ToLower() == "nearest"
@@ -415,6 +451,7 @@ namespace Skilly.Persistence.Implementation
 
             return serviceDtos.ToList();
         }
+
         public async Task AcceptService(string requestId, string userId)
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -432,21 +469,22 @@ namespace Skilly.Persistence.Implementation
             string title = "قبول خدمة";
             string body = $"تم قبول خدمتك {service.Name} من قبل موفر الخدمة {user.FirstName} {user.LastName}، برجاء الذهاب للدفع.";
             
-            var users=await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId== service.uId);
+            var userprofile=await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId== service.uId);
+            var userr=await _context.users.FirstOrDefaultAsync(p=>p.Id==userprofile.UserId);
             if (service != null)
             {
                 await _firebase.SendNotificationAsync(
-                    users.User.FcmToken,
+                    userr.FcmToken,
                     title,
                     body
                 );
 
                 _context.notifications.Add(new Notifications
                 {
-                    UserId = users.UserId,
+                    UserId = userr.Id,
                     Title = title,
                     Body = body,
-                    userImg = users.Img,
+                    userImg = userprofile.Img,
                     serviceId = service.Id,
                     CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                 });

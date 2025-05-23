@@ -42,7 +42,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
 
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
-                var services = await _unitOfWork._requestserviceRepository.GetSortedUserAsync(sortBy, userLat, userLon);
+                var services = await _unitOfWork._requestserviceRepository.GetSortedUserAsync(sortBy,userId, userLat, userLon);
                 if (services == null || !services.Any())
                 {
                     return NotFound(new { message = "No services found." });
@@ -104,7 +104,8 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             try
             {
-                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
+                string userId = GetUserIdFromClaims();
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId,userId);
                 if (service == null)
                 {
                     return NotFound(new { message = "Service not found." });
@@ -149,7 +150,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             try
             {
                 string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId, userId);
                 if (service == null)
                 {
                     return NotFound(new { message = "Service not found." });
@@ -171,7 +172,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             try
             {
                 string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId);
+                var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId, userId);
                 if (service == null)
                 {
                     return NotFound(new { message = "Service not found." });
@@ -192,11 +193,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             try
             {
                 string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork._requestserviceRepository.GetRequestById(requestId);
-                if (service == null)
-                {
-                    return NotFound(new { message = "Service not found." });
-                }
                 await _unitOfWork._requestserviceRepository.AcceptService(requestId, userId);
                 return Ok(new { message = "Service accepted successfully." });
             }
