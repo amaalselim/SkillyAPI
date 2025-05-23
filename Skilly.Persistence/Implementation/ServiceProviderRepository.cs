@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
 using System.ComponentModel.DataAnnotations.Schema;
+using Skilly.Core.Enums;
 
 namespace Skilly.Persistence.Implementation
 {
@@ -92,10 +93,13 @@ namespace Skilly.Persistence.Implementation
             }
             if (ServiceProviderDTO.NationalNumberPDF != null)
             {
-                var path = @"Images/ServiceProvider/File";
+                if (ServiceProviderDTO.NationalNumberPDF.ContentType != "application/pdf")
+                {
+                    throw new InvalidOperationException("File type is not valid. Only PDF files are allowed.");
+                }
+                var path = @"Images/ServiceProvider/File/";
                 ServiceProvider.NationalNumberPDF = await _imageService.SaveFileAsync(ServiceProviderDTO.NationalNumberPDF, path);
             }
-
             _context.serviceProviders.Update(ServiceProvider);
             await _context.SaveChangesAsync();
         }
@@ -105,17 +109,23 @@ namespace Skilly.Persistence.Implementation
             var provider = await _context.serviceProviders
                 .FirstOrDefaultAsync(c => c.UserId == id);
 
-                var reviews = await _context.reviews
-                    .Where(r => r.ProviderServices.serviceProviderId == provider.UserId)
-                    .ToListAsync();
+            var reviews = await _context.reviews
+                 .Where(r => r.ProviderServices.uId == provider.UserId)
+                 .ToListAsync();
 
-                provider.Review = reviews.Any()
-                     ? Math.Round(reviews.Average(r => r.Rating), 2)
-                     : 0;
+            provider.Review = reviews.Any()
+                ? Math.Round(reviews.Average(r => r.Rating), 2)
+                : 0;
 
-                provider.numberOfEndedservices = 3;
+            var servicecount = await _context.providerServices
+                .Where(ps => ps.uId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                .ToListAsync();
+            var requestcount = await _context.requestServices
+                .Where(ps => ps.providerId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                .ToListAsync();
+            provider.numberOfEndedservices = servicecount.Count() + requestcount.Count();
 
-                var category = await _context.categories
+            var category = await _context.categories
                 .FirstOrDefaultAsync(c => c.Id == provider.categoryId);
 
             provider.profession= category?.ProfessionName ?? "غير محدد";
@@ -129,14 +139,20 @@ namespace Skilly.Persistence.Implementation
                 .FirstOrDefaultAsync(c => c.Id== id);
 
             var reviews = await _context.reviews
-                .Where(r => r.ProviderServices.serviceProviderId == provider.UserId)
-                .ToListAsync();
+                    .Where(r => r.ProviderServices.uId == provider.UserId)
+                    .ToListAsync();
 
             provider.Review = reviews.Any()
-                 ? Math.Round(reviews.Average(r => r.Rating), 2)
-                 : 0;
+                ? Math.Round(reviews.Average(r => r.Rating), 2)
+                : 0;
 
-            provider.numberOfEndedservices = 3;
+            var servicecount = await _context.providerServices
+                .Where(ps => ps.uId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                .ToListAsync();
+            var requestcount = await _context.requestServices
+                .Where(ps => ps.providerId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                .ToListAsync();
+            provider.numberOfEndedservices = servicecount.Count() + requestcount.Count();
 
             var category = await _context.categories
             .FirstOrDefaultAsync(c => c.Id == provider.categoryId);
@@ -158,14 +174,20 @@ namespace Skilly.Persistence.Implementation
             foreach (var provider in providers)
             {
                 var reviews = await _context.reviews
-                    .Where(r => r.ProviderServices.serviceProviderId== provider.UserId)
+                    .Where(r => r.ProviderServices.uId== provider.UserId)
                     .ToListAsync();
 
                 provider.Review = reviews.Any()
                     ? Math.Round(reviews.Average(r => r.Rating), 2)
                     : 0;
 
-                provider.numberOfEndedservices = 3;
+                var servicecount= await _context.providerServices
+                    .Where(ps => ps.uId== provider.UserId && ps.ServiceStatus==ServiceStatus.Completed)
+                    .ToListAsync();
+                var requestcount = await _context.requestServices
+                    .Where(ps => ps.providerId== provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                    .ToListAsync();
+                provider.numberOfEndedservices = servicecount.Count()+ requestcount.Count();
 
  
                 provider.profession = categoryMap.ContainsKey(provider.categoryId)
@@ -207,14 +229,20 @@ namespace Skilly.Persistence.Implementation
             foreach (var provider in providers)
             {
                 var reviews = await _context.reviews
-                    .Where(r => r.ProviderServices.serviceProviderId == provider.UserId)
+                    .Where(r => r.ProviderServices.uId == provider.UserId)
                     .ToListAsync();
 
                 provider.Review = reviews.Any()
                     ? Math.Round(reviews.Average(r => r.Rating), 2)
                     : 0;
 
-                provider.numberOfEndedservices = 3;
+                var servicecount = await _context.providerServices
+                    .Where(ps => ps.uId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                    .ToListAsync();
+                var requestcount = await _context.requestServices
+                    .Where(ps => ps.providerId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                    .ToListAsync();
+                provider.numberOfEndedservices = servicecount.Count() + requestcount.Count();
 
                 provider.profession = professionName;
             }
