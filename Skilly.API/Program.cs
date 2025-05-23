@@ -98,18 +98,21 @@ namespace Skilly.API
             builder.Services.AddScoped<PaymobService>();
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-           // builder.Services.AddTransient<ExceptionMiddleware>();
+            // builder.Services.AddTransient<ExceptionMiddleware>();
 
             // Add services to the container.
-            builder.Services.AddCors(corsOptions =>
+            builder.Services.AddCors(options =>
             {
-                corsOptions.AddPolicy("MyPolicy", policyBuilder =>
+                options.AddPolicy("MyPolicy", builder =>
                 {
-                    policyBuilder.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
+                    builder
+                        .SetIsOriginAllowed(_ => true) // يسمح بأي Origin
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials(); // مهم جداً في حالة WebSocket
                 });
             });
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -159,6 +162,7 @@ namespace Skilly.API
             builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
             {
                 options.EnableDetailedErrors = true;
+
             });
 
 
