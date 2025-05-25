@@ -210,8 +210,6 @@ namespace Skilly.API.Controllers
         //    }
         //}
 
-
-
         //[HttpPost("verify-otp")]
         //public async Task<IActionResult> Verifyotp([FromBody]VerifyOtpDTO verifyOtpDTO)
         //{

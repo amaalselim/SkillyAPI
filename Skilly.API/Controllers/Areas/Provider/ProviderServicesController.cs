@@ -108,7 +108,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(serviceId,userId);
+                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(userId,serviceId);
                 return StatusCode(StatusCodes.Status200OK, new { service });
             }
             catch (ProviderServiceNotFoundException ex)
