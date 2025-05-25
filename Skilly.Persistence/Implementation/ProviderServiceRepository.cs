@@ -150,56 +150,78 @@ namespace Skilly.Persistence.Implementation
 
         public async Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId)
         {
+            
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+            {
+                throw new ServiceProviderNotFoundException("Service Provider not found.");
+            }
+
+         
             var service = await _context.providerServices
-            .Include(g => g.ServicesImages)
-            .FirstOrDefaultAsync(g => g.Id == serviceId && g.uId == user.Id);
+                .Include(g => g.ServicesImages)
+                .FirstOrDefaultAsync(g => g.Id == serviceId && g.uId == user.UserId);
 
             if (service == null)
             {
-                throw new ProviderServiceNotFoundException("Provider not found.");
+                throw new ProviderServiceNotFoundException("Provider service not found.");
             }
+
+            
             _mapper.Map(providerservicesDTO, service);
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
             service.uId = user.UserId;
             service.categoryId = user.categoryId;
+
             var path = @"Images/ServiceProvider/MyServices/";
+
+            
             if (providerservicesDTO.video != null)
             {
                 if (providerservicesDTO.video.ContentType != "video/mp4")
                 {
                     throw new InvalidOperationException("Invalid video format. Only mp4 is allowed.");
                 }
+
+                
+                if (!string.IsNullOrEmpty(service.video))
+                {
+                    await _imageService.DeleteFileAsync(service.video);
+                }
+
                 var videoPath = await _imageService.SaveFileAsync(providerservicesDTO.video, path);
                 service.video = videoPath;
             }
-            
+
+          
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
+                
                 foreach (var image in service.ServicesImages)
                 {
                     await _imageService.DeleteFileAsync(image.Img);
                 }
+
+                _context.providerServicesImages.RemoveRange(service.ServicesImages);
                 service.ServicesImages.Clear();
 
-                if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
+                
+                foreach (var image in providerservicesDTO.Images)
                 {
-
-                    foreach (var image in providerservicesDTO.Images)
+                    var imagePath = await _imageService.SaveFileAsync(image, path);
+                    service.ServicesImages.Add(new ProviderServicesImage
                     {
-                        var imagePath = await _imageService.SaveFileAsync(image, path);
-                        service.ServicesImages.Add(new ProviderServicesImage
-                        {
-                            Img = imagePath,
-                            serviceId = service.Id
-                        });
-                    }
+                        Img = imagePath,
+                        serviceId = service.Id
+                    });
                 }
             }
+
             await _context.SaveChangesAsync();
         }
+
         public async Task<IEnumerable<ProviderServices>> GetAllProviderService(string currentUserId, double? userLat = null, double? userLng = null)
         {
             var services = await _context.providerServices
