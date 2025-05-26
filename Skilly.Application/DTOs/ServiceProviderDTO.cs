@@ -13,10 +13,10 @@ namespace Skilly.Application.DTOs
         public string Governorate { get; set; }
         public string City { get; set; }
         public string StreetName { get; set; }
-        public string Age { get; set; }
+        public int Age { get; set; }
         public Gender Gender { get; set; }
         public IFormFile Img { get; set; }
-        public string NumberOfYearExperience { get; set; }
+        public int NumberOfYearExperience { get; set; }
         public string BriefSummary { get; set; }
         public IFormFile NationalNumberPDF { get; set; }
         public string categoryId { get; set; }

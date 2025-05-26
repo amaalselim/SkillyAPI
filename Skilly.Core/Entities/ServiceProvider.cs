@@ -19,12 +19,12 @@ namespace Skilly.Core.Entities
         public string Governorate { get; set; }
         public string City { get; set; }
         public string StreetName { get; set; }
-        public string Age { get; set; }
+        public int Age { get; set; }
         public Gender Gender { get; set; }
         public string Img { get; set; }
         [NotMapped]
         public string profession {  get; set; }
-        public string NumberOfYearExperience { get; set; }
+        public int NumberOfYearExperience { get; set; }
         public string BriefSummary { get; set; }
         public string NationalNumberPDF { get; set; }
         [NotMapped]
