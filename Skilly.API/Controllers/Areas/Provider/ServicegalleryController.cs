@@ -59,6 +59,17 @@ namespace Skilly.API.Controllers.Areas.Provider
             }
             return StatusCode(StatusCodes.Status200OK, new { servicesgallery });
         }
+        [HttpGet("GetAllServicegalleryBy/{providerId}")]
+        public async Task<IActionResult> GetservicesbyproviderId(string providerId)
+        {
+            //string userId = GetUserIdFromClaims();
+            var servicesgallery = await _unitOfWork.servicegalleryRepository.GetAllgalleryByPProviderId(providerId);
+            if (servicesgallery == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { message = "No galleries found for this provider." });
+            }
+            return StatusCode(StatusCodes.Status200OK, new { servicesgallery });
+        }
 
         [HttpGet("GetGalleryBy/{galleryId}")]
         public async Task<IActionResult> GetServiceGalleryById([FromRoute] string galleryId)

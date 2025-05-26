@@ -172,6 +172,10 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 string userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User not authorized.");
+                }
                 await _unitOfWork.providerServiceRepository.DeleteProviderServiceAsync(serviceId, userId);
 
                 return StatusCode(StatusCodes.Status200OK, new { message = "Service deleted successfully." });
