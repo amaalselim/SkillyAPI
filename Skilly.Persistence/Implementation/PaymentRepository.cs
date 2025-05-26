@@ -49,12 +49,13 @@ namespace Skilly.Persistence.Implementation
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
             var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
 
-            
+
 
             var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
-            var provider = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.uId);
+           
             if (providerService != null)
             {
+                var provider = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.uId);
                 providerService.ServiceStatus = ServiceStatus.Paid;
 
                 string title = "تم شراء الخدمة";
@@ -90,10 +91,12 @@ namespace Skilly.Persistence.Implementation
             else
             {
                 var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == payment.RequestServiceId);
-                var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.userId);
+               
                 if (service != null)
                 {
+                    var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.uId);
                     service.ServiceStatus = ServiceStatus.Paid;
+
                     string title = "تم شراء الخدمة";
                     decimal discountPercentage = 0.10m;
                     decimal totalAmount = payment.Amount;
@@ -113,7 +116,7 @@ namespace Skilly.Persistence.Implementation
 
                         _context.notifications.Add(new Notifications
                         {
-                            UserId = service.userId,
+                            UserId = service.uId,
                             Title = title,
                             Body = body,
                             userImg = user.Img,

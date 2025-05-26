@@ -66,7 +66,8 @@ namespace Skilly.Persistence.Implementation
                 Deliverytime = offersalaryDTO.Deliverytime,
                 Notes = offersalaryDTO.Notes,
                 serviceId = offersalaryDTO.serviceId,
-                requestserviceId = offersalaryDTO.requestserviceId
+                requestserviceId = offersalaryDTO.requestserviceId,
+                Status = OfferStatus.Pending
             };
 
             
@@ -324,7 +325,7 @@ namespace Skilly.Persistence.Implementation
                 var userr = await _context.users.FirstOrDefaultAsync(u => u.Id == requestService.UserProfile.UserId);
 
                 string title = "قبول عرض سعر";
-                string body = $"تم تأكيد طلبك من قِبل المستخدم {userr.FirstName + " " + userr.LastName} برجاء الانتظار حتى يتم الدفعٍ";
+                string body = $"تم تأكيد طلبك {requestService.Name}من قِبل المستخدم {userr.FirstName + " " + userr.LastName} برجاء الانتظار حتى يتم الدفعٍ";
 
 
 

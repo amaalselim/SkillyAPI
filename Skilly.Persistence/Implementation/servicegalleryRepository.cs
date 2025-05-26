@@ -179,6 +179,35 @@ namespace Skilly.Persistence.Implementation
             return galleryDto;
         }
 
+        public async Task<IEnumerable<Servicesgallery>> GetAllgalleryByPProviderId(string providerId)
+        {
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.Id== providerId);
+            var service = await _context.servicesgalleries
+                .Include(i => i.galleryImages)
+                .Where(c => c.serviceProviderId == user.Id)
+                .ToListAsync();
+
+            if (service == null || !service.Any())
+            {
+                return new List<Servicesgallery>();
+            }
+
+            var galleryDtos = service.Select(item => new Servicesgallery
+            {
+                Id = item.Id,
+                galleryName = item.galleryName,
+                Description = item.Description,
+                Deliverytime = item.Deliverytime,
+                serviceProviderId = item.serviceProviderId,
+                Images = item.galleryImages?
+                    .Select(img => img.Img)
+                    .ToList() ?? new List<string>(),
+                video = item.video,
+            }).ToList();
+
+            return galleryDtos;
+        }
+
         public async Task<IEnumerable<Servicesgallery>> GetAllgalleryByProviderId(string providerId)
         {
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == providerId);

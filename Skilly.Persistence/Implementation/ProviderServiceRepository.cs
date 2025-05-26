@@ -131,22 +131,43 @@ namespace Skilly.Persistence.Implementation
 
         public async Task DeleteProviderServiceAsync(string serviceId, string userId)
         {
-            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.serviceProviders
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
             var service = await _context.providerServices
-            .Include(g => g.ServicesImages)
-                .FirstOrDefaultAsync(g => g.Id == serviceId && g.serviceProviderId == user.Id);
+                .Include(s => s.ServicesImages)
+                .FirstOrDefaultAsync(s => s.Id == serviceId && s.uId == user.UserId);
 
             if (service == null)
-            {
                 throw new ProviderServiceNotFoundException("Service not found.");
-            }
-            var path = @"Images/ServiceProvider/MyServices/";
 
+  
+            var payments = await _context.payments
+                .Where(p => p.ProviderServiceId== serviceId)
+                .ToListAsync();
+            _context.payments.RemoveRange(payments);
 
-            service.ServicesImages.Clear();
+       
+            var reviews = await _context.reviews
+                .Where(r => r.serviceId == serviceId)
+                .ToListAsync();
+            _context.reviews.RemoveRange(reviews);
+
+            var bookings = await _context.offerSalaries
+                .Where(b => b.serviceId== serviceId)
+                .ToListAsync();
+            _context.offerSalaries.RemoveRange(bookings);
+
+            var not = await _context.notifications
+                .Where(b => b.serviceId == serviceId)
+                .ToListAsync();
+            _context.notifications.RemoveRange(not);
+
             _context.providerServices.Remove(service);
+
             await _context.SaveChangesAsync();
         }
+
 
         public async Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId)
         {
@@ -190,6 +211,7 @@ namespace Skilly.Persistence.Implementation
                 {
                     await _imageService.DeleteFileAsync(service.video);
                 }
+                await _context.SaveChangesAsync();
 
                 var videoPath = await _imageService.SaveFileAsync(providerservicesDTO.video, path);
                 service.video = videoPath;
@@ -205,6 +227,7 @@ namespace Skilly.Persistence.Implementation
                 }
 
                 _context.providerServicesImages.RemoveRange(service.ServicesImages);
+                await _context.SaveChangesAsync();
                 service.ServicesImages.Clear();
 
                 

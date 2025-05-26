@@ -134,7 +134,7 @@ namespace Skilly.Persistence.Implementation
             var service = await _context.requestServices
                 .Include(c => c.UserProfile)
             .Include(g => g.requestServiceImages)
-                .FirstOrDefaultAsync(g => g.Id == requestId && g.userId == user.Id);
+                .FirstOrDefaultAsync(g => g.Id == requestId && g.uId == user.UserId);
 
             if (service == null)
             {
@@ -144,6 +144,22 @@ namespace Skilly.Persistence.Implementation
 
 
             service.requestServiceImages.Clear();
+
+            var payments = await _context.payments
+            .Where(p => p.RequestServiceId == requestId)
+                .ToListAsync();
+            _context.payments.RemoveRange(payments);
+
+
+            var bookings = await _context.offerSalaries
+            .Where(b => b.requestserviceId == requestId)
+                .ToListAsync();
+            _context.offerSalaries.RemoveRange(bookings);
+
+            var not = await _context.notifications
+            .Where(b => b.serviceId == requestId)
+                .ToListAsync();
+            _context.notifications.RemoveRange(not);
             _context.requestServices.Remove(service);
             await _context.SaveChangesAsync();
         }
@@ -184,7 +200,9 @@ namespace Skilly.Persistence.Implementation
                 {
                     await _imageService.DeleteFileAsync(service.video);
                 }
+                await _context.SaveChangesAsync();
 
+                
                 var videoPath = await _imageService.SaveFileAsync(requestServiceDTO.video, path);
                 service.video = videoPath;
             }
@@ -194,7 +212,7 @@ namespace Skilly.Persistence.Implementation
                 {
                     await _imageService.DeleteFileAsync(image.Img);
                 }
-
+                await _context.SaveChangesAsync();
                 service.requestServiceImages.Clear();
 
                 foreach (var image in requestServiceDTO.Images)
