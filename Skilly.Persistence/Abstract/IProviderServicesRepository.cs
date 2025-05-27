@@ -16,12 +16,14 @@ namespace Skilly.Persistence.Abstract
         Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId);
         Task<ProviderServices> GetProviderServiceByIdAsync(string galleryId, string currentUserId);
         Task AddProviderService(ProviderservicesDTO providerservicesDTO, string userId);
-        Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId);
+
+        Task EditProviderService(EditProviderServiceDTO providerservicesDTO, string userId, string serviceId);
         Task DeleteProviderServiceAsync(string serviceId, string userId);
         Task<List<ProviderServices>> GetAllservicesbyCategoryId(string currentUserId,string categoryId, string sortBy, double? userLat = null, double? userLon = null);
         Task<IEnumerable<ProviderServices>> GetAllProviderServiceDiscounted(double? userLat = null, double? userLng = null);
         Task UseServiceDiscount(string serviceId, string userId);
         Task<object> GetAllServicesInProgress(string userId);
         Task CompleteAsync(string serviceId,string userId);
+        Task EditServiceImageAsync(ServiceImageDTO dto);
     }
 }

@@ -140,7 +140,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPut("EditrequestServiceBy/{serviceId}")]
-        public async Task<IActionResult> EditService([FromForm] requestServiceDTO requestServiceDTO, [FromRoute] string serviceId)
+        public async Task<IActionResult> EditService([FromForm] EditRequestServiceDTO requestServiceDTO, [FromRoute] string serviceId)
         {
             if (requestServiceDTO == null)
             {
@@ -165,6 +165,26 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
+        //[HttpDelete("delete-Img")]
+        //public async Task<IActionResult> DeleteService([FromBody] ServiceImageDTO serviceImageDTO)
+        //{
+        //    try
+        //    {
+        //        string userId = GetUserIdFromClaims();
+        //        if (string.IsNullOrEmpty(userId))
+        //        {
+        //            throw new UnauthorizedAccessException("User not authorized.");
+        //        }
+        //        await _unitOfWork._requestserviceRepository.EditServiceImageAsync(serviceImageDTO);
+
+        //        return StatusCode(StatusCodes.Status200OK, new { message = "Image deleted successfully." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+        //    }
+        //}
 
         [HttpDelete("DeleterequestServiceBy/{serviceId}")]
         public async Task<IActionResult> DeleteService([FromRoute] string serviceId)

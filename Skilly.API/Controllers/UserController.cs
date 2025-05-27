@@ -57,16 +57,16 @@ namespace Skilly.API.Controllers
 
             return NoContent();
         }
-        [HttpDelete("DeleteUserById")]
-        public async Task<IActionResult> DeleteUser()
+        [HttpDelete("DeleteUserBy/{Id}")]
+        public async Task<IActionResult> DeleteUser(string Id)
         {
-            var userId= GetUserIdFromClaims();
-            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            //var userId= GetUserIdFromClaims();
+            var user = await _unitOfWork.Users.GetByIdAsync(Id);
             if (user == null)
             {
                 return NotFound();
             }
-            await _unitOfWork.Users.DeleteAsync(userId);
+            await _unitOfWork.Users.DeleteAsync(Id);
             return NoContent();
         }
     }

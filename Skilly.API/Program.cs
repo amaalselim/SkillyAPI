@@ -1,6 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using FirebaseAdmin;
+﻿using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Http.Features;
@@ -24,6 +22,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.FileProviders;
+using Skilly.API.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Skilly.API
 {
@@ -170,6 +170,7 @@ namespace Skilly.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
+                c.OperationFilter<SwaggerFileOperationFilter>();
                 c.CustomSchemaIds(type => type.FullName);
             });
 

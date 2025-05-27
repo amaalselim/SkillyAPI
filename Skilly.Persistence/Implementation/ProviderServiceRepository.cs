@@ -98,7 +98,7 @@ namespace Skilly.Persistence.Implementation
             service.uId = user.UserId;
             service.categoryId = user.categoryId;
             service.ServiceStatus = ServiceStatus.Posted;
-            if(providerservicesDTO.video != null)
+            if (providerservicesDTO.video != null)
             {
                 if (providerservicesDTO.video != null)
                 {
@@ -128,7 +128,6 @@ namespace Skilly.Persistence.Implementation
             await _context.providerServices.AddAsync(service);
             await _context.SaveChangesAsync();
         }
-
         public async Task DeleteProviderServiceAsync(string serviceId, string userId)
         {
             var user = await _context.serviceProviders
@@ -168,17 +167,14 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-
-        public async Task EditProviderService(ProviderservicesDTO providerservicesDTO, string userId, string serviceId)
+        public async Task EditProviderService(EditProviderServiceDTO providerservicesDTO, string userId, string serviceId)
         {
-            
             var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
             {
                 throw new ServiceProviderNotFoundException("Service Provider not found.");
             }
 
-         
             var service = await _context.providerServices
                 .Include(g => g.ServicesImages)
                 .FirstOrDefaultAsync(g => g.Id == serviceId && g.uId == user.UserId);
@@ -189,6 +185,22 @@ namespace Skilly.Persistence.Implementation
             }
 
             
+            if (providerservicesDTO.ImagesToDeleteIds != null && providerservicesDTO.ImagesToDeleteIds.Any())
+            {
+                var imagesToDelete = service.ServicesImages
+                    .Where(img => providerservicesDTO.ImagesToDeleteIds.Contains(img.Id))
+                    .ToList();
+
+                foreach (var img in imagesToDelete)
+                {
+ 
+                    await _imageService.DeleteFileAsync(img.Img);
+
+                    service.ServicesImages.Remove(img);
+                }
+                await _context.SaveChangesAsync();
+            }
+
             _mapper.Map(providerservicesDTO, service);
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
@@ -198,7 +210,6 @@ namespace Skilly.Persistence.Implementation
 
             var path = @"Images/ServiceProvider/MyServices/";
 
-            
             if (providerservicesDTO.video != null)
             {
                 if (providerservicesDTO.video.ContentType != "video/mp4")
@@ -206,7 +217,6 @@ namespace Skilly.Persistence.Implementation
                     throw new InvalidOperationException("Invalid video format. Only mp4 is allowed.");
                 }
 
-                
                 if (!string.IsNullOrEmpty(service.video))
                 {
                     await _imageService.DeleteFileAsync(service.video);
@@ -217,20 +227,8 @@ namespace Skilly.Persistence.Implementation
                 service.video = videoPath;
             }
 
-          
             if (providerservicesDTO.Images != null && providerservicesDTO.Images.Any())
             {
-                
-                foreach (var image in service.ServicesImages)
-                {
-                    await _imageService.DeleteFileAsync(image.Img);
-                }
-
-                _context.providerServicesImages.RemoveRange(service.ServicesImages);
-                await _context.SaveChangesAsync();
-                service.ServicesImages.Clear();
-
-                
                 foreach (var image in providerservicesDTO.Images)
                 {
                     var imagePath = await _imageService.SaveFileAsync(image, path);
@@ -244,6 +242,30 @@ namespace Skilly.Persistence.Implementation
 
             await _context.SaveChangesAsync();
         }
+        public async Task EditServiceImageAsync(ServiceImageDTO dto)
+        {
+            var service = await _context.providerServices
+                .Include(s => s.ServicesImages)
+                .FirstOrDefaultAsync(s => s.Id == dto.ServiceId);
+
+            if (service == null)
+                throw new ProviderServiceNotFoundException("Service not found.");
+
+            var image = service.ServicesImages.FirstOrDefault(img => img.Id == dto.ImageId);
+            if (image == null)
+                throw new Exception("Image not found.");
+
+
+            
+            if (!string.IsNullOrEmpty(image.Img))
+            {
+                await _imageService.DeleteFileAsync(image.Img);
+            }
+            _context.providerServicesImages.Remove(image);
+            await _context.SaveChangesAsync();
+        }
+
+
 
         public async Task<IEnumerable<ProviderServices>> GetAllProviderService(string currentUserId, double? userLat = null, double? userLng = null)
         {

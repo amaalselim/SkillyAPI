@@ -16,9 +16,10 @@ namespace Skilly.Persistence.Abstract
         Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId);
         Task<RequestService> GetRequestById(string requestId, string currentUserId);
         Task AddRequestService(requestServiceDTO requestServiceDTO, string userId);
-        Task EditRequestService(requestServiceDTO requestServiceDTO, string userId, string requestId);
+        Task EditRequestService(EditRequestServiceDTO requestServiceDTO, string userId, string requestId);
         Task DeleteRequestServiceAsync(string requestId, string userId);
         Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId, string sortBy, double? userLat = null, double? userLon = null);
         Task AcceptService(string requestId, string userId);
+        Task EditServiceImageAsync(ServiceImageDTO dto);
     }
 }

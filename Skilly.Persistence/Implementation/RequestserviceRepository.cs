@@ -164,7 +164,7 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditRequestService(requestServiceDTO requestServiceDTO, string userId, string requestId)
+        public async Task EditRequestService(EditRequestServiceDTO requestServiceDTO, string userId, string requestId)
         {
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
@@ -175,18 +175,34 @@ namespace Skilly.Persistence.Implementation
             var service = await _context.requestServices
                 .Include(c => c.UserProfile)
                 .Include(g => g.requestServiceImages)
-                .FirstOrDefaultAsync(g => g.Id == requestId && g.uId == user.UserId); 
+                .FirstOrDefaultAsync(g => g.Id == requestId && g.uId == user.UserId);
 
             if (service == null)
             {
                 throw new Exception("Service not found.");
             }
 
-            
+
+            if (requestServiceDTO.ImagesToDeleteIds != null && requestServiceDTO.ImagesToDeleteIds.Any())
+            {
+                var imagesToDelete = service.requestServiceImages
+                    .Where(img => requestServiceDTO.ImagesToDeleteIds.Contains(img.Id))
+                    .ToList();
+
+                foreach (var img in imagesToDelete)
+                {
+                    
+                    await _imageService.DeleteFileAsync(img.Img);
+
+                   
+                    service.requestServiceImages.Remove(img);
+                }
+                await _context.SaveChangesAsync();
+            }
+
             _mapper.Map(requestServiceDTO, service);
 
             var path = @"Images/UserProfile/RequestServices/";
-
 
             if (requestServiceDTO.video != null)
             {
@@ -195,26 +211,18 @@ namespace Skilly.Persistence.Implementation
                     throw new Exception("Invalid video format. Only mp4 is allowed.");
                 }
 
-  
                 if (!string.IsNullOrEmpty(service.video))
                 {
                     await _imageService.DeleteFileAsync(service.video);
                 }
                 await _context.SaveChangesAsync();
 
-                
                 var videoPath = await _imageService.SaveFileAsync(requestServiceDTO.video, path);
                 service.video = videoPath;
             }
+
             if (requestServiceDTO.Images != null && requestServiceDTO.Images.Any())
             {
-                foreach (var image in service.requestServiceImages)
-                {
-                    await _imageService.DeleteFileAsync(image.Img);
-                }
-                await _context.SaveChangesAsync();
-                service.requestServiceImages.Clear();
-
                 foreach (var image in requestServiceDTO.Images)
                 {
                     var imagePath = await _imageService.SaveFileAsync(image, path);
@@ -228,6 +236,7 @@ namespace Skilly.Persistence.Implementation
 
             await _context.SaveChangesAsync();
         }
+
 
 
         public async Task<IEnumerable<RequestService>> GetAllRequests(string currentUserId,double? userLat = null, double? userLng = null)
@@ -328,6 +337,29 @@ namespace Skilly.Persistence.Implementation
             }).ToList();
 
             return serviceDtos;
+        }
+
+        public async Task EditServiceImageAsync(ServiceImageDTO dto)
+        {
+            var service = await _context.requestServices
+                .Include(s => s.requestServiceImages)
+                .FirstOrDefaultAsync(s => s.Id == dto.ServiceId);
+
+            if (service == null)
+                throw new Exception("Service not found.");
+
+            var image = service.requestServiceImages.FirstOrDefault(img => img.Id == dto.ImageId);
+            if (image == null)
+                throw new Exception("Image not found.");
+
+
+
+            if (!string.IsNullOrEmpty(image.Img))
+            {
+                await _imageService.DeleteFileAsync(image.Img);
+            }
+            _context.requestServiceImages.Remove(image);
+            await _context.SaveChangesAsync();
         }
 
 

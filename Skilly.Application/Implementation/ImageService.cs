@@ -17,19 +17,29 @@ namespace Skilly.Application.Implementation
         {
             _webHostEnvironment = webHostEnvironment;
         }
-        public async Task DeleteFileAsync(string File)
+        public async Task DeleteFileAsync(string filePath)
         {
-            if (File != null)
-            {
-                var RootPath = _webHostEnvironment.WebRootPath;
-                var oldFile = Path.Combine(RootPath, File);
+            if (string.IsNullOrWhiteSpace(filePath))
+                return;
 
-                if (System.IO.File.Exists(oldFile))
-                {
-                    System.IO.File.Delete(oldFile);
-                }
+          
+            if (filePath.StartsWith("/"))
+                filePath = filePath.Substring(1);
+           
+            var relativePath = filePath.Replace("https://skilly.runasp.net/", "").Replace("http://skilly.runasp.net/", "");
+
+            
+            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
+
+        
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
             }
+
         }
+
+
         public async Task<string> SaveFileAsync(IFormFile file, string folderPath)
         {
             if (file == null || file.Length == 0)

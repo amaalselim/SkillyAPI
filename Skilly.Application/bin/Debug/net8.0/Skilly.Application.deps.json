@@ -16,6 +16,7 @@
           "Newtonsoft.Json": "13.0.3",
           "Skilly.Core": "1.0.0",
           "Skilly.Infrastructure": "1.0.0",
+          "Swashbuckle.AspNetCore.Annotations": "8.1.2",
           "System.IdentityModel.Tokens.Jwt": "8.2.1"
         },
         "runtime": {
@@ -587,6 +588,14 @@
       },
       "Microsoft.NETCore.Platforms/2.0.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
+      "Microsoft.OpenApi/1.6.23": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.OpenApi.dll": {
+            "assemblyVersion": "1.6.23.0",
+            "fileVersion": "1.6.23.0"
+          }
+        }
+      },
       "Microsoft.Win32.Registry/4.5.0": {
         "dependencies": {
           "System.Security.AccessControl": "4.5.0",
@@ -636,6 +645,39 @@
           "lib/netstandard2.1/StandardSocketsHttpHandler.dll": {
             "assemblyVersion": "2.2.0.8",
             "fileVersion": "2.2.0.8"
+          }
+        }
+      },
+      "Swashbuckle.AspNetCore.Annotations/8.1.2": {
+        "dependencies": {
+          "Swashbuckle.AspNetCore.SwaggerGen": "8.1.2"
+        },
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Annotations.dll": {
+            "assemblyVersion": "8.1.2.0",
+            "fileVersion": "8.1.2.1419"
+          }
+        }
+      },
+      "Swashbuckle.AspNetCore.Swagger/8.1.2": {
+        "dependencies": {
+          "Microsoft.OpenApi": "1.6.23"
+        },
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Swagger.dll": {
+            "assemblyVersion": "8.1.2.0",
+            "fileVersion": "8.1.2.1419"
+          }
+        }
+      },
+      "Swashbuckle.AspNetCore.SwaggerGen/8.1.2": {
+        "dependencies": {
+          "Swashbuckle.AspNetCore.Swagger": "8.1.2"
+        },
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
+            "assemblyVersion": "8.1.2.0",
+            "fileVersion": "8.1.2.1419"
           }
         }
       },
@@ -1485,6 +1527,13 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
+    "Microsoft.OpenApi/1.6.23": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tZ1I0KXnn98CWuV8cpI247A17jaY+ILS9vvF7yhI0uPPEqF4P1d7BWL5Uwtel10w9NucllHB3nTkfYTAcHAh8g==",
+      "path": "microsoft.openapi/1.6.23",
+      "hashPath": "microsoft.openapi.1.6.23.nupkg.sha512"
+    },
     "Microsoft.Win32.Registry/4.5.0": {
       "type": "package",
       "serviceable": true,
@@ -1596,6 +1645,27 @@
       "sha512": "sha512-OBEY+nj57eiHn0cHzEFjBJ3nL1SFzlPGTkEwIyfq5jLsC5x7/XpQbqGExODflAyIc70oU4er/uAlNv4p/ZUT1Q==",
       "path": "standardsocketshttphandler/2.2.0.8",
       "hashPath": "standardsocketshttphandler.2.2.0.8.nupkg.sha512"
+    },
+    "Swashbuckle.AspNetCore.Annotations/8.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Y+aPwLvwNiS1HzyJj9+aWESDlpkFs7s+sCSTM5Lg54TIU8NuXYeHiPWpQvi04XTWV6OuLgB7yDsxIJ2OM4e9fA==",
+      "path": "swashbuckle.aspnetcore.annotations/8.1.2",
+      "hashPath": "swashbuckle.aspnetcore.annotations.8.1.2.nupkg.sha512"
+    },
+    "Swashbuckle.AspNetCore.Swagger/8.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-5GTvC2Lbv3LnEHllm4N3LxpRSrDkVSBjUPlPHg3oIN7VJhxxuysYuTXzS2hExf3tuCPsTa5/TaDoCzfBlI05SQ==",
+      "path": "swashbuckle.aspnetcore.swagger/8.1.2",
+      "hashPath": "swashbuckle.aspnetcore.swagger.8.1.2.nupkg.sha512"
+    },
+    "Swashbuckle.AspNetCore.SwaggerGen/8.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-R91Wt4NpBJAgkx924Scv22WC80NmZH1VMgUNbmvqNfXE3H07noA4Q8wUMkBwJehQiRJr3Ts519JoScKazbLcww==",
+      "path": "swashbuckle.aspnetcore.swaggergen/8.1.2",
+      "hashPath": "swashbuckle.aspnetcore.swaggergen.8.1.2.nupkg.sha512"
     },
     "System.Buffers/4.5.0": {
       "type": "package",
