@@ -200,7 +200,21 @@ namespace Skilly.Persistence.Implementation
                 await _context.SaveChangesAsync();
             }
 
-            _mapper.Map(requestServiceDTO, service);
+            //_mapper.Map(requestServiceDTO, service);
+
+            service.Name = requestServiceDTO.Name;
+            service.Price = requestServiceDTO.Price;
+            service.Deliverytime = requestServiceDTO.Deliverytime;
+            service.startDate = requestServiceDTO.startDate;
+            service.categoryId = requestServiceDTO.categoryId;
+            service.Notes = requestServiceDTO.Notes;
+
+            var sid = service.Id;
+            service.userId = user.Id;
+            service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
+            service.userImg = user.Img;
+            service.uId = user.UserId;
+            service.ServiceStatus = ServiceStatus.Posted;
 
             var path = @"Images/UserProfile/RequestServices/";
 

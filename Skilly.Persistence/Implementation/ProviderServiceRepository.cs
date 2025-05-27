@@ -51,7 +51,7 @@ namespace Skilly.Persistence.Implementation
                 Name = item.Name,
                 Description = item.Description,
                 ServiceRequestTime = item.ServiceRequestTime,
-                Price = item.Price,
+                Price =item.Price,
                 PriceDiscount = item.PriceDiscount,
                 Deliverytime = item.Deliverytime,
                 categoryId = item.categoryId,
@@ -188,25 +188,28 @@ namespace Skilly.Persistence.Implementation
                 throw new ProviderServiceNotFoundException("Provider service not found.");
             }
 
-            
             if (providerservicesDTO.ImagesToDeleteIds != null && providerservicesDTO.ImagesToDeleteIds.Any())
             {
                 var imagesToDelete = service.ServicesImages
                      .Where(img => providerservicesDTO.ImagesToDeleteIds.Contains(img.Id))
                      .ToList();
 
-
                 foreach (var img in imagesToDelete)
                 {
- 
                     await _imageService.DeleteFileAsync(img.Img);
-
                     service.ServicesImages.Remove(img);
                 }
                 await _context.SaveChangesAsync();
             }
 
-            _mapper.Map(providerservicesDTO, service);
+            // التعيين اليدوي للخصائص من DTO إلى الكائن service
+            service.Name = providerservicesDTO.Name;
+            service.Description = providerservicesDTO.Description;
+            service.Price = providerservicesDTO.Price;
+            service.Deliverytime = providerservicesDTO.Deliverytime;
+            service.Notes = providerservicesDTO.Notes;
+
+
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
@@ -247,6 +250,7 @@ namespace Skilly.Persistence.Implementation
 
             await _context.SaveChangesAsync();
         }
+
         public async Task<IEnumerable<ProviderServices>> GetAllProviderService(string currentUserId, double? userLat = null, double? userLng = null)
         {
             var services = await _context.providerServices

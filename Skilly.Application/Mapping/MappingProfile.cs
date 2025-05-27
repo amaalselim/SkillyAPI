@@ -60,20 +60,19 @@ public class MappingProfile : Profile
 
 
         CreateMap<ProviderServices, EditProviderServiceDTO>()
-           .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.ServicesImages.Select(img => new requestServiceImage
-           {
-               Img = img.Img
-           }).ToList()));
+    .ForMember(dest => dest.Images, opt => opt.Ignore())
+    .ForMember(dest => dest.ImagesToDeleteIds, opt => opt.Ignore())
+    .ForMember(dest => dest.video, opt => opt.Ignore());
+
         CreateMap<EditProviderServiceDTO, ProviderServices>()
-              .ForMember(dest => dest.ServicesImages, opt => opt.Ignore());
+            .ForMember(dest => dest.ServicesImages, opt => opt.Ignore())
+            .ForMember(dest => dest.video, opt => opt.Ignore());
+
+
         CreateMap<EditRequestServiceDTO, RequestService>()
            .ForMember(dest => dest.requestServiceImages, opt => opt.Ignore());
 
-        CreateMap<RequestService, EditRequestServiceDTO>()
-           .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.requestServiceImages.Select(img => new ProviderServicesImage
-           {
-               Img = img.Img
-           }).ToList()));
+        CreateMap<RequestService, EditRequestServiceDTO>();
 
         // Review
         CreateMap<Review, ReviewDTO>();
