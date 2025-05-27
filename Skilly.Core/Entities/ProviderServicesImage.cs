@@ -10,7 +10,6 @@ namespace Skilly.Core.Entities
 {
     public class ProviderServicesImage
     {
-        [JsonIgnore]
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Img { get; set; }
         [JsonIgnore]
