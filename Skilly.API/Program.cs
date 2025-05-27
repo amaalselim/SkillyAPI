@@ -170,7 +170,7 @@ namespace Skilly.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.OperationFilter<SwaggerFileOperationFilter>();
+               
                 c.CustomSchemaIds(type => type.FullName);
             });
 
