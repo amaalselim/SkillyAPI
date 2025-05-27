@@ -19,7 +19,7 @@ namespace Skilly.Application.DTOs
         public string? Notes { get; set; }
         public decimal Price { get; set; }
         public List<IFormFile>? Images { get; set; } = new List<IFormFile>();
-        //public List<IFormFile<ServiceImageDTO>>? Images { get; set; } = new List<ServiceImageDTO>();
+       
         public IFormFile? video { get; set; }
        
     }
