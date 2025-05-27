@@ -22,7 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.FileProviders;
-using Skilly.API.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Skilly.API

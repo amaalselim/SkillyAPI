@@ -60,7 +60,11 @@ namespace Skilly.Persistence.Implementation
                 ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                 providerImg = item.serviceProvider.Img,
                 video = item.video,
-                Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>()
+                Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ProviderServicesImage>(),
             }).ToList();
 
             return serviceDtos;
@@ -188,8 +192,9 @@ namespace Skilly.Persistence.Implementation
             if (providerservicesDTO.ImagesToDeleteIds != null && providerservicesDTO.ImagesToDeleteIds.Any())
             {
                 var imagesToDelete = service.ServicesImages
-                    .Where(img => providerservicesDTO.ImagesToDeleteIds.Contains(img.Id))
-                    .ToList();
+                     .Where(img => providerservicesDTO.ImagesToDeleteIds.Contains(img.Id))
+                     .ToList();
+
 
                 foreach (var img in imagesToDelete)
                 {
@@ -242,31 +247,6 @@ namespace Skilly.Persistence.Implementation
 
             await _context.SaveChangesAsync();
         }
-        public async Task EditServiceImageAsync(ServiceImageDTO dto)
-        {
-            var service = await _context.providerServices
-                .Include(s => s.ServicesImages)
-                .FirstOrDefaultAsync(s => s.Id == dto.ServiceId);
-
-            if (service == null)
-                throw new ProviderServiceNotFoundException("Service not found.");
-
-            var image = service.ServicesImages.FirstOrDefault(img => img.Id == dto.ImageId);
-            if (image == null)
-                throw new Exception("Image not found.");
-
-
-            
-            if (!string.IsNullOrEmpty(image.Img))
-            {
-                await _imageService.DeleteFileAsync(image.Img);
-            }
-            _context.providerServicesImages.Remove(image);
-            await _context.SaveChangesAsync();
-        }
-
-
-
         public async Task<IEnumerable<ProviderServices>> GetAllProviderService(string currentUserId, double? userLat = null, double? userLng = null)
         {
             var services = await _context.providerServices
@@ -305,7 +285,11 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-                    Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                    Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                    {
+                        Id = img.Id,
+                        Img = img.Img
+                    }).ToList() ?? new List<ProviderServicesImage>(),
                     video = item.video,
 
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
@@ -371,7 +355,11 @@ namespace Skilly.Persistence.Implementation
                 serviceProviderId = service.serviceProviderId,
                 ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName,
                 providerImg = service.serviceProvider.Img,
-                Images = service.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                Images = service.ServicesImages?.Select(img => new ProviderServicesImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ProviderServicesImage>(),
                 video = service.video,
                 offerSalaries = service.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                 CountOfOffers = service.offerSalaries?.Count(p => p.Status == 0) ?? 0,
@@ -413,7 +401,11 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-                    Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                    Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                    {
+                        Id = img.Id,
+                        Img = img.Img
+                    }).ToList() ?? new List<ProviderServicesImage>(),
                     video = item.video,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                     CountOfOffers = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
@@ -474,7 +466,11 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-                    Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                    Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                    {
+                        Id = img.Id,
+                        Img = img.Img
+                    }).ToList() ?? new List<ProviderServicesImage>(),
                     video = item.video,
                     offerSalaries = item.offerSalaries?.Where(p => p.Status == 0).ToList() ?? new List<OfferSalary>(),
                     CountOfOffers = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
@@ -486,7 +482,7 @@ namespace Skilly.Persistence.Implementation
         }
 
         public async Task<IEnumerable<ProviderServices>> GetSortedProviderServicesAsync(
-    string sortBy, double? userLat = null, double? userLon = null, string currentUserId=null)
+            string sortBy, double? userLat = null, double? userLon = null, string currentUserId=null)
         {
             var services = await _context.providerServices
                 .Include(s => s.serviceProvider)
@@ -524,7 +520,13 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-                    Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+
+                    Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                    {
+                        Id = img.Id,
+                        Img= img.Img
+                    }).ToList() ?? new List<ProviderServicesImage>(),
+
                     video = item.video,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0).ToList() ?? new List<OfferSalary>(),
                     CountOfOffers = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
@@ -611,7 +613,11 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-                    Images = item.ServicesImages?.Select(img => img.Img).ToList() ?? new List<string>(),
+                    Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                    {
+                        Id = img.Id,
+                        Img = img.Img
+                    }).ToList() ?? new List<ProviderServicesImage>(),
                     video = item.video,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                     CountOfOffers = item.offerSalaries?.Count(p => p.Status == 0) ?? 0
@@ -643,7 +649,11 @@ namespace Skilly.Persistence.Implementation
                     userId = item.userId,
                     userImg = item.UserProfile.Img,
                     userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
-                    Images = item.requestServiceImages.Select(img => img.Img).ToList(),
+                    Images = item.requestServiceImages?.Select(img => new requestServiceImage
+                    {
+                        Id = img.Id,
+                        Img = img.Img
+                    }).ToList() ?? new List<requestServiceImage>(),
                     video = item.video,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                     OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0

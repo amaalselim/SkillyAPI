@@ -24,6 +24,5 @@ namespace Skilly.Persistence.Abstract
         Task UseServiceDiscount(string serviceId, string userId);
         Task<object> GetAllServicesInProgress(string userId);
         Task CompleteAsync(string serviceId,string userId);
-        Task EditServiceImageAsync(ServiceImageDTO dto);
     }
 }

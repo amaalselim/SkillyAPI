@@ -9,7 +9,7 @@ namespace Skilly.Application.DTOs
 {
     public class ServiceImageDTO
     {
-        public string ServiceId { get; set; }
-        public string ImageId { get; set; }
+        public string Id { get; set; }
+        public string Img{ get; set; }
     }
 }

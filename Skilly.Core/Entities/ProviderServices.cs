@@ -34,7 +34,8 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public ServiceProvider? serviceProvider { get; set; }
         [NotMapped]
-        public List<string> Images { get; set; }
+        public List<ProviderServicesImage> Images { get; set; }
+
         public string? video { get; set; }
 
         [ForeignKey("Category")]
