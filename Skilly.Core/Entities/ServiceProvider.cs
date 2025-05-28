@@ -47,7 +47,13 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
 
         public ICollection<Review>? Reviews { get; set; } = new List<Review>();
-        
+
+
+        [JsonIgnore]
+        public bool IsEmergency { get; set; } = false;
+        [JsonIgnore]
+        public decimal PricePerEmergencyService { get; set; } = 0.0m;
+
 
     }
 }
