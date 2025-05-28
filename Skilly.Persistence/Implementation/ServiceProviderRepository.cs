@@ -161,6 +161,34 @@ namespace Skilly.Persistence.Implementation
 
             return provider;
         }
+        public async Task<ServiceProvider> GetproviderByuserIdAsync(string id)
+        {
+            var provider = await _context.serviceProviders
+                .FirstOrDefaultAsync(c => c.UserId == id);
+
+            var reviews = await _context.reviews
+                    .Where(r => r.ProviderServices.uId == provider.UserId)
+                    .ToListAsync();
+
+            provider.Review = reviews.Any()
+                ? Math.Round(reviews.Average(r => r.Rating), 2)
+                : 0;
+
+            var servicecount = await _context.providerServices
+                .Where(ps => ps.uId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                .ToListAsync();
+            var requestcount = await _context.requestServices
+                .Where(ps => ps.providerId == provider.UserId && ps.ServiceStatus == ServiceStatus.Completed)
+                .ToListAsync();
+            provider.numberOfEndedservices = servicecount.Count() + requestcount.Count();
+
+            var category = await _context.categories
+            .FirstOrDefaultAsync(c => c.Id == provider.categoryId);
+
+            provider.profession = category?.ProfessionName ?? "غير محدد";
+
+            return provider;
+        }
         public async Task<List<ServiceProvider>> GetAllServiceProviderAsync()
         {
             var providers = await _context.serviceProviders.ToListAsync();
