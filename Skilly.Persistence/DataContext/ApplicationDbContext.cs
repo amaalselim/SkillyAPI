@@ -35,6 +35,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<Chat> chats { get; set; }
         public DbSet<Banner> banners{ get; set; }
         public DbSet<Payment> payments{ get; set; }
+        public DbSet<EmergencyRequest> emergencyRequests { get; set; }
 
 
 
@@ -52,7 +53,7 @@ namespace Skilly.Persistence.DataContext
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
             modelBuilder.ApplyConfiguration(new MessageConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentConfiguration());
-            modelBuilder.ApplyConfiguration(new serviceConfiguration());
+            //modelBuilder.ApplyConfiguration(new serviceConfiguration());
 
         }
     }
