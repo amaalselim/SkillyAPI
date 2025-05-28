@@ -48,16 +48,12 @@ namespace Skilly.API.Controllers
             {
                 return Ok(new
                 {
-                    Success = true,
-                    Message = "Email confirmed successfully.",
-                    Token = token
+                    Success = true, Message = "Email confirmed successfully.",Token = token
                 });
             }
-
             return BadRequest(new
             {
-                Success = false,
-                Message = "Invalid verification code."
+                Success = false,Message = "Invalid verification code."
             });
         }
 
@@ -77,9 +73,7 @@ namespace Skilly.API.Controllers
             }
 
             var response = await _authService.LoginAsync(loginDTO);
-            return response != null
-                ? Ok(response)
-                : BadRequest(new { Success = false, Message = "Invalid login attempt." });
+            return response != null ? Ok(response): BadRequest(new { Success = false, Message = "Invalid login attempt." });
         }
 
         [HttpPost("reset-password")]
