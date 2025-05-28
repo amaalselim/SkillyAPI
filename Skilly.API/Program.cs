@@ -92,6 +92,7 @@ namespace Skilly.API
             builder.Services.AddScoped<IBannerService,BannerService>();
             builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IEmergencyService, EmergencyService>();
 
             builder.Services.AddScoped<FirebaseV1Service>();
             builder.Services.AddScoped<PaymobService>();
