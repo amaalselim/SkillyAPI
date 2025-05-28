@@ -76,6 +76,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         [HttpGet("GetAllServiceProvidersBy/{categoryId}")]
         public async Task<ActionResult<ServiceProvider>> GetserviceProviderbycategoryId(string categoryId)
         {
+
             var provider = await _unitOfWork.ServiceProviderRepository.GetAllserviceProvidersbyCategoryId(categoryId);
             if (provider == null)
             {
