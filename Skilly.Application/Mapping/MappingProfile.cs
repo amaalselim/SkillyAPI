@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Emergency;
 using Skilly.Core.Entities;
 
 public class MappingProfile : Profile
@@ -116,7 +117,10 @@ public class MappingProfile : Profile
         CreateMap<Message, MessageDTO>();
 
         CreateMap<CreateChatDTO, Chat>();
-        CreateMap<ChatDTO, Chat>(); 
+        CreateMap<ChatDTO, Chat>();
+
+        CreateMap<EmergencyRequest, EmergencyRequestDTO>();
+        CreateMap<EmergencyRequestDTO, EmergencyRequest>();
 
 
     }
