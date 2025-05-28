@@ -160,6 +160,7 @@ namespace Skilly.Persistence.Implementation
                 .Where(c => c.FirstUserId == userId || c.SecondUserId == userId)
                 .Include(c => c.FirstUser)
                 .Include(c => c.SecondUser)
+                .Include(c=>c.Messages)
                 .OrderByDescending(c => c.LastUpdatedAt)
                 .ToListAsync();
 
@@ -170,8 +171,38 @@ namespace Skilly.Persistence.Implementation
                 var chat = chats.FirstOrDefault(c => c.Id == chatDto.Id);
                 if (chat != null)
                 {
+                    var provider= await _context.serviceProviders.FirstOrDefaultAsync(sp => sp.UserId == chat.SecondUserId);
+                    if (provider != null)
+                    {
+                        chatDto.SecondUserImg = provider.Img;
+                    }
+                    else
+                    {
+                        var user = await _context.userProfiles.FirstOrDefaultAsync(sp => sp.UserId == chat.SecondUserId);
+                        if (user != null)
+                        {
+                            chatDto.SecondUserImg = user.Img;
+                        }
+                        else
+                        {
+                            chatDto.SecondUserImg = null; 
+                        }
+                    }
+
                     chatDto.FirstUserName = chat.FirstUser.FirstName + " " + chat.FirstUser.LastName;
                     chatDto.SecondUserName = chat.SecondUser.FirstName + " " + chat.SecondUser.LastName;
+                    if (chat.Messages != null && chat.Messages.Any())
+                    {
+                        chatDto.lastMessage = chat.Messages
+                            .OrderByDescending(m => m.SentAt)
+                            .First().Content;
+                    }
+                    else
+                    {
+                        chatDto.lastMessage = null;
+                    }
+
+
                 }
             }
 

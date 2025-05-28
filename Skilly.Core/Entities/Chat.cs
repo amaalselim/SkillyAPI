@@ -19,9 +19,13 @@ namespace Skilly.Core.Entities
         public string SecondUserId { get; set; }
         [NotMapped]
         public string SecondUserName { get; set; }
+        [NotMapped]
+        public string SecondUserImg { get; set; }
         public virtual User SecondUser { get; set; }
 
         public ICollection<Message> Messages { get; set; }
+        [NotMapped]
+        public string? LastMessage { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime LastUpdatedAt { get; set; } = DateTime.Now;

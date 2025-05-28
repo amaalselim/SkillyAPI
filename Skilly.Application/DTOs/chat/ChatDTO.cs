@@ -17,6 +17,9 @@ namespace Skilly.Application.DTOs
 
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdatedAt { get; set; }
+
+        public string? SecondUserImg { get; set; }
+        public string? lastMessage { get; set; } 
     }
 
 }
