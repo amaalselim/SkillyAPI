@@ -116,7 +116,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         }
 
         [HttpPut("editServiceProvider")]
-        public async Task<IActionResult> EditServiceProvider([FromForm] ServiceProviderDTO ServiceProviderDTO)
+        public async Task<IActionResult> EditServiceProvider([FromForm] editServiceproviderDTO ServiceProviderDTO)
         {
             try
             {

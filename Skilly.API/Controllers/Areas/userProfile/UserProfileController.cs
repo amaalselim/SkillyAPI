@@ -99,7 +99,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPut("editUserProfile")]
-        public async Task<IActionResult> EditUserProfile([FromForm] UserProfileDTO userProfileDTO)
+        public async Task<IActionResult> EditUserProfile([FromForm] edituserProfileDTO userProfileDTO)
         {
             try
             {
