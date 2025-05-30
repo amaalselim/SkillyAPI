@@ -4,6 +4,7 @@ using Skilly.Application.DTOs.Emergency;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Skilly.API.Controllers
 {
@@ -42,8 +43,13 @@ namespace Skilly.API.Controllers
             }
             try
             {
-                await _emergencyService.CreateEmergencyRequestAsync(emergencyRequestDTO, userId);
-                return Ok(new { message = "Emergency request created successfully." });
+                
+              var requestId= await _emergencyService.CreateEmergencyRequestAsync(emergencyRequestDTO, userId);
+                return Ok(new
+                {
+                    message = "Emergency request created successfully.",
+                    requestId = requestId
+                });
             }
             catch (Exception ex)
             {
@@ -52,7 +58,7 @@ namespace Skilly.API.Controllers
 
         }
 
-        [HttpPost("nearby-providers/{requestId}")]
+        [HttpGet("nearby-providers/{requestId}")]
         public async Task<IActionResult> GetNearbyProviders(string requestId)
         {
             if (requestId == null)
@@ -62,6 +68,8 @@ namespace Skilly.API.Controllers
 
             if (result == null || !result.Any())
                 return NotFound("No nearby providers found");
+
+
 
             return Ok(new { result });
         }
