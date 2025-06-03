@@ -231,15 +231,44 @@ namespace Skilly.Persistence.Implementation
                 .Include(m => m.Sender)   
                 .Include(m => m.Receiver) 
 
+
                 .ToListAsync();
 
             var messageDtos = _mapper.Map<List<MessageResponseDto>>(messages);
+
+            object? sender = await _context.userProfiles
+                .FirstOrDefaultAsync(u => u.UserId == chat.FirstUserId);
+            if (sender == null) {
+                sender = await _context.serviceProviders
+                    .FirstOrDefaultAsync(sp => sp.UserId == chat.FirstUserId);
+            }
+
+            object? receiver = await _context.userProfiles
+                .FirstOrDefaultAsync(u => u.UserId == chat.SecondUserId);
+            if (receiver == null)
+            {
+                receiver = await _context.serviceProviders
+                    .FirstOrDefaultAsync(sp => sp.UserId == chat.SecondUserId);
+            }
+            string? senderImg = null;
+            if (sender is UserProfile userSender)
+                senderImg = userSender.Img;
+            else if (sender is ServiceProvider providerSender)
+                senderImg = providerSender.Img;
+
+            string? receiverImg = null;
+            if (receiver is UserProfile userReceiver)
+                receiverImg = userReceiver.Img;
+            else if (receiver is ServiceProvider providerReceiver)
+                receiverImg = providerReceiver.Img;
 
             for (int i = 0; i < messageDtos.Count; i++)
             {
                 var message = messages[i];
                 messageDtos[i].SenderName = message.Sender.FirstName + " " + message.Sender.LastName;
                 messageDtos[i].ReceiverName = message.Receiver.FirstName + " " + message.Receiver.LastName;
+                messageDtos[i].SenderImg = senderImg;
+                messageDtos[i].ReceiverImg = receiverImg;
             }
 
             await _hubContext.Clients.Users(chat.FirstUserId, chat.SecondUserId)

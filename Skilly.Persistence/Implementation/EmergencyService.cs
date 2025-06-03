@@ -23,7 +23,7 @@ namespace Skilly.Persistence.Implementation
             _context = context;
             _mapper = mapper;
         }
-        public async Task CreateEmergencyRequestAsync(EmergencyRequestDTO emergencyRequestDTO, string userId)
+        public async Task<string> CreateEmergencyRequestAsync(EmergencyRequestDTO emergencyRequestDTO, string userId)
         {
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId== userId);
             if (user == null)
@@ -37,6 +37,7 @@ namespace Skilly.Persistence.Implementation
             await _context.emergencyRequests.AddAsync(request);
             await _context.SaveChangesAsync();
 
+            return request.Id; 
             //send notification to admin that a new emergency request has been created
 
 
@@ -76,6 +77,7 @@ namespace Skilly.Persistence.Implementation
                     return new nearestprovidersDTO
                     {
                         Id = p.UserId,
+                        requestId=requestId,
                         Name = $"{p.User.FirstName} {p.User.LastName}",
                         ImageUrl = p.Img,
                         CategoryName = p.Category.ProfessionName,
@@ -118,6 +120,7 @@ namespace Skilly.Persistence.Implementation
                 return false;
 
             request.AssignedProviderId = provider.UserId;
+            request.Finalprice = provider.PricePerEmergencyService;
             request.Status = "Accepted";
 
             await _context.SaveChangesAsync();

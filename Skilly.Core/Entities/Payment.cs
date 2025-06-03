@@ -22,6 +22,10 @@ namespace Skilly.Core.Entities
         public string? RequestServiceId { get; set; }
         public virtual RequestService? RequestService { get; set; }
 
+        [ForeignKey("EmergencyRequest")]
+        public string? EmergencyRequestId { get; set; }
+        public virtual EmergencyRequest? EmergencyRequest { get; set; }
+
         public string? PaymobOrderId { get; set; }
         public string? TransactionId { get; set; }
 

@@ -52,7 +52,7 @@ namespace Skilly.Persistence.Implementation
 
 
             var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
-           
+
             if (providerService != null)
             {
                 var provider = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.uId);
@@ -60,7 +60,7 @@ namespace Skilly.Persistence.Implementation
 
                 string title = "تم شراء الخدمة";
                 decimal discountPercentage = 0.10m;
-                decimal totalAmount=payment.Amount;
+                decimal totalAmount = payment.Amount;
                 decimal systemShare = totalAmount * discountPercentage;
                 decimal providerAmount = totalAmount - systemShare;
 
@@ -85,13 +85,14 @@ namespace Skilly.Persistence.Implementation
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
-                
+                userprofile.useDiscount = false;
+
 
             }
             else
             {
                 var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == payment.RequestServiceId);
-               
+
                 if (service != null)
                 {
                     var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.uId);
@@ -124,17 +125,59 @@ namespace Skilly.Persistence.Implementation
                             CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                         });
                     }
-                    
+
                 }
+                else
+                {
+                    var emergencyRequest = await _context.emergencyRequests.FirstOrDefaultAsync(s => s.Id == payment.EmergencyRequestId);
+
+                    if (emergencyRequest != null)
+                    {
+                        var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.UserId);
+                        string title = "تم شراء الخدمة";
+                        decimal discountPercentage = 0.10m;
+                        decimal totalAmount = payment.Amount;
+                        decimal systemShare = totalAmount * discountPercentage;
+                        decimal providerAmount = totalAmount - systemShare;
+
+                        string body = $"تم دفع خدمة الطوارئ التي تنص على  {emergencyRequest.ProblemDescription} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
+
+                        var userrequest = await _context.serviceProviders
+                            .Include(p => p.User)
+                            .FirstOrDefaultAsync(u => u.UserId == emergencyRequest.AssignedProviderId);
+
+
+                        if (emergencyRequest?.Id != null)
+                        {
+                            await _firebase.SendNotificationAsync(
+                                userrequest.User.FcmToken,
+                                title,
+                                body
+                            );
+
+                            _context.notifications.Add(new Notifications
+                            {
+                                UserId = userrequest.UserId,
+                                Title = title,
+                                Body = body,
+                                userImg = user.Img,
+                                serviceId = emergencyRequest.Id,
+                                CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+                            });
+                        }
+                        emergencyRequest.Status = "paid";
+                        emergencyRequest.Finalprice = 0;
+                        emergencyRequest.AssignedProviderId = "";
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                payment.PaymentStatus = "paid";
+                user.Points += 20;
+                await _context.SaveChangesAsync(); 
             }
-            payment.PaymentStatus = "paid";
-            user.Points += 20;
-            userprofile.useDiscount = false;
-
-            await _context.SaveChangesAsync();
-
             return "Success";
         }
+        
 
 
         public async Task<object> StartPaymentAsync(string serviceId)
@@ -155,6 +198,8 @@ namespace Skilly.Persistence.Implementation
             string relatedId = "";
             string serviceType = "";
             string providerId = "";
+
+
 
             if (providerService != null)
             {
@@ -196,7 +241,18 @@ namespace Skilly.Persistence.Implementation
                 }
                 else
                 {
-                    throw new Exception("Service not found");
+                    var request = await _context.emergencyRequests.FirstOrDefaultAsync(r => r.Id == serviceId && r.UserId==userId);
+                    if (request != null)
+                    {
+                        amount = request.Finalprice??0;
+                        relatedId = request.Id;
+                        serviceType = "Emergency";
+                        providerId = request.AssignedProviderId;
+                    }
+                    else
+                    {
+                        throw new Exception("Service not found");
+                    }
                 }
             }
 
@@ -212,6 +268,7 @@ namespace Skilly.Persistence.Implementation
                 PaymobOrderId = orderId.ToString(),
                 ProviderServiceId = (serviceType == "provider") ? relatedId : null,
                 RequestServiceId = (serviceType == "Request") ? relatedId : null,
+                EmergencyRequestId = (serviceType == "Emergency") ? relatedId : null,
                 CreatedAt = DateTime.UtcNow,
                 UserId = userId
             };

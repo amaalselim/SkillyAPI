@@ -9,7 +9,7 @@ namespace Skilly.Application.DTOs
 {
     public class requestServiceDTO
     {
-        public string Name { get; set; }
+        public string Name { get; set; } 
         public decimal Price { get; set; }
         public string Deliverytime { get; set; }
         public DateOnly startDate { get; set; }

@@ -14,7 +14,7 @@ namespace Skilly.Persistence.Abstract
         Task<List<ServiceProvider>> GetAllServiceProviderAsync();
         Task<ServiceProvider> GetByIdAsync(string id);
         Task AddServiceProviderAsync(ServiceProviderDTO serviceProviderDTO, string userId);
-        Task EditServiceProviderAsync(ServiceProviderDTO serviceProviderDTO, string userId);
+        Task EditServiceProviderAsync(editServiceproviderDTO serviceProviderDTO, string userId);
         Task<ServiceProvider> GetproviderByuserIdAsync(string id);
         Task DeleteServiceProviderAsync(string Id);
         Task<List<ServiceProvider>> GetAllserviceProvidersbyCategoryId(string categoryId);

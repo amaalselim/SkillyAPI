@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Skilly.Persistence.DataContext;
 
@@ -11,9 +12,11 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250529121024_allownull")]
+    partial class allownull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,9 +410,6 @@ namespace Skilly.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EmergencyRequestId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -435,8 +435,6 @@ namespace Skilly.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmergencyRequestId");
 
                     b.HasIndex("ProviderServiceId");
 
@@ -1070,10 +1068,6 @@ namespace Skilly.Persistence.Migrations
 
             modelBuilder.Entity("Skilly.Core.Entities.Payment", b =>
                 {
-                    b.HasOne("Skilly.Core.Entities.EmergencyRequest", "EmergencyRequest")
-                        .WithMany()
-                        .HasForeignKey("EmergencyRequestId");
-
                     b.HasOne("Skilly.Core.Entities.ProviderServices", "ProviderService")
                         .WithMany("Payments")
                         .HasForeignKey("ProviderServiceId");
@@ -1087,8 +1081,6 @@ namespace Skilly.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("EmergencyRequest");
 
                     b.Navigation("ProviderService");
 

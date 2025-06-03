@@ -52,9 +52,22 @@ namespace Skilly.Persistence.Implementation
                 throw new UserProfileNotFoundException("User not found.");
             }
             var path = @"Images/UserProfile/RequestServices/";
-            var service = _mapper.Map<RequestService>(requestServiceDTO);
+            //var service = _mapper.Map<RequestService>(requestServiceDTO);
+            var service = new RequestService
+            {
+                Name = requestServiceDTO.Name,
+                Price = requestServiceDTO.Price,
+                Deliverytime = requestServiceDTO.Deliverytime,
+                startDate = requestServiceDTO.startDate,
+                categoryId = requestServiceDTO.categoryId,
+                Notes = requestServiceDTO.Notes,
+                userId = user.Id,
+                userImg = user.Img,
+                uId = user.UserId
+
+            };
             var sid = service.Id;
-            service.userId = user.Id;
+            //service.userId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.userImg = user.Img;
             service.uId = user.UserId;
@@ -70,6 +83,7 @@ namespace Skilly.Persistence.Implementation
                 {
                     throw new Exception("Invalid video format. Only mp4 is allowed.");
                 }
+
                 var videoPath = await _imageService.SaveFileAsync(requestServiceDTO.video, path);
                 service.video = videoPath;
             }
@@ -88,7 +102,7 @@ namespace Skilly.Persistence.Implementation
                     requestServiceId = service.Id
                 }).ToList();
             }
-            user.Points += 20;
+            //user.Points += 20;
             await _context.SaveChangesAsync();
 
 

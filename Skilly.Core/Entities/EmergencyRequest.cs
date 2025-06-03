@@ -17,7 +17,8 @@ namespace Skilly.Core.Entities
         public string Status { get; set; } = "Pending";
 
         public string? AssignedProviderId { get; set; }
-        
+        public decimal? Finalprice { get; set; } = 0.0m;
+
 
 
 

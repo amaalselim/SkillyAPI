@@ -9,6 +9,7 @@ namespace Skilly.Application.DTOs.Emergency
     public class nearestprovidersDTO
     {
         public string Id { get; set; }
+        public string requestId { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }
         public string CategoryName { get; set; }

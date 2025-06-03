@@ -65,7 +65,7 @@ namespace Skilly.Persistence.Implementation
             await _context.serviceProviders.AddAsync(ServiceProvider);
             await _context.SaveChangesAsync();
         }
-        public async Task EditServiceProviderAsync(ServiceProviderDTO ServiceProviderDTO, string userId)
+        public async Task EditServiceProviderAsync(editServiceproviderDTO ServiceProviderDTO, string userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
@@ -79,12 +79,20 @@ namespace Skilly.Persistence.Implementation
                 throw new ServiceProviderNotFoundException("User Profile not found.");
             }
 
-            _mapper.Map(ServiceProviderDTO, ServiceProvider);
 
+            ServiceProvider.City = ServiceProviderDTO.City;
+            ServiceProvider.StreetName = ServiceProviderDTO.StreetName;
+            ServiceProvider.Governorate = ServiceProviderDTO.Governorate;
+            ServiceProvider.categoryId = ServiceProviderDTO.categoryId;
+            ServiceProvider.Age= ServiceProviderDTO.Age;
+            ServiceProvider.Gender= ServiceProviderDTO.Gender;
+            ServiceProvider.NumberOfYearExperience = ServiceProviderDTO.NumberOfYearExperience;
+            ServiceProvider.BriefSummary= ServiceProviderDTO.BriefSummary;
             ServiceProvider.FirstName = user.FirstName;
             ServiceProvider.LastName = user.LastName;
             ServiceProvider.Email = user.Email;
             ServiceProvider.PhoneNumber = user.PhoneNumber;
+
 
             if (ServiceProviderDTO.Img != null)
             {
@@ -191,7 +199,7 @@ namespace Skilly.Persistence.Implementation
         }
         public async Task<List<ServiceProvider>> GetAllServiceProviderAsync()
         {
-            var providers = await _context.serviceProviders.ToListAsync();
+            var providers = await _context.serviceProviders.Include(p=>p.Reviews).ToListAsync();
 
             if (!providers.Any())
                 return new List<ServiceProvider>();

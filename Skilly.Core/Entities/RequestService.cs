@@ -14,7 +14,7 @@ namespace Skilly.Core.Entities
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public DateOnly? ServiceRequestTime { get; set; } = DateOnly.FromDateTime(DateTime.Now);
-        public string Name {  get; set; }
+        public string Name {  get; set; } 
         public decimal Price { get; set; }
         public string Deliverytime { get; set; }
         public DateOnly? startDate { get; set; }

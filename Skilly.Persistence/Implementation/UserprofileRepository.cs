@@ -53,7 +53,7 @@ namespace Skilly.Persistence.Implementation
             await _context.userProfiles.AddAsync(UserProfile);
             await _context.SaveChangesAsync();
         }
-        public async Task EditUserProfileAsync(UserProfileDTO UserProfileDTO, string userId)
+        public async Task EditUserProfileAsync(edituserProfileDTO UserProfileDTO, string userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
@@ -67,8 +67,11 @@ namespace Skilly.Persistence.Implementation
                 throw new UserProfileNotFoundException("User Profile not found.");
             }
 
-            _mapper.Map(UserProfileDTO, UserProfile);
-
+            //_mapper.Map(UserProfileDTO, UserProfile);
+            UserProfile.City = UserProfileDTO.City;
+            UserProfile.StreetName = UserProfileDTO.StreetName;
+            UserProfile.Governorate = UserProfileDTO.Governorate;
+            UserProfile.Gender= UserProfileDTO.Gender;
             UserProfile.FirstName = user.FirstName;
             UserProfile.LastName = user.LastName;
             UserProfile.Email = user.Email;

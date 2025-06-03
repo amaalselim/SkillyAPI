@@ -13,7 +13,6 @@ namespace Skilly.Application.DTOs
         public string Governorate { get; set; }
         public string City { get; set; }
         public string StreetName { get; set; }
-        //public string Age { get; set; }
         public Gender Gender { get; set; }
         public IFormFile Img { get; set; }
     }

@@ -32,6 +32,8 @@ namespace Skilly.Core.Entities
         [NotMapped]
         public string ServiceProviderName { get; set; }
         public string providerImg { get; set; }
+        [NotMapped]
+        public decimal providerReview { get; set; }
         [JsonIgnore]
         public string uId { get; set; }
         [JsonIgnore]

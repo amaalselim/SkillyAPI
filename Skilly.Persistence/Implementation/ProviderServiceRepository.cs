@@ -95,12 +95,21 @@ namespace Skilly.Persistence.Implementation
                 throw new ServiceProviderNotFoundException("Service Provider not found.");
             }
             var path = @"Images/ServiceProvider/MyServices/";
-            var service = _mapper.Map<ProviderServices>(providerservicesDTO);
+            //var service = _mapper.Map<ProviderServices>(providerservicesDTO);
+            var service = new ProviderServices
+            {
+                Name = providerservicesDTO.Name,
+                Description = providerservicesDTO.Description,
+                Price = providerservicesDTO.Price,
+                Deliverytime = providerservicesDTO.Deliverytime,
+                Notes = providerservicesDTO.Notes
+
+            };
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
             service.uId = user.UserId;
-            service.categoryId = user.categoryId;
+            service.categoryId = user.categoryId; 
             service.ServiceStatus = ServiceStatus.Posted;
             if (providerservicesDTO.video != null)
             {
@@ -202,7 +211,7 @@ namespace Skilly.Persistence.Implementation
                 await _context.SaveChangesAsync();
             }
 
-            // التعيين اليدوي للخصائص من DTO إلى الكائن service
+
             service.Name = providerservicesDTO.Name;
             service.Description = providerservicesDTO.Description;
             service.Price = providerservicesDTO.Price;
@@ -256,23 +265,40 @@ namespace Skilly.Persistence.Implementation
             var services = await _context.providerServices
                 .Include(i => i.ServicesImages)
                 .Include(i => i.serviceProvider)
-                    .ThenInclude(sp => sp.User)
+                .ThenInclude(sp => sp.User)
+                .Include(i => i.serviceProvider)
+                .ThenInclude(i=>i.Reviews)
+                .Include(i => i.serviceProvider)
+                
                 .Include(i => i.offerSalaries)
                 .Include(i => i.Reviews)
                 .ToListAsync();
 
             if (services == null || !services.Any())
                 return new List<ProviderServices>();
+            
 
             var allUserIds = services.SelectMany(s => s.Reviews.Select(r => r.UserId)).Distinct().ToList();
             var allUsers = await _context.userProfiles
                 .Where(u => allUserIds.Contains(u.UserId))
                 .ToListAsync();
 
+           
+
+
             var serviceDtos = services.Select(item =>
             {
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId);
+
+                var providers = _context.serviceProviders.Include(p => p.Reviews)
+                .FirstOrDefault(p=>p.Equals(item.serviceProviderId));
+
+                var reviews = _context.reviews
+                    .Where(r => r.ProviderServices.uId == providers.UserId)
+                    .ToList();
+
+                
 
                 return new ProviderServices
                 {
@@ -289,6 +315,12 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
+
+                    providerReview = reviews.Any()
+                    ? Math.Round(reviews.Average(r => r.Rating), 2)
+                    : 0,
+
+
                     Images = item.ServicesImages?.Select(img => new ProviderServicesImage
                     {
                         Id = img.Id,

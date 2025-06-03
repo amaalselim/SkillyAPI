@@ -60,20 +60,20 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.requestServiceImages, opt => opt.Ignore());
 
 
-        CreateMap<ProviderServices, EditProviderServiceDTO>()
-    .ForMember(dest => dest.Images, opt => opt.Ignore())
-    .ForMember(dest => dest.ImagesToDeleteIds, opt => opt.Ignore())
-    .ForMember(dest => dest.video, opt => opt.Ignore());
+    //    CreateMap<ProviderServices, EditProviderServiceDTO>()
+    //.ForMember(dest => dest.Images, opt => opt.Ignore())
+    //.ForMember(dest => dest.ImagesToDeleteIds, opt => opt.Ignore())
+    //.ForMember(dest => dest.video, opt => opt.Ignore());
 
-        CreateMap<EditProviderServiceDTO, ProviderServices>()
-            .ForMember(dest => dest.ServicesImages, opt => opt.Ignore())
-            .ForMember(dest => dest.video, opt => opt.Ignore());
+        //CreateMap<EditProviderServiceDTO, ProviderServices>()
+        //    .ForMember(dest => dest.ServicesImages, opt => opt.Ignore())
+        //    .ForMember(dest => dest.video, opt => opt.Ignore());
 
 
-        CreateMap<EditRequestServiceDTO, RequestService>()
-           .ForMember(dest => dest.requestServiceImages, opt => opt.Ignore());
+        //CreateMap<EditRequestServiceDTO, RequestService>()
+        //   .ForMember(dest => dest.requestServiceImages, opt => opt.Ignore());
 
-        CreateMap<RequestService, EditRequestServiceDTO>();
+        //CreateMap<RequestService, EditRequestServiceDTO>();
 
         // Review
         CreateMap<Review, ReviewDTO>();
