@@ -14,6 +14,7 @@ namespace Skilly.Application.DTOs
 
         public string SecondUserId { get; set; }
         public string SecondUserName { get; set; }
+        public string? firstUserImg {  get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdatedAt { get; set; }
