@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using Microsoft.EntityFrameworkCore;
-
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
@@ -217,8 +216,6 @@ namespace Skilly.Persistence.Implementation
             service.Price = providerservicesDTO.Price;
             service.Deliverytime = providerservicesDTO.Deliverytime;
             service.Notes = providerservicesDTO.Notes;
-
-
             service.serviceProviderId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.providerImg = user.Img;
@@ -372,6 +369,14 @@ namespace Skilly.Persistence.Implementation
                 .Include(g => g.offerSalaries)
                 .FirstOrDefaultAsync(g => g.Id == serviceId);
 
+
+            var provider = await _context.serviceProviders
+                .FirstOrDefaultAsync(c => c.UserId == service.uId);
+
+            var reviews = await _context.reviews
+                    .Where(r => r.ProviderServices.uId == provider.UserId)
+                    .ToListAsync();
+
             if (service == null)
                 throw new ProviderServiceNotFoundException("Service not found.");
             var acceptedOffer =service.offerSalaries
@@ -391,6 +396,9 @@ namespace Skilly.Persistence.Implementation
                 serviceProviderId = service.serviceProviderId,
                 ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName,
                 providerImg = service.serviceProvider.Img,
+                providerReview = reviews.Any()
+                ? Math.Round(reviews.Average(r => r.Rating), 2)
+                : 0,
                 Images = service.ServicesImages?.Select(img => new ProviderServicesImage
                 {
                     Id = img.Id,
@@ -467,7 +475,7 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<IEnumerable<ProviderServices>> GetAllServicesByproviderId(string userId)
         {
-            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.serviceProviders.FirstOrDefaultAsync(u => u.UserId == userId || u.Id==userId);
             if (user == null)
                 return new List<ProviderServices>();
 
@@ -632,6 +640,7 @@ namespace Skilly.Persistence.Implementation
 
             var serviceDtos = services.Select(item =>
             {
+                
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted);
 
@@ -713,10 +722,11 @@ namespace Skilly.Persistence.Implementation
                 .Include(g => g.offerSalaries)
                 .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.Paid);
             var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
-            var payment = await _context.payments.FirstOrDefaultAsync(p => p.UserId == userId);
-            var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
+           
             if (service != null)
             {
+                var payment = await _context.payments.FirstOrDefaultAsync(p => p.ProviderServiceId == serviceId);
+                var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
                 service.ServiceStatus = ServiceStatus.Completed;
                 var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.serviceId== service.Id && o.Status == OfferStatus.Accepted);
 
@@ -740,7 +750,7 @@ namespace Skilly.Persistence.Implementation
 
                     _context.notifications.Add(new Notifications
                     {
-                        UserId = provviderr.UserId,
+                        UserId = user.Id,
                         Title = title,
                         Body = body,
                         userImg = provviderr.Img,
@@ -788,6 +798,8 @@ namespace Skilly.Persistence.Implementation
                 
                 if (request != null)
                 {
+                    var payment = await _context.payments.FirstOrDefaultAsync(p => p.RequestServiceId == serviceId);
+                    var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
                     request.ServiceStatus = ServiceStatus.Completed;
                     var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.requestserviceId == request.Id && o.Status == OfferStatus.Accepted);
 
@@ -808,7 +820,7 @@ namespace Skilly.Persistence.Implementation
 
                         _context.notifications.Add(new Notifications
                         {
-                            UserId = provviderr.UserId,
+                            UserId = user.Id,
                             Title = title,
                             Body = body,
                             userImg = provviderr.Img,

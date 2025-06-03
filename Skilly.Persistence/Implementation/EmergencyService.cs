@@ -38,9 +38,6 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
 
             return request.Id; 
-            //send notification to admin that a new emergency request has been created
-
-
         }
 
         public async Task<List<nearestprovidersDTO>> GetNearbyProvidersAsync(string requestId)

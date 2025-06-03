@@ -325,7 +325,7 @@ namespace Skilly.Persistence.Implementation
 
         public async Task<IEnumerable<RequestService>> GetAllRequestsByUserId(string userId)
         {
-            var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId || u.Id==userId);
 
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)

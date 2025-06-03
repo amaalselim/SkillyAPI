@@ -42,7 +42,7 @@ namespace Skilly.Persistence.Implementation
         {
             var reviews = await _context.reviews
                 .Include(p=>p.ProviderServices)
-                .Where(r => r.ProviderServices.uId== providerId)
+                .Where(r => r.ProviderServices.uId== providerId || r.ProviderServices.serviceProviderId==providerId)
                 .ToListAsync();
             
 
@@ -74,6 +74,8 @@ namespace Skilly.Persistence.Implementation
                 Reviews = reviewDisplayDTOs
             };
         }
+
+
         public async Task<ReviewsWithAverageDTO> GetAllReviewsByserviceIdAsync(string serviceId)
         {
             var reviews = await _context.reviews

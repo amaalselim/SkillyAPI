@@ -90,8 +90,8 @@ namespace Skilly.Persistence.Implementation
             ServiceProvider.BriefSummary= ServiceProviderDTO.BriefSummary;
             ServiceProvider.FirstName = user.FirstName;
             ServiceProvider.LastName = user.LastName;
-            ServiceProvider.Email = user.Email;
-            ServiceProvider.PhoneNumber = user.PhoneNumber;
+            ServiceProvider.Email = ServiceProviderDTO.Email;
+            ServiceProvider.PhoneNumber = ServiceProviderDTO.phoneNumber;
 
 
             if (ServiceProviderDTO.Img != null)

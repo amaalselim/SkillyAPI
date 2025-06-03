@@ -171,13 +171,25 @@ namespace Skilly.Persistence.Implementation
                 var chat = chats.FirstOrDefault(c => c.Id == chatDto.Id);
                 if (chat != null)
                 {
-                    var provider= await _context.serviceProviders.FirstOrDefaultAsync(sp => sp.UserId == chat.SecondUserId);
+                   
+                    var userr= await _context.userProfiles.FirstOrDefaultAsync(sp => sp.UserId == chat.FirstUserId);
+                    if (userr != null)
+                    {
+                        chatDto.firstUserImg = userr.Img;
+                    }
+                    else
+                    {
+                        var providerr = await _context.serviceProviders.FirstOrDefaultAsync(sp => sp.UserId == chat.FirstUserId);
+                        chatDto.firstUserImg = providerr.Img;
+                    }
+                    var provider = await _context.serviceProviders.FirstOrDefaultAsync(sp => sp.UserId == chat.SecondUserId);
                     if (provider != null)
                     {
                         chatDto.SecondUserImg = provider.Img;
                     }
                     else
                     {
+
                         var user = await _context.userProfiles.FirstOrDefaultAsync(sp => sp.UserId == chat.SecondUserId);
                         if (user != null)
                         {
@@ -185,7 +197,7 @@ namespace Skilly.Persistence.Implementation
                         }
                         else
                         {
-                            chatDto.SecondUserImg = null; 
+                            chatDto.SecondUserImg = null;
                         }
                     }
 
@@ -269,6 +281,9 @@ namespace Skilly.Persistence.Implementation
                 messageDtos[i].ReceiverName = message.Receiver.FirstName + " " + message.Receiver.LastName;
                 messageDtos[i].SenderImg = senderImg;
                 messageDtos[i].ReceiverImg = receiverImg;
+                messageDtos[i].ImageUrl = message.Img;
+                messageDtos[i].Content = string.IsNullOrWhiteSpace(message.Content) ? null : message.Content;
+
             }
 
             await _hubContext.Clients.Users(chat.FirstUserId, chat.SecondUserId)

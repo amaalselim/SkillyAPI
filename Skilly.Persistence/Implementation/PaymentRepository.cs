@@ -171,15 +171,14 @@ namespace Skilly.Persistence.Implementation
                         await _context.SaveChangesAsync();
                     }
                 }
-                payment.PaymentStatus = "paid";
-                user.Points += 20;
-                await _context.SaveChangesAsync(); 
+                
             }
+            payment.PaymentStatus = "paid";
+            user.Points += 20;
+            await _context.SaveChangesAsync();
             return "Success";
         }
         
-
-
         public async Task<object> StartPaymentAsync(string serviceId)
         {
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
