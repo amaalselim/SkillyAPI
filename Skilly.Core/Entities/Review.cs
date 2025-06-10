@@ -19,6 +19,8 @@ namespace Skilly.Core.Entities
         public string Feedback { get; set; }
         [Range(0.0, 5.0)]
         public decimal Rating { get; set; }
+
+
         [ForeignKey("ServiceProvider")]
         public string? ProviderId { get; set; }
         [ForeignKey("ProviderServices")]

@@ -54,6 +54,8 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public decimal PricePerEmergencyService { get; set; } = 0.0m;
 
+        
+
 
     }
 }

@@ -32,8 +32,6 @@ namespace Skilly.Core.Entities
         [NotMapped]
         public string ServiceProviderName { get; set; }
         public string providerImg { get; set; }
-        [NotMapped]
-        public decimal providerReview { get; set; }
         [JsonIgnore]
         public string uId { get; set; }
         [JsonIgnore]
@@ -62,6 +60,9 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public virtual User? UserProfile { get; set; }
         public ICollection<Review>? Reviews { get; set; } = new List<Review>();
+        [NotMapped]
+        public decimal AverageRating { get; set; }
+
 
 
     }
