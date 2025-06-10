@@ -76,7 +76,7 @@ namespace Skilly.Persistence.Implementation
         }
 
 
-        public async Task<ReviewsWithAverageDTO> GetAllReviewsByserviceIdAsync(string serviceId)
+        public async Task<ReviewsWithAverageDTO>GetAllReviewsByserviceIdAsync(string serviceId)
         {
             var reviews = await _context.reviews
                 .Include(p => p.ProviderServices)

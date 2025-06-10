@@ -393,7 +393,7 @@ namespace Skilly.Persistence.Implementation
                         Title = title,
                         Body = body,
                         userImg = providerService.serviceProvider.Img,
-                        serviceId = offer.Id,
+                        serviceId = providerService.Id,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
@@ -425,7 +425,7 @@ namespace Skilly.Persistence.Implementation
                         Title = title,
                         Body = body,
                         userImg = requestService.UserProfile.Img,
-                        serviceId = offer.Id,
+                        serviceId = requestService.Id,
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }

@@ -79,7 +79,7 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditServiceGallery(servicegalleryDTO servicegalleryDTO, string userId, string galleryId)
+        public async Task EditServiceGallery(editgalleryDTO servicegalleryDTO, string userId, string galleryId)
         {
             var gallery = await _context.servicesgalleries
             .Include(g => g.galleryImages)
@@ -89,6 +89,19 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new ServiceGalleryNotFoundException("Gallery not found.");
             }
+            if (servicegalleryDTO.ImagesToDeleteIds != null && servicegalleryDTO.ImagesToDeleteIds.Any())
+            {
+                var imagesToDelete = gallery.galleryImages
+                     .Where(img => servicegalleryDTO.ImagesToDeleteIds.Contains(img.Id))
+                     .ToList();
+
+                foreach (var img in imagesToDelete)
+                {
+                    await _imageService.DeleteFileAsync(img.Img);
+                    gallery.galleryImages.Remove(img);
+                }
+                await _context.SaveChangesAsync();
+            }
             _mapper.Map(servicegalleryDTO, gallery);
             var path = @"Images/ServiceProvider/Servicegallery/";
             if (servicegalleryDTO.video != null)
@@ -97,24 +110,25 @@ namespace Skilly.Persistence.Implementation
                 {
                     throw new InvalidOperationException("Invalid file type. Only mp4 files are allowed.");
                 }
+                if (!string.IsNullOrEmpty(gallery.video))
+                {
+                    await _imageService.DeleteFileAsync(gallery.video);
+                }
+                await _context.SaveChangesAsync();
                 gallery.video = await _imageService.SaveFileAsync(servicegalleryDTO.video, path);
             }
+                
             if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
             {
-                
 
-                if (servicegalleryDTO.Images != null && servicegalleryDTO.Images.Any())
+                foreach (var image in servicegalleryDTO.Images)
                 {
-
-                    foreach (var image in servicegalleryDTO.Images)
+                    var imagePath = await _imageService.SaveFileAsync(image, path);
+                    gallery.galleryImages.Add(new ServicesgalleryImage
                     {
-                        var imagePath = await _imageService.SaveFileAsync(image, path);
-                        gallery.galleryImages.Add(new ServicesgalleryImage
-                        {
-                            Img = imagePath,
-                            galleryId = gallery.Id
-                        });
-                    }
+                        Img = imagePath,
+                        galleryId = gallery.Id
+                    });
                 }
             }
             await _context.SaveChangesAsync();

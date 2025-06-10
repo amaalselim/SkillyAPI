@@ -44,30 +44,39 @@ namespace Skilly.Persistence.Implementation
             if (services == null || !services.Any())
                 return new List<ProviderServices>();
 
-            var serviceDtos = services.Select(item => new ProviderServices
+            var reviews = await _context.reviews
+                .ToListAsync();
+
+            var serviceDtos = services.Select(item =>
             {
-                Id = item.Id,
-                Name = item.Name,
-                Description = item.Description,
-                ServiceRequestTime = item.ServiceRequestTime,
-                Price =item.Price,
-                PriceDiscount = item.PriceDiscount,
-                Deliverytime = item.Deliverytime,
-                categoryId = item.categoryId,
-                Notes = item.Notes,
-                serviceProviderId = item.serviceProviderId,
-                ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
-                providerImg = item.serviceProvider.Img,
-                video = item.video,
-                Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                var relatedReviews = reviews.Where(r => r.ProviderId== item.serviceProviderId).ToList();
+                var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
+
+                return new ProviderServices
                 {
-                    Id = img.Id,
-                    Img = img.Img
-                }).ToList() ?? new List<ProviderServicesImage>(),
+                    Id = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    ServiceRequestTime = item.ServiceRequestTime,
+                    Price = item.Price,
+                    PriceDiscount = item.PriceDiscount,
+                    Deliverytime = item.Deliverytime,
+                    categoryId = item.categoryId,
+                    Notes = item.Notes,
+                    serviceProviderId = item.serviceProviderId,
+                    ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
+                    providerImg = item.serviceProvider.Img,
+                    video = item.video,
+                    AverageRating = avgRate,
+                    Images = item.ServicesImages?.Select(img => new ProviderServicesImage
+                    {
+                        Id = img.Id,
+                        Img = img.Img
+                    }).ToList() ?? new List<ProviderServicesImage>(),
+                };
             }).ToList();
 
             return serviceDtos;
-
         }
         public async Task UseServiceDiscount(string serviceId, string userId)
         {
@@ -280,8 +289,9 @@ namespace Skilly.Persistence.Implementation
                 .Where(u => allUserIds.Contains(u.UserId))
                 .ToListAsync();
 
-           
 
+            var reviews = await _context.reviews
+                .ToListAsync();
 
             var serviceDtos = services.Select(item =>
             {
@@ -291,32 +301,25 @@ namespace Skilly.Persistence.Implementation
                 var providers = _context.serviceProviders.Include(p => p.Reviews)
                 .FirstOrDefault(p=>p.Equals(item.serviceProviderId));
 
-                var reviews = _context.reviews
-                    .Where(r => r.ProviderServices.uId == providers.UserId)
-                    .ToList();
+ 
+                var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
+                var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
 
-                
-
-                return new ProviderServices
-                {
+                    return new ProviderServices
+                    {
                     Id = item.Id,
                     Name = item.Name,
                     Description = item.Description,
                     ServiceRequestTime = item.ServiceRequestTime,
                     Price = acceptedOffer!=null? acceptedOffer.Salary:item.Price,
                     PriceDiscount = item.PriceDiscount,
-                  
+                    AverageRating = avgRate,
                     Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
                     categoryId = item.categoryId,
                     Notes = item.Notes,
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-
-                    providerReview = reviews.Any()
-                    ? Math.Round(reviews.Average(r => r.Rating), 2)
-                    : 0,
-
 
                     Images = item.ServicesImages?.Select(img => new ProviderServicesImage
                     {
@@ -356,11 +359,6 @@ namespace Skilly.Persistence.Implementation
 
             return serviceDtos;
         }
-
-
-
-
-
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string currentUserId,string serviceId)
         {
             var service = await _context.providerServices
@@ -374,13 +372,17 @@ namespace Skilly.Persistence.Implementation
                 .FirstOrDefaultAsync(c => c.UserId == service.uId);
 
             var reviews = await _context.reviews
-                    .Where(r => r.ProviderServices.uId == provider.UserId)
-                    .ToListAsync();
+            .ToListAsync();
+
+            var relatedReviews = reviews.Where(r => r.ProviderId == service.serviceProviderId).ToList();
+            var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
 
             if (service == null)
                 throw new ProviderServiceNotFoundException("Service not found.");
             var acceptedOffer =service.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId);
+
+
             var serviceDto = new ProviderServices
             {
 
@@ -396,15 +398,13 @@ namespace Skilly.Persistence.Implementation
                 serviceProviderId = service.serviceProviderId,
                 ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName,
                 providerImg = service.serviceProvider.Img,
-                providerReview = reviews.Any()
-                ? Math.Round(reviews.Average(r => r.Rating), 2)
-                : 0,
                 Images = service.ServicesImages?.Select(img => new ProviderServicesImage
                 {
                     Id = img.Id,
                     Img = img.Img
                 }).ToList() ?? new List<ProviderServicesImage>(),
                 video = service.video,
+                AverageRating = avgRate,
                 offerSalaries = service.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                 CountOfOffers = service.offerSalaries?.Count(p => p.Status == 0) ?? 0,
             };
@@ -426,11 +426,15 @@ namespace Skilly.Persistence.Implementation
             if (services == null || !services.Any())
                 return new List<ProviderServices>();
 
+            var reviews = await _context.reviews
+                .ToListAsync();
+
             var serviceDtos = services.Select(item =>
             {
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId);
-
+                var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
+                var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
                 return new ProviderServices
                 {
                     Id = item.Id,
@@ -445,6 +449,7 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
+                    AverageRating = avgRate,
                     Images = item.ServicesImages?.Select(img => new ProviderServicesImage
                     {
                         Id = img.Id,
@@ -491,11 +496,16 @@ namespace Skilly.Persistence.Implementation
             if (services == null || !services.Any())
                 return new List<ProviderServices>();
 
+            var reviews = await _context.reviews
+                .ToListAsync();
+
 
             var serviceDtos = services.Select(item =>
             {
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == userId);
+                var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
+                var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
                 return new ProviderServices
                 {
                     Id = item.Id,
@@ -510,6 +520,7 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
+                    AverageRating = avgRate,
                     Images = item.ServicesImages?.Select(img => new ProviderServicesImage
                     {
                         Id = img.Id,
@@ -544,11 +555,16 @@ namespace Skilly.Persistence.Implementation
                 .Where(u => allUserIds.Contains(u.UserId))
                 .ToListAsync();
 
+            var reviews = await _context.reviews.ToListAsync();
+
             var serviceDtos = services.Select(item =>
             {
                 var acceptedOffer = !string.IsNullOrEmpty(currentUserId)
                     ? item.offerSalaries.FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId)
                     : null;
+
+                var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
+                var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
 
                 return new ProviderServices
                 {
@@ -564,7 +580,7 @@ namespace Skilly.Persistence.Implementation
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
-
+                    AverageRating=avgRate,
                     Images = item.ServicesImages?.Select(img => new ProviderServicesImage
                     {
                         Id = img.Id,
@@ -638,11 +654,17 @@ namespace Skilly.Persistence.Implementation
                 .Where(c => c.serviceProviderId == user.Id && c.ServiceStatus == ServiceStatus.Paid)
                 .ToListAsync();
 
+            var reviews = await _context.reviews
+                .ToListAsync();
+
             var serviceDtos = services.Select(item =>
             {
                 
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted);
+
+                var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
+                var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
 
                 return new ProviderServices
                 {
@@ -664,6 +686,7 @@ namespace Skilly.Persistence.Implementation
                         Img = img.Img
                     }).ToList() ?? new List<ProviderServicesImage>(),
                     video = item.video,
+                    AverageRating = avgRate,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                     CountOfOffers = item.offerSalaries?.Count(p => p.Status == 0) ?? 0
                 };
