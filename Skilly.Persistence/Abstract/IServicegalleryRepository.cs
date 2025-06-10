@@ -15,7 +15,7 @@ namespace Skilly.Persistence.Abstract
         Task<IEnumerable<Servicesgallery>> GetAllgalleryByPProviderId(string providerId);
         Task<Servicesgallery> GetServiceGalleryByIdAsync(string galleryId, string userId);
         Task AddServiceGallery(servicegalleryDTO servicegalleryDTO, string userId);
-        Task EditServiceGallery(servicegalleryDTO servicegalleryDTO, string userId, string galleryId);
+        Task EditServiceGallery(editgalleryDTO servicegalleryDTO, string userId, string galleryId);
         Task DeleteServiceGalleryAsync(string galleryId, string userId);
     }
 }

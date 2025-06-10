@@ -109,7 +109,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         }
 
         [HttpPut("EditgalleryBy/{galleryId}")]
-        public async Task<IActionResult> EditServiceGallery([FromForm] servicegalleryDTO servicegalleryDTO, [FromRoute] string galleryId)
+        public async Task<IActionResult> EditServiceGallery([FromForm] editgalleryDTO servicegalleryDTO, [FromRoute] string galleryId)
         {
             if (servicegalleryDTO == null)
             {
