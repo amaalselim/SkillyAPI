@@ -71,7 +71,6 @@ namespace Skilly.API.Controllers.Areas.Provider
         [HttpGet("GetAllReviewsByproviderId")]
         public async Task<IActionResult> GetAllReviewsByProvider()
         {
-
             try
             {
                 var providerId = GetUserIdFromClaims();

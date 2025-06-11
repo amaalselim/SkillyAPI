@@ -30,6 +30,12 @@ namespace Skilly.Core.Entities
         public virtual ServiceProvider? ServiceProvider { get; set; }
         [JsonIgnore]
         public virtual ProviderServices? ProviderServices { get; set; }
+
+        [ForeignKey("RequestService")]
+        [JsonIgnore]
+        public string? requestId { get; set; } 
+        [JsonIgnore]
+        public virtual RequestService? RequestService { get; set; } 
         //public virtual UserProfile? UserProfile { get; set; }
 
 

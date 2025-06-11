@@ -26,17 +26,45 @@ namespace Skilly.Persistence.Implementation
         public async Task AddReviewserviceAsync(string userId, ReviewServiceDTO reviewDTO)
         {
             var review = _mapper.Map<Review>(reviewDTO);
+
+            var id = reviewDTO.serviceId;
             review.UserId = userId;
-            review.UserName = _context.users.Where(u => u.Id == userId).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault();
-            review.serviceId= reviewDTO.serviceId;
-            review.UserImg = _context.userProfiles.Where(u => u.UserId == userId).Select(u => u.Img).FirstOrDefault();
-            var services = await _context.providerServices
-                .Where(s => s.Id == reviewDTO.serviceId)
+            review.UserName = await _context.users
+                .Where(u => u.Id == userId)
+                .Select(u => u.FirstName + " " + u.LastName)
                 .FirstOrDefaultAsync();
-            review.ProviderId = services.serviceProviderId;
+
+            if (await _context.providerServices.AnyAsync(s => s.Id == id))
+            {
+                review.serviceId = id;
+                review.requestId = null;
+
+                var services = await _context.providerServices
+                    .Where(s => s.Id == id)
+                    .FirstOrDefaultAsync();
+
+                review.ProviderId = services.serviceProviderId;
+            }
+            else if (await _context.requestServices.AnyAsync(r => r.Id == id))
+            {
+                review.requestId = id;
+                review.serviceId = null;
+            }
+            else
+            {
+                review.serviceId = null;
+                review.requestId = null;
+            }
+
+            review.UserImg = await _context.userProfiles
+                .Where(u => u.UserId == userId)
+                .Select(u => u.Img)
+                .FirstOrDefaultAsync();
+
             await _context.reviews.AddAsync(review);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<ReviewsWithAverageDTO> GetAllReviewsByproviderIdAsync(string providerId)
         {
