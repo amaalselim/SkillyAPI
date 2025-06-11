@@ -92,10 +92,9 @@ namespace Skilly.Persistence.Implementation
             else
             {
                 var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == payment.RequestServiceId);
-
                 if (service != null)
                 {
-                    var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.uId);
+                    var userrr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.providerId);
                     service.ServiceStatus = ServiceStatus.Paid;
 
                     string title = "تم شراء الخدمة";
@@ -110,14 +109,14 @@ namespace Skilly.Persistence.Implementation
                     if (service?.Id != null)
                     {
                         await _firebase.SendNotificationAsync(
-                            userr.FcmToken,
+                            userrr.FcmToken,
                             title,
                             body
                         );
 
                         _context.notifications.Add(new Notifications
                         {
-                            UserId = service.uId,
+                            UserId = userrr.Id,
                             Title = title,
                             Body = body,
                             userImg = user.Img,
@@ -133,7 +132,7 @@ namespace Skilly.Persistence.Implementation
 
                     if (emergencyRequest != null)
                     {
-                        var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.UserId);
+                        var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.AssignedProviderId);
                         string title = "تم شراء الخدمة";
                         decimal discountPercentage = 0.10m;
                         decimal totalAmount = payment.Amount;
