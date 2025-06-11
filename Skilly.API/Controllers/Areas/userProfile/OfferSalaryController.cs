@@ -38,11 +38,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             {
                 var offers = await _unitOfWork._OfferSalaryRepository.GetAllOffersAsync();
 
-                if (offers == null || !offers.Any())
-                {
-                    return NotFound(new { message = "No offers found." });
-                }
-
+                
                 return Ok(new { offers });
             }
             catch (Exception ex)
@@ -58,10 +54,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             {
                 var offers = await _unitOfWork._OfferSalaryRepository.GetAllOffersByServiceId(serviceId);
 
-                if (offers == null || !offers.Any())
-                {
-                    return NotFound(new { message = "No offers found for the specified service." });
-                }
+               
 
                 return Ok(new { offers });
             }
@@ -78,10 +71,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             {
                 var offer = await _unitOfWork._OfferSalaryRepository.GetOfferByIdAsync(Id);
 
-                if (offer == null)
-                {
-                    return NotFound(new { message = "Offer not found." });
-                }
+                
 
                 return Ok(new { offer });
             }

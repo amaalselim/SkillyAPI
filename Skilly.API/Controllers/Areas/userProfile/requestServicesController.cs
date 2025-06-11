@@ -43,10 +43,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
                 var services = await _unitOfWork._requestserviceRepository.GetSortedUserAsync(sortBy,userId, userLat, userLon);
-                if (services == null || !services.Any())
-                {
-                    return NotFound(new { message = "No services found." });
-                }
+               
                 return StatusCode(StatusCodes.Status200OK, new { services });
             }
             catch (Exception ex)
@@ -68,10 +65,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
                 var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByCategoryId(userId,sortBy,userLat,userLon);
-                if (services == null || !services.Any())
-                {
-                    return NotFound(new { message = "No services found for this user." });
-                }
+               
                 return Ok(new { services });
             }
             catch (Exception ex)
@@ -87,10 +81,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             {
                 string userId = GetUserIdFromClaims();
                 var services = await _unitOfWork._requestserviceRepository.GetAllRequestsByUserId(userId);
-                if (services == null || !services.Any())
-                {
-                    return NotFound(new { message = "No services found for this user." });
-                }
                 return Ok(new { services });
             }
             catch (Exception ex)
@@ -106,10 +96,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             {
                 string userId = GetUserIdFromClaims();
                 var service = await _unitOfWork._requestserviceRepository.GetRequestById(serviceId,userId);
-                if (service == null)
-                {
-                    return NotFound(new { message = "Service not found." });
-                }
                 return Ok(new { service });
             }
             catch (Exception ex)
