@@ -65,7 +65,7 @@ namespace Skilly.Infrastructure.Implementation
             var orderId = result.GetProperty("id").GetInt32();
             return orderId;
         }
-        public async Task<string> CreatePaymentKeyAsync(string authToken, int orderId, decimal amountCents,UserProfile userProfile)
+        public async Task<string> CreatePaymentKeyAsync(string authToken, int orderId, decimal amountCents,UserProfile userProfile, string redirectUrl)
         {
 
             var payload = new
@@ -78,7 +78,52 @@ namespace Skilly.Infrastructure.Implementation
 
                 billing_data = new
                 {
-                    apartment = "NA", 
+                    apartment = "NA",
+                    email = userProfile.Email,
+                    floor = "NA",
+                    first_name = userProfile.FirstName,
+                    street = "NA",
+                    building = "NA",
+                    phone_number = userProfile.PhoneNumber,
+                    shipping_method = "PKG",
+                    postal_code = "NA",
+                    city = userProfile.City ?? "Cairo",
+                    country = userProfile.Governorate,
+                    last_name = userProfile.LastName,
+                    state = userProfile.StreetName ?? "Cairo"
+                },
+                redirect_url = redirectUrl
+            };
+
+            var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("acceptance/payment_keys", content);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Error: {response.StatusCode}, Body: {responseBody}");
+            }
+
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var paymentKey = result.GetProperty("token").GetString();
+            return paymentKey;
+        }
+
+        public async Task<string> CreatePaymentKeyAsync2(string authToken, int orderId, decimal amountCents, UserProfile userProfile)
+        {
+
+            var payload = new
+            {
+                auth_token = authToken,
+                amount_cents = (int)(amountCents * 100),
+                currency = "EGP",
+                integration_id = _settings.CardIntegrationId,
+                order_id = orderId,
+
+                billing_data = new
+                {
+                    apartment = "NA",
                     email = userProfile.Email,
                     floor = "NA",
                     first_name = userProfile.FirstName,

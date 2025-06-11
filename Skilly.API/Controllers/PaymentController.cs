@@ -54,80 +54,31 @@ namespace Skilly.API.Controllers
             }
 
         }
-        //[HttpGet("payment-callback")]
-        //public async Task<IActionResult> HandlePaymentCallback(string order, string url)
-        //{
-        //    if (string.IsNullOrEmpty(order))
-        //    {
-        //        return BadRequest(new { success = false, message = "Order ID is missing." });
-        //    }
 
-        //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(order);
 
-        //    if (result == null)
-        //    {
-        //        return NotFound(new { success = false, message = "Payment not found." });
-        //    }
+        [HttpPost("start-payment-URL")]
+        public async Task<IActionResult> StartPaymentURL([FromBody] StartPaymentURLDTO paymentDTO)
+        {
+            try
+            {
+                var userId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new { message = "User not authorized." });
+                }
 
-        //    return Redirect($"{url}");
-        //}
-
-        //[HttpPost("payment-callback")]
-        //public async Task<IActionResult> PaymentCallback([FromBody] PaymobCallbackDTO callbackData)
-        //{
-        //    if (callbackData == null || string.IsNullOrEmpty(callbackData.OrderId) || string.IsNullOrEmpty(callbackData.Url))
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            url = string.IsNullOrEmpty(callbackData?.Url) ? new[] { "The url field is required." } : null,
-        //            order = string.IsNullOrEmpty(callbackData?.OrderId) ? new[] { "The order field is required." } : null,
-        //        });
-        //    }
-
-        //    var success = callbackData.Success;
-
-        //    if (!success)
-        //    {
-        //        return BadRequest(new { success = false, message = "Payment was not successful." });
-        //    }
-
-        //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(callbackData.OrderId, success);
-        //    if (result == null)
-        //    {
-        //        return NotFound(new { success = false, message = "Payment not found." });
-        //    }
-
-        //    var uriBuilder = new UriBuilder(callbackData.Url);
-        //    var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-        //    query["order"] = callbackData.OrderId;
-        //    uriBuilder.Query = query.ToString();
-
-        //    string fullUrl = uriBuilder.ToString();
-
-        //    return Ok(new { success = true, endpointfullPath = fullUrl });
-        //}
-
-        //[HttpGet("payment-callback")]
-        //public async Task<IActionResult> PaymentCallback([FromQuery] bool success, [FromQuery] string order)
-        //{
-        //    if (string.IsNullOrEmpty(order))
-        //    {
-        //        return BadRequest(new { success = false, message = "Order ID is required." });
-        //    }
-
-        //    if (!success)
-        //    {
-        //        return BadRequest(new { success = false, message = "Payment was not successful." });
-        //    }
-
-        //    var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(order, success);
-        //    if (result == null)
-        //    {
-        //        return NotFound(new { success = false, message = "Payment not found." });
-        //    }
-
-        //    return Ok(new { success = true, message = "Payment confirmed successfully." });
-        //}
+                var result = await _unitOfWork._paymentRepository.StartPaymentAsync(paymentDTO.ServiceId, paymentDTO.RedirectUrl);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Payment initiation failed." });
+                }
+                return Ok(new { message = "Payment initiated successfully.", result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpGet("payment-callback")]
         public async Task<IActionResult> PaymentCallbackCheck()
@@ -157,10 +108,6 @@ namespace Skilly.API.Controllers
 
             return Ok(new { success = true, message = "Payment confirmed successfully." });
         }
-
-
-
-
 
     }
 

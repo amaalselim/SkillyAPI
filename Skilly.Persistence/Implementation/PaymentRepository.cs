@@ -132,7 +132,7 @@ namespace Skilly.Persistence.Implementation
 
                     if (emergencyRequest != null)
                     {
-                        var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.AssignedProviderId);
+                        var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.UserId);
                         string title = "تم شراء الخدمة";
                         decimal discountPercentage = 0.10m;
                         decimal totalAmount = payment.Amount;
@@ -256,7 +256,7 @@ namespace Skilly.Persistence.Implementation
 
             var authToken = await _paymobService.GetAuthTokenAsync();
             var orderId = await _paymobService.CreateOrderAsync(authToken, amount);
-            var paymentToken = await _paymobService.CreatePaymentKeyAsync(authToken, orderId, amount,userprofile);
+            var paymentToken = await _paymobService.CreatePaymentKeyAsync2(authToken, orderId, amount,userprofile);
 
             var payment = new Payment
             {
@@ -275,6 +275,105 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
 
             var iframeUrl = $"https://accept.paymob.com/api/acceptance/iframes/{_paymobService.IframeId}?payment_token={paymentToken}";
+
+            return new
+            {
+                iframeUrl
+            };
+        }
+
+
+
+        public async Task<object> StartPaymentAsync(string serviceId, string redirectUrl)
+        {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("User is not authenticated");
+
+            var user = await _context.Users.FindAsync(userId);
+            var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == serviceId);
+
+            decimal amount = 0;
+            string relatedId = "";
+            string serviceType = "";
+            string providerId = "";
+
+            if (providerService != null)
+            {
+                var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.serviceId == providerService.Id && o.Status == OfferStatus.Accepted);
+                if (providerService.PriceDiscount != null && userprofile.useDiscount == true)
+                {
+                    amount = (decimal)providerService.PriceDiscount;
+                }
+                else if (offers != null)
+                {
+                    amount = offers.Salary;
+                }
+                else
+                {
+                    amount = providerService.Price;
+                }
+                providerService.userprofileId = userId;
+                relatedId = providerService.Id;
+                serviceType = "provider";
+                providerId = providerService.serviceProviderId;
+            }
+            else
+            {
+                var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == serviceId);
+                if (service != null)
+                {
+                    var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.requestserviceId == service.Id && o.Status == OfferStatus.Accepted);
+                    amount = offers?.Salary ?? service.Price;
+
+                    relatedId = service.Id;
+                    serviceType = "Request";
+                    providerId = service.providerId;
+                }
+                else
+                {
+                    var request = await _context.emergencyRequests.FirstOrDefaultAsync(r => r.Id == serviceId && r.UserId == userId);
+                    if (request != null)
+                    {
+                        amount = request.Finalprice ?? 0;
+                        relatedId = request.Id;
+                        serviceType = "Emergency";
+                        providerId = request.AssignedProviderId;
+                    }
+                    else
+                    {
+                        throw new Exception("Service not found");
+                    }
+                }
+            }
+
+            var authToken = await _paymobService.GetAuthTokenAsync();
+            var orderId = await _paymobService.CreateOrderAsync(authToken, amount);
+            var paymentToken = await _paymobService.CreatePaymentKeyAsync(authToken, orderId, amount, userprofile, redirectUrl);
+
+            var payment = new Payment
+            {
+                Amount = amount,
+                PaymentStatus = "Pending",
+                PaymentMethod = "Card",
+                PaymobOrderId = orderId.ToString(),
+                ProviderServiceId = (serviceType == "provider") ? relatedId : null,
+                RequestServiceId = (serviceType == "Request") ? relatedId : null,
+                EmergencyRequestId = (serviceType == "Emergency") ? relatedId : null,
+                CreatedAt = DateTime.UtcNow,
+                UserId = userId
+            };
+
+            _context.payments.Add(payment);
+            await _context.SaveChangesAsync();
+
+            var iframeUrl = $"https://accept.paymob.com/api/acceptance/iframes/{_paymobService.IframeId}?payment_token={paymentToken}";
+
 
             return new
             {

@@ -10,6 +10,7 @@ namespace Skilly.Persistence.Abstract
     public interface IPaymentRepository
     {
         Task<object> StartPaymentAsync(string serviceId);
+        Task<object> StartPaymentAsync(string serviceId, string redirectUrl);
         Task<string> HandlePaymentCallbackAsync(string id, bool success);
     }
 }
