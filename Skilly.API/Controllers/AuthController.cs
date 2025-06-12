@@ -48,16 +48,19 @@ namespace Skilly.API.Controllers
             {
                 return Ok(new
                 {
-                    Success = true, Message = "Email confirmed successfully.",Token = token
+                    Success = true,
+                    Message = "Email confirmed successfully.",
+                    Token = token
                 });
             }
             return BadRequest(new
             {
-                Success = false,Message = "Invalid verification code."
+                Success = false,
+                Message = "Invalid verification code."
             });
         }
 
-       
+
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)

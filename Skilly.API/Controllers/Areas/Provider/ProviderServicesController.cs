@@ -28,23 +28,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             return userId;
         }
 
-        [HttpGet("getAllproviderServices")]
-        public async Task<IActionResult> GetAllproviderServices()
-        {
-            try
-            {
-                var services = await _unitOfWork.providerServiceRepository.GetAllProviderService();
-                if (services == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
-                }
-                return StatusCode(StatusCodes.Status200OK, new { services });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
-            }
-        }
+        
         [HttpGet("getAllServices")]
         public async Task<IActionResult> GetAllServices([FromQuery] string sortBy = "nearest")
         {
@@ -58,6 +42,23 @@ namespace Skilly.API.Controllers.Areas.Provider
                 var userLat = user.Latitude.Value;
                 var userLon = user.Longitude.Value;
                 var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon,userId);
+                if (services == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
+                }
+                return StatusCode(StatusCodes.Status200OK, new { services });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
+        [HttpGet("getAllproviderServices")]
+        public async Task<IActionResult> GetAllproviderServices()
+        {
+            try
+            {
+                var services = await _unitOfWork.providerServiceRepository.GetAllProviderService();
                 if (services == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });

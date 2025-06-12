@@ -94,7 +94,7 @@ namespace Skilly.Application.Implementation
 
             var user = _mapper.Map<User>(registerDTO);
             user.UserType = registerDTO.UserType;
-           // user.FcmToken = registerDTO.FcmToken;
+            user.FcmToken = registerDTO.FcmToken;
             user.EmailConfirmed = false;
 
             var result = await _usermanager.CreateAsync(user, registerDTO.Password);

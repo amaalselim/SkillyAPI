@@ -20,7 +20,6 @@ namespace Skilly.Persistence.Configurations
             modelBuilder
                 .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
-
         }
     }
 }

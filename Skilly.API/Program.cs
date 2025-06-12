@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Skilly.API
 {
@@ -106,7 +107,7 @@ namespace Skilly.API
                 options.AddPolicy("MyPolicy", builder =>
                 {
                     builder
-                        .SetIsOriginAllowed(_ => true) // يسمح بأي Origin
+                        .SetIsOriginAllowed(_ => true) 
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials(); // مهم جداً في حالة WebSocket
@@ -164,15 +165,13 @@ namespace Skilly.API
                 options.EnableDetailedErrors = true;
 
             });
+            
+
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
-            {
-               
-                c.CustomSchemaIds(type => type.FullName);
-            });
+
 
 
             /*-----------------------------Swagger Part-----------------------------*/
@@ -182,7 +181,11 @@ namespace Skilly.API
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Skilly API", Version = "v1" });
-
+                c.CustomSchemaIds(type => type.FullName);
+                c.SchemaGeneratorOptions = new SchemaGeneratorOptions
+                {
+                    UseAllOfToExtendReferenceSchemas = false
+                };
                 // Add support for bearer token authentication
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -191,6 +194,7 @@ namespace Skilly.API
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey
                 });
+
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
                 { new OpenApiSecurityScheme
@@ -222,7 +226,15 @@ namespace Skilly.API
 
             
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Skilly API v1");
+
+                // مهم جداً!
+                c.RoutePrefix = ""; // أو "" لو عايزة تكون في الصفحة الرئيسية
+            });
+
+
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
@@ -241,6 +253,7 @@ namespace Skilly.API
             app.UseCors("MyPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapHub<ChatHub>("/chatHub");
             app.MapControllers();
 
