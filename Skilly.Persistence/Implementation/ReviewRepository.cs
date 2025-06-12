@@ -103,6 +103,43 @@ namespace Skilly.Persistence.Implementation
             };
         }
 
+        public async Task<ReviewsWithAverageDTO> GetAllReviews()
+        {
+            var reviews = await _context.reviews
+                .Include(p => p.ProviderServices)
+                .Where(r => r.ProviderServices != null)
+                .ToListAsync();
+
+
+
+            var userIds = reviews.Select(r => r.UserId).Distinct().ToList();
+
+            var users = await _context.userProfiles
+                .Where(u => userIds.Contains(u.UserId))
+                .ToListAsync();
+
+            var reviewDisplayDTOs = reviews.Select(r => new ReviewserviceDisplayDTO
+            {
+                serviceId = r.ProviderServices.Id,
+                serviceName = r.ProviderServices.Name,
+                userName = users.FirstOrDefault(u => u.UserId == r.UserId)?.FirstName + " " +
+                           users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
+                userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
+                Feedback = r.Feedback,
+                Rating = r.Rating,
+
+
+            }).ToList();
+
+            var avgRate = Math.Round(reviews.Any() ? reviews.Average(r => r.Rating) : 0, 2);
+
+            return new ReviewsWithAverageDTO
+            {
+                AverageRating = avgRate,
+                Reviews = reviewDisplayDTOs
+            };
+        }
+
 
         public async Task<ReviewsWithAverageDTO>GetAllReviewsByserviceIdAsync(string serviceId)
         {

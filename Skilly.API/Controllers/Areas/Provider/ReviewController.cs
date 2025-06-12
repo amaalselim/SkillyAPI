@@ -47,6 +47,20 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
+        [HttpGet("GetAllReviews")]
+        public async Task<IActionResult> GetAllReviews()
+        {
+            try
+            {
+                var reviews = await _unitOfWork.reviewRepository.GetAllReviews();
+                return StatusCode(StatusCodes.Status200OK, new { reviews });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
         [HttpGet("GetReviewsBy/{serviceId}")]
         public async Task<IActionResult> GetAllReviewsByservice(string serviceId)
         {
@@ -87,6 +101,9 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
+       
+
 
 
         [HttpGet("GetAllReviewsBy/{providerId}")]
