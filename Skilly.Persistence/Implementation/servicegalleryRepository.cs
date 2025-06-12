@@ -155,9 +155,11 @@ namespace Skilly.Persistence.Implementation
                 Deliverytime = item.Deliverytime,
                 
                 serviceProviderId = item.serviceProviderId,
-                Images = item.galleryImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
+                Images = item.galleryImages?.Select(img => new ServicesgalleryImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ServicesgalleryImage>(),
                 video = item.video,
             }).ToList();
 
@@ -184,9 +186,11 @@ namespace Skilly.Persistence.Implementation
                 Description = gallery.Description,
                 Deliverytime = gallery.Deliverytime,
                 serviceProviderId = gallery.serviceProviderId,
-                Images = gallery.galleryImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
+                Images = gallery.galleryImages?.Select(img => new ServicesgalleryImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ServicesgalleryImage>(),
                 video = gallery.video,
             };
 
@@ -213,9 +217,11 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 Deliverytime = item.Deliverytime,
                 serviceProviderId = item.serviceProviderId,
-                Images = item.galleryImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
+                Images = item.galleryImages?.Select(img => new ServicesgalleryImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ServicesgalleryImage>(),
                 video = item.video,
             }).ToList();
 
@@ -242,9 +248,11 @@ namespace Skilly.Persistence.Implementation
                 Description = item.Description,
                 Deliverytime = item.Deliverytime,
                 serviceProviderId = item.serviceProviderId,
-                Images = item.galleryImages?
-                    .Select(img => img.Img)
-                    .ToList() ?? new List<string>(),
+                Images = item.galleryImages?.Select(img => new ServicesgalleryImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ServicesgalleryImage>(),
                 video = item.video,
             }).ToList();
 
