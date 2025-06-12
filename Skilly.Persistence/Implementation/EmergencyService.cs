@@ -93,14 +93,61 @@ namespace Skilly.Persistence.Implementation
         }
         public async Task<List<EmergencyRequest>> GetAllEmergencyRequestsAsync()
         {
-            return await _context.emergencyRequests
+            var emergency= await _context.emergencyRequests
+                .Include(p=>p.User)
+                .Include(p=>p.Category)
+                .Include(p => p.AssignedProvider)
                 .ToListAsync();
+
+            var emer = emergency.Select(r => new EmergencyRequest
+            {
+                UserId = r.UserId,
+                UserName = $"{r.User.FirstName} {r.User.LastName}",
+                CategoryId = r.CategoryId,
+                CategoryName = r.Category.Name,
+                ProblemDescription = r.ProblemDescription,
+                RequestTime = r.RequestTime,
+                Status = r.Status,
+                AssignedProviderId = r.AssignedProviderId,
+                AssignedProviderName = r.AssignedProvider != null ? $"{r.AssignedProvider.FirstName} {r.AssignedProvider.LastName}" : null,
+                Finalprice = r.Finalprice
+            }).ToList();
+            return emer;
+
+
+
         }
         public async Task<EmergencyRequest> GetEmergencyRequestByIdAsync(string requestId)
         {
-            return await _context.emergencyRequests
+            var emergency = await _context.emergencyRequests
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .Include(p => p.AssignedProvider)
                 .FirstOrDefaultAsync(r => r.Id == requestId);
+
+            if (emergency == null)
+                return null;
+
+            var emer = new EmergencyRequest
+            {
+                Id = emergency.Id,
+                UserId = emergency.UserId,
+                UserName = $"{emergency.User.FirstName} {emergency.User.LastName}",
+                CategoryId = emergency.CategoryId,
+                CategoryName = emergency.Category.Name,
+                ProblemDescription = emergency.ProblemDescription,
+                RequestTime = emergency.RequestTime,
+                Status = emergency.Status,
+                AssignedProviderId = emergency.AssignedProviderId,
+                AssignedProviderName = emergency.AssignedProvider != null
+                    ? $"{emergency.AssignedProvider.FirstName} {emergency.AssignedProvider.LastName}"
+                    : null,
+                Finalprice = emergency.Finalprice
+            };
+
+            return emer;
         }
+
         public async Task<bool> AcceptEmergencyOfferAsync(string providerId, string requestId)
         {
             
