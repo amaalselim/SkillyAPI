@@ -32,7 +32,8 @@ namespace Skilly.Infrastructure.Implementation
                     smtpClient.Credentials = new NetworkCredential(_smtpUser, _smtpPass);
                     smtpClient.EnableSsl = true;
 
-                    string imageUrl = "https://img.icons8.com/color/96/000000/checkmark.png";
+                   string imageUrl = "https://i.ibb.co/twYs0CZx/photo-2025-06-01-22-44-09.jpg";
+
 
                     string message = $@"
                 <html>
