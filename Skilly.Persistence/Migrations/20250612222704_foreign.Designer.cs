@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Skilly.Persistence.DataContext;
 
@@ -11,9 +12,11 @@ using Skilly.Persistence.DataContext;
 namespace Skilly.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612222704_foreign")]
+    partial class foreign
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,7 +252,7 @@ namespace Skilly.Persistence.Migrations
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Finalprice")
                         .HasColumnType("decimal(18,2)");
@@ -272,8 +275,6 @@ namespace Skilly.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedProviderId");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("UserId");
 
@@ -1026,12 +1027,6 @@ namespace Skilly.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("AssignedProviderId");
 
-                    b.HasOne("Skilly.Core.Entities.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Skilly.Core.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1039,8 +1034,6 @@ namespace Skilly.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("AssignedProvider");
-
-                    b.Navigation("Category");
 
                     b.Navigation("User");
                 });
