@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 using Microsoft.Extensions.Logging;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
@@ -267,7 +266,7 @@ namespace Skilly.Persistence.Implementation
 
 
 
-        public async Task<IEnumerable<RequestService>> GetAllRequests(string currentUserId,double? userLat = null, double? userLng = null)
+        public async Task<IEnumerable<RequestService>> GetAllRequests()
         {
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
@@ -283,15 +282,13 @@ namespace Skilly.Persistence.Implementation
 
             var serviceDtos = services.Select(item =>
             {
-                var acceptedOffer = item.offerSalaries
-                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId==currentUserId);
 
                 return new RequestService
                 {
                     Id = item.Id,
                     Name = item.Name,
-                    Price = acceptedOffer != null ? acceptedOffer.Salary : item.Price,
-                    Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
+                    Price =item.Price,
+                    Deliverytime =item.Deliverytime,
                     startDate = item.startDate,
                     categoryId = item.categoryId,
                     Notes = item.Notes,
@@ -306,20 +303,10 @@ namespace Skilly.Persistence.Implementation
                     }).ToList() ?? new List<requestServiceImage>(),
                     video = item.video,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
-                    OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
-                    Distance = (userLat != null && userLng != null)
-                        ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.UserProfile.User?.Latitude, item?.UserProfile.User?.Longitude).GetValueOrDefault()
-                        : 0
+                    OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0
+                   
                 };
             }).ToList();
-
-            if (userLat != null && userLng != null)
-            {
-                serviceDtos = serviceDtos
-                    .OrderBy(s => s.Distance)
-                    .ToList();
-            }
-
             return serviceDtos;
         }
 
