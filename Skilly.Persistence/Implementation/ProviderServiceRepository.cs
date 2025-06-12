@@ -266,7 +266,7 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ProviderServices>> GetAllProviderService(string currentUserId, double? userLat = null, double? userLng = null)
+        public async Task<IEnumerable<ProviderServices>> GetAllProviderService()
         {
             var services = await _context.providerServices
                 .Include(i => i.ServicesImages)
@@ -295,11 +295,9 @@ namespace Skilly.Persistence.Implementation
 
             var serviceDtos = services.Select(item =>
             {
-                var acceptedOffer = item.offerSalaries
-                    .FirstOrDefault(o => o.Status == OfferStatus.Accepted && o.userId == currentUserId);
 
-                var providers = _context.serviceProviders.Include(p => p.Reviews)
-                .FirstOrDefault(p=>p.Equals(item.serviceProviderId));
+                //var providers = _context.serviceProviders.Include(p => p.Reviews)
+                //.FirstOrDefault(p=>p.Equals(item.serviceProviderId));
 
  
                 var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
@@ -311,10 +309,10 @@ namespace Skilly.Persistence.Implementation
                     Name = item.Name,
                     Description = item.Description,
                     ServiceRequestTime = item.ServiceRequestTime,
-                    Price = acceptedOffer!=null? acceptedOffer.Salary:item.Price,
+                    Price = item.Price,
                     PriceDiscount = item.PriceDiscount,
                     AverageRating = avgRate,
-                    Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
+                    Deliverytime = item.Deliverytime,
                     categoryId = item.categoryId,
                     Notes = item.Notes,
                     serviceProviderId = item.serviceProviderId,
@@ -331,9 +329,7 @@ namespace Skilly.Persistence.Implementation
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                     CountOfOffers = item.offerSalaries?.Count(p => p.Status == 0) ?? 0,
 
-                    Distance = (userLat != null && userLng != null)
-                        ? GeoHelper.GetDistance(userLat.Value, userLng.Value, item?.serviceProvider.User?.Latitude, item?.serviceProvider.User?.Longitude).GetValueOrDefault()
-                        : 0,
+                    
 
                     Reviews = item.Reviews.Select(r =>
                     {
@@ -352,11 +348,7 @@ namespace Skilly.Persistence.Implementation
                 };
             }).ToList();
 
-            if (userLat != null && userLng != null)
-            {
-                serviceDtos = serviceDtos.OrderBy(s => s.Distance).ToList();
-            }
-
+            
             return serviceDtos;
         }
         public async Task<ProviderServices> GetProviderServiceByIdAsync(string currentUserId,string serviceId)
@@ -791,7 +783,10 @@ namespace Skilly.Persistence.Implementation
                     video = service.video, 
                     serviceProviderId = service.serviceProviderId,
                     serviceProvider = service.serviceProvider,
-                    Images = images
+                    Images = images.Select(img => new ServicesgalleryImage
+                    {
+                        Img = img
+                    }).ToList()
                 };
 
                 gallery.galleryImages = images
@@ -860,7 +855,10 @@ namespace Skilly.Persistence.Implementation
                         Deliverytime = request.Deliverytime,
                         video=request.video,
                         serviceProviderId = request.providerId,
-                        Images = imagess
+                        Images = imagess.Select(img => new ServicesgalleryImage
+                        {
+                            Img = img
+                        }).ToList()
                     };
 
                     gallery.galleryImages = imagess
