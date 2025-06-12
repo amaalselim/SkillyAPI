@@ -381,6 +381,35 @@ namespace Skilly.Persistence.Implementation
             };
         }
 
+        public async Task<IEnumerable<Payment>> GetAllTransactions()
+        {
+            var trans = await _context.payments
+                .Include(p=>p.User)
+                .ToListAsync();
+
+            if (trans == null || !trans.Any())
+            {
+                return new List<Payment>();
+            }
+
+            var transDtos = trans.Select(item => new Payment
+            {
+                Id = item.Id,
+                Amount = item.Amount,
+                PaymentStatus = item.PaymentStatus,
+                PaymentMethod = item.PaymentMethod,
+                CreatedAt = item.CreatedAt,
+                ProviderServiceId = item.ProviderServiceId,
+                RequestServiceId = item.RequestServiceId,
+                EmergencyRequestId = item.EmergencyRequestId,
+                PaymobOrderId = item.PaymobOrderId,
+                TransactionId = item.TransactionId,
+                UserId = item.UserId,
+            }).ToList();
+
+            return trans;
+        }
+
 
     }
 }

@@ -108,6 +108,45 @@ namespace Skilly.API.Controllers
 
             return Ok(new { success = true, message = "Payment confirmed successfully." });
         }
+        [HttpPost("payment-URl-callback/{orderId}")]
+        public async Task<IActionResult> PaymentCallbackPost([FromQuery] string orderId, [FromBody] CallbackDTO callbackDTO)
+        {
+            if (string.IsNullOrEmpty(orderId))
+            {
+                return BadRequest(new { success = false, message = "Order ID is required." });
+            }
+
+            var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId, callbackDTO.success);
+            if (result == null)
+            {
+                return NotFound(new { success = false, message = "Payment not found." });
+            }
+
+            return Ok(new { success = true, message = "Payment confirmed successfully." });
+        }
+        [HttpGet("GetAllTransactions")]
+        public async Task<IActionResult> GetAllTransactions()
+        {
+            try
+            {
+                var trans = await _unitOfWork._paymentRepository.GetAllTransactions();
+
+                if (trans == null || !trans.Any())
+                {
+                    return NotFound(new { message = "No Transactions found." });
+                }
+                return Ok(new { trans});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
 
     }
 
