@@ -43,6 +43,8 @@ namespace Skilly.Core.Entities
 
         [ForeignKey("Category")]
         public string categoryId { get; set; }
+        [NotMapped]
+        public string CategoryName { get; set; }
         [JsonIgnore]    
         public virtual Category? Category { get; set; }
         [JsonIgnore]

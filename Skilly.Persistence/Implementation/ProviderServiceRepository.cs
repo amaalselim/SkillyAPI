@@ -275,7 +275,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(i => i.serviceProvider)
                 .ThenInclude(i=>i.Reviews)
                 .Include(i => i.serviceProvider)
-                
+                .Include(i => i.Category)
                 .Include(i => i.offerSalaries)
                 .Include(i => i.Reviews)
                 .ToListAsync();
@@ -314,7 +314,9 @@ namespace Skilly.Persistence.Implementation
                     AverageRating = avgRate,
                     Deliverytime = item.Deliverytime,
                     categoryId = item.categoryId,
+                    CategoryName = item.Category != null ? item.Category.Name : null,
                     Notes = item.Notes,
+                    ServiceStatus = item.ServiceStatus,
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
@@ -357,6 +359,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(c => c.serviceProvider)
                 .Include(g => g.ServicesImages)
                 .Include(g => g.offerSalaries)
+                .Include(g => g.Category)
                 .FirstOrDefaultAsync(g => g.Id == serviceId);
 
 
@@ -386,7 +389,9 @@ namespace Skilly.Persistence.Implementation
                 PriceDiscount = service.PriceDiscount,
                 Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : service.Deliverytime,
                 categoryId = service.categoryId,
+                CategoryName = service.Category.Name,
                 Notes = service.Notes,
+                ServiceStatus = service.ServiceStatus,
                 serviceProviderId = service.serviceProviderId,
                 ServiceProviderName = service.serviceProvider.FirstName + " " + service.serviceProvider.LastName,
                 providerImg = service.serviceProvider.Img,
@@ -412,6 +417,7 @@ namespace Skilly.Persistence.Implementation
                     .ThenInclude(sp => sp.User)
                 .Include(i => i.offerSalaries)
                 .Include(i => i.Reviews)
+                .Include(i => i.Category)
                 .Where(c => c.categoryId == categoryId)
                 .ToListAsync();
 
@@ -438,6 +444,8 @@ namespace Skilly.Persistence.Implementation
                     Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
                     Notes = item.Notes,
                     categoryId = item.categoryId,
+                    CategoryName = item.Category != null ? item.Category.Name : null,
+                    ServiceStatus = item.ServiceStatus,
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
@@ -481,6 +489,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(c => c.serviceProvider)
                 .Include(c => c.ServicesImages)
                 .Include(c => c.offerSalaries)
+                .Include(c => c.Category)
                 .Where(c => c.serviceProviderId == user.Id)
                 .ToListAsync();
 
@@ -509,6 +518,8 @@ namespace Skilly.Persistence.Implementation
                     Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
                     Notes = item.Notes,
                     categoryId = item.categoryId,
+                    CategoryName = item.Category != null ? item.Category.Name : null,
+                    ServiceStatus = item.ServiceStatus,
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
@@ -536,6 +547,7 @@ namespace Skilly.Persistence.Implementation
                     .ThenInclude(sp => sp.User)
                 .Include(s => s.ServicesImages)
                 .Include(s => s.offerSalaries)
+                .Include(s=>s.Category)
                 .Include(s => s.Reviews)
                 .ToListAsync();
 
@@ -569,6 +581,8 @@ namespace Skilly.Persistence.Implementation
                     Deliverytime = acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
                     Notes = item.Notes,
                     categoryId = item.categoryId,
+                    CategoryName = item.Category != null ? item.Category.Name : null,
+                    ServiceStatus = item.ServiceStatus,
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
@@ -643,6 +657,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(c => c.serviceProvider)
                 .Include(c => c.ServicesImages)
                 .Include(c => c.offerSalaries)
+                .Include(c => c.Category)
                 .Where(c => c.serviceProviderId == user.Id && c.ServiceStatus == ServiceStatus.Paid)
                 .ToListAsync();
 
@@ -669,6 +684,8 @@ namespace Skilly.Persistence.Implementation
                     Deliverytime= acceptedOffer != null ? acceptedOffer.Deliverytime : item.Deliverytime,
                     Notes = item.Notes,
                     categoryId = item.categoryId,
+                    CategoryName = item.Category != null ? item.Category.Name : null,
+                    ServiceStatus = item.ServiceStatus,
                     serviceProviderId = item.serviceProviderId,
                     ServiceProviderName = item.serviceProvider.FirstName + " " + item.serviceProvider.LastName,
                     providerImg = item.serviceProvider.Img,
@@ -708,6 +725,7 @@ namespace Skilly.Persistence.Implementation
                     ServiceRequestTime = item.ServiceRequestTime,
                     userId = item.userId,
                     userImg = item.UserProfile.Img,
+                    ServiceStatus = item.ServiceStatus,
                     userName = item.UserProfile.FirstName + " " + item.UserProfile.LastName,
                     Images = item.requestServiceImages?.Select(img => new requestServiceImage
                     {
