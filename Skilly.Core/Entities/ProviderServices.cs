@@ -55,7 +55,6 @@ namespace Skilly.Core.Entities
         public double Distance { get; set; }
         [JsonIgnore]
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        [JsonIgnore]
         public ServiceStatus ServiceStatus { get; set; } = ServiceStatus.Posted;
         [JsonIgnore]
         public string? userprofileId { get; set; }
