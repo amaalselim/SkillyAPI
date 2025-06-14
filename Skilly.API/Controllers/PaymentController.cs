@@ -101,28 +101,45 @@ namespace Skilly.API.Controllers
             }
 
             var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId, success);
-            if (result == null)
+
+            if (result.result == "Payment not found")
             {
                 return NotFound(new { success = false, message = "Payment not found." });
             }
 
-            return Ok(new { success = true, message = "Payment confirmed successfully." });
+            return Ok(new
+            {
+                success = true,
+                message = result.result,
+                providerId = result.providerId
+            });
         }
+
         [HttpPost("payment-URl-callback/{orderId}")]
-        public async Task<IActionResult> PaymentCallbackPost([FromQuery] string orderId, [FromBody] CallbackDTO callbackDTO)
+        public async Task<IActionResult> PaymentCallbackPost(string orderId, [FromBody] CallbackDTO callbackDTO)
         {
             if (string.IsNullOrEmpty(orderId))
             {
                 return BadRequest(new { success = false, message = "Order ID is required." });
             }
+            if (!callbackDTO.success)
+            {
+                return BadRequest(new { success = false, message = "Payment was not successful." });
+            }
 
             var result = await _unitOfWork._paymentRepository.HandlePaymentCallbackAsync(orderId, callbackDTO.success);
-            if (result == null)
+
+            if (result.result == "Payment not found")
             {
                 return NotFound(new { success = false, message = "Payment not found." });
             }
 
-            return Ok(new { success = true, message = "Payment confirmed successfully." });
+            return Ok(new
+            {
+                success = true,
+                message = result.result,
+                providerId = result.providerId
+            });
         }
         [HttpGet("GetAllTransactions")]
         public async Task<IActionResult> GetAllTransactions()

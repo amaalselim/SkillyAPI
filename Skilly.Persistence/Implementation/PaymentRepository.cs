@@ -36,20 +36,20 @@ namespace Skilly.Persistence.Implementation
             _firebase = firebase;
         }
 
-        public async Task<string> HandlePaymentCallbackAsync(string id, bool success)
+        public async Task<(string result, string? providerId)> HandlePaymentCallbackAsync(string id, bool success)
         {
             var payment = await _context.payments.FirstOrDefaultAsync(p => p.PaymobOrderId == id);
             if (payment == null)
-                return "Payment not found";
+                return ("Payment not found", null);
+
             if (!success)
             {
                 payment.PaymentStatus = "Failed";
-                return "Failed";
+                return ("Failed", null);
             }
+
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
-            var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
-
-
+            var userprofile = user;
 
             var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
 
@@ -66,14 +66,9 @@ namespace Skilly.Persistence.Implementation
 
                 string body = $"تم شراء الخدمة {providerService.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
 
-
                 if (providerService?.Id != null)
                 {
-                    await _firebase.SendNotificationAsync(
-                        provider.FcmToken,
-                        title,
-                        body
-                    );
+                    await _firebase.SendNotificationAsync(provider.FcmToken, title, body);
 
                     _context.notifications.Add(new Notifications
                     {
@@ -87,7 +82,11 @@ namespace Skilly.Persistence.Implementation
                 }
                 userprofile.useDiscount = false;
 
+                payment.PaymentStatus = "paid";
+                user.Points += 20;
+                await _context.SaveChangesAsync();
 
+                return ("Success", providerService.uId);
             }
             else
             {
@@ -105,14 +104,9 @@ namespace Skilly.Persistence.Implementation
 
                     string body = $"تم شراء الخدمة {service.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
 
-
                     if (service?.Id != null)
                     {
-                        await _firebase.SendNotificationAsync(
-                            userrr.FcmToken,
-                            title,
-                            body
-                        );
+                        await _firebase.SendNotificationAsync(userrr.FcmToken, title, body);
 
                         _context.notifications.Add(new Notifications
                         {
@@ -125,6 +119,11 @@ namespace Skilly.Persistence.Implementation
                         });
                     }
 
+                    payment.PaymentStatus = "paid";
+                    user.Points += 20;
+                    await _context.SaveChangesAsync();
+
+                    return ("Success", service.providerId);
                 }
                 else
                 {
@@ -145,14 +144,9 @@ namespace Skilly.Persistence.Implementation
                             .Include(p => p.User)
                             .FirstOrDefaultAsync(u => u.UserId == emergencyRequest.AssignedProviderId);
 
-
                         if (emergencyRequest?.Id != null)
                         {
-                            await _firebase.SendNotificationAsync(
-                                userrequest.User.FcmToken,
-                                title,
-                                body
-                            );
+                            await _firebase.SendNotificationAsync(userrequest.User.FcmToken, title, body);
 
                             _context.notifications.Add(new Notifications
                             {
@@ -164,20 +158,170 @@ namespace Skilly.Persistence.Implementation
                                 CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                             });
                         }
+
                         emergencyRequest.Status = "paid";
                         emergencyRequest.Finalprice = 0;
+                        var providerId = emergencyRequest.AssignedProviderId;
                         emergencyRequest.AssignedProviderId = "";
+
+                        payment.PaymentStatus = "paid";
+                        user.Points += 20;
                         await _context.SaveChangesAsync();
+
+                        return ("Success", providerId);
                     }
                 }
-                
             }
+
             payment.PaymentStatus = "paid";
             user.Points += 20;
             await _context.SaveChangesAsync();
-            return "Success";
+            return ("Success", null);
         }
-        
+
+
+        //public async Task<string> HandlePaymentCallbackAsync(string id, bool success)
+        //{
+        //    var payment = await _context.payments.FirstOrDefaultAsync(p => p.PaymobOrderId == id);
+        //    if (payment == null)
+        //        return "Payment not found";
+        //    if (!success)
+        //    {
+        //        payment.PaymentStatus = "Failed";
+        //        return "Failed";
+        //    }
+        //    var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
+        //    var userprofile = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
+
+
+
+        //    var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
+
+        //    if (providerService != null)
+        //    {
+        //        var provider = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.uId);
+        //        providerService.ServiceStatus = ServiceStatus.Paid;
+
+        //        string title = "تم شراء الخدمة";
+        //        decimal discountPercentage = 0.10m;
+        //        decimal totalAmount = payment.Amount;
+        //        decimal systemShare = totalAmount * discountPercentage;
+        //        decimal providerAmount = totalAmount - systemShare;
+
+        //        string body = $"تم شراء الخدمة {providerService.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
+
+
+        //        if (providerService?.Id != null)
+        //        {
+        //            await _firebase.SendNotificationAsync(
+        //                provider.FcmToken,
+        //                title,
+        //                body
+        //            );
+
+        //            _context.notifications.Add(new Notifications
+        //            {
+        //                UserId = providerService.uId,
+        //                Title = title,
+        //                Body = body,
+        //                userImg = user.Img,
+        //                serviceId = providerService.Id,
+        //                CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+        //            });
+        //        }
+        //        userprofile.useDiscount = false;
+
+
+        //    }
+        //    else
+        //    {
+        //        var service = await _context.requestServices.FirstOrDefaultAsync(s => s.Id == payment.RequestServiceId);
+        //        if (service != null)
+        //        {
+        //            var userrr = await _context.users.FirstOrDefaultAsync(s => s.Id == service.providerId);
+        //            service.ServiceStatus = ServiceStatus.Paid;
+
+        //            string title = "تم شراء الخدمة";
+        //            decimal discountPercentage = 0.10m;
+        //            decimal totalAmount = payment.Amount;
+        //            decimal systemShare = totalAmount * discountPercentage;
+        //            decimal providerAmount = totalAmount - systemShare;
+
+        //            string body = $"تم شراء الخدمة {service.Name} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
+
+
+        //            if (service?.Id != null)
+        //            {
+        //                await _firebase.SendNotificationAsync(
+        //                    userrr.FcmToken,
+        //                    title,
+        //                    body
+        //                );
+
+        //                _context.notifications.Add(new Notifications
+        //                {
+        //                    UserId = userrr.Id,
+        //                    Title = title,
+        //                    Body = body,
+        //                    userImg = user.Img,
+        //                    serviceId = service.Id,
+        //                    CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+        //                });
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            var emergencyRequest = await _context.emergencyRequests.FirstOrDefaultAsync(s => s.Id == payment.EmergencyRequestId);
+
+        //            if (emergencyRequest != null)
+        //            {
+        //                var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.UserId);
+        //                string title = "تم شراء الخدمة";
+        //                decimal discountPercentage = 0.10m;
+        //                decimal totalAmount = payment.Amount;
+        //                decimal systemShare = totalAmount * discountPercentage;
+        //                decimal providerAmount = totalAmount - systemShare;
+
+        //                string body = $"تم دفع خدمة الطوارئ التي تنص على  {emergencyRequest.ProblemDescription} من قبل المستخدم {user.FirstName} {user.LastName}، برجاء البدء في تنفيذ الخدمة. تم خصم {discountPercentage * 100}% كنسبة للسيستم، واستلمت مبلغ قدره {providerAmount} جنيه.";
+
+        //                var userrequest = await _context.serviceProviders
+        //                    .Include(p => p.User)
+        //                    .FirstOrDefaultAsync(u => u.UserId == emergencyRequest.AssignedProviderId);
+
+
+        //                if (emergencyRequest?.Id != null)
+        //                {
+        //                    await _firebase.SendNotificationAsync(
+        //                        userrequest.User.FcmToken,
+        //                        title,
+        //                        body
+        //                    );
+
+        //                    _context.notifications.Add(new Notifications
+        //                    {
+        //                        UserId = userrequest.UserId,
+        //                        Title = title,
+        //                        Body = body,
+        //                        userImg = user.Img,
+        //                        serviceId = emergencyRequest.Id,
+        //                        CreatedAt = DateOnly.FromDateTime(DateTime.Now)
+        //                    });
+        //                }
+        //                emergencyRequest.Status = "paid";
+        //                emergencyRequest.Finalprice = 0;
+        //                emergencyRequest.AssignedProviderId = "";
+        //                await _context.SaveChangesAsync();
+        //            }
+        //        }
+
+        //    }
+        //    payment.PaymentStatus = "paid";
+        //    user.Points += 20;
+        //    await _context.SaveChangesAsync();
+        //    return "Success";
+        //}
+
         public async Task<object> StartPaymentAsync(string serviceId)
         {
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
