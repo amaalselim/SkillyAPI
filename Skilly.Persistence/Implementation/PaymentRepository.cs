@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Exchange.WebServices.Data;
@@ -27,13 +28,17 @@ namespace Skilly.Persistence.Implementation
         private readonly PaymobService _paymobService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly FirebaseV1Service _firebase;
+        private readonly IChatService _chat;
+        private readonly IMapper _mapper;
 
-        public PaymentRepository(ApplicationDbContext context,PaymobService paymobService, IHttpContextAccessor httpContextAccessor,FirebaseV1Service firebase)
+        public PaymentRepository(ApplicationDbContext context,PaymobService paymobService, IHttpContextAccessor httpContextAccessor,FirebaseV1Service firebase,IChatService chat,IMapper mapper)
         {
             _context = context;
             _paymobService = paymobService;
             _httpContextAccessor = httpContextAccessor;
             _firebase = firebase;
+            _chat = chat;
+            _mapper = mapper;
         }
 
         public async Task<(string result, string? providerId,string? chatId)> HandlePaymentCallbackAsync(string id, bool success)
@@ -83,6 +88,18 @@ namespace Skilly.Persistence.Implementation
                 userprofile.useDiscount = false;
 
                 var chat = await _context.chats.FirstOrDefaultAsync(c =>( c.FirstUserId == user.UserId || c.FirstUserId == providerService.uId) && (c.SecondUserId==user.UserId || c.SecondUserId == providerService.uId));
+                if (chat == null)
+                {
+                    var createChatDto = new CreateChatDTO
+                    {
+                        FirstUserId = user.UserId,
+                        SecondUserId = providerService.uId
+                    };
+
+                    var createdChat = await _chat.CreateChatAsync(createChatDto);
+
+                    chat = _mapper.Map<Chat>(createdChat);
+                }
 
                 payment.PaymentStatus = "paid";
                 user.Points += 20;
@@ -121,6 +138,18 @@ namespace Skilly.Persistence.Implementation
                         });
                     }
                     var chat = await _context.chats.FirstOrDefaultAsync(c => (c.FirstUserId == user.UserId || c.FirstUserId == service.providerId) && (c.SecondUserId == user.UserId || c.SecondUserId == service.providerId));
+                    if (chat == null)
+                    {
+                        var createChatDto = new CreateChatDTO
+                        {
+                            FirstUserId = user.UserId,
+                            SecondUserId = service.uId
+                        };
+
+                        var createdChat = await _chat.CreateChatAsync(createChatDto);
+
+                        chat = _mapper.Map<Chat>(createdChat);
+                    }
 
                     payment.PaymentStatus = "paid";
                     user.Points += 20;
@@ -168,7 +197,18 @@ namespace Skilly.Persistence.Implementation
                         emergencyRequest.AssignedProviderId = "";
 
                         var chat = await _context.chats.FirstOrDefaultAsync(c => (c.FirstUserId == user.UserId || c.FirstUserId == providerId) && (c.SecondUserId == user.UserId || c.SecondUserId == providerId));
+                        if (chat == null)
+                        {
+                            var createChatDto = new CreateChatDTO
+                            {
+                                FirstUserId = user.UserId,
+                                SecondUserId = providerId
+                            };
 
+                            var createdChat = await _chat.CreateChatAsync(createChatDto);
+
+                            chat = _mapper.Map<Chat>(createdChat);
+                        }
                         payment.PaymentStatus = "paid";
                         user.Points += 20;
                         await _context.SaveChangesAsync();
