@@ -11,7 +11,7 @@ namespace Skilly.Persistence.Abstract
     {
         Task<object> StartPaymentAsync(string serviceId);
         Task<object> StartPaymentAsync(string serviceId, string redirectUrl);
-        Task<(string result, string? providerId)> HandlePaymentCallbackAsync(string id, bool success);
+        Task<(string result, string? providerId,string? chatId)> HandlePaymentCallbackAsync(string id, bool success);
         Task<IEnumerable<Payment>> GetAllTransactions();
     }
 }

@@ -111,7 +111,8 @@ namespace Skilly.API.Controllers
             {
                 success = true,
                 message = result.result,
-                providerId = result.providerId
+                providerId = result.providerId,
+                chatId=result.chatId
             });
         }
 
@@ -138,7 +139,8 @@ namespace Skilly.API.Controllers
             {
                 success = true,
                 message = result.result,
-                providerId = result.providerId
+                providerId = result.providerId,
+                chatId=result.chatId
             });
         }
         [HttpGet("GetAllTransactions")]

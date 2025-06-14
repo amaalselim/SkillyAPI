@@ -36,16 +36,16 @@ namespace Skilly.Persistence.Implementation
             _firebase = firebase;
         }
 
-        public async Task<(string result, string? providerId)> HandlePaymentCallbackAsync(string id, bool success)
+        public async Task<(string result, string? providerId,string? chatId)> HandlePaymentCallbackAsync(string id, bool success)
         {
             var payment = await _context.payments.FirstOrDefaultAsync(p => p.PaymobOrderId == id);
             if (payment == null)
-                return ("Payment not found", null);
+                return ("Payment not found", null,null);
 
             if (!success)
             {
                 payment.PaymentStatus = "Failed";
-                return ("Failed", null);
+                return ("Failed", null,null);
             }
 
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
@@ -82,11 +82,13 @@ namespace Skilly.Persistence.Implementation
                 }
                 userprofile.useDiscount = false;
 
+                var chat = await _context.chats.FirstOrDefaultAsync(c =>( c.FirstUserId == user.UserId || c.FirstUserId == providerService.uId) && (c.SecondUserId==user.UserId || c.SecondUserId == providerService.uId));
+
                 payment.PaymentStatus = "paid";
                 user.Points += 20;
                 await _context.SaveChangesAsync();
 
-                return ("Success", providerService.uId);
+                return ("Success", providerService.uId,chat.Id);
             }
             else
             {
@@ -118,12 +120,13 @@ namespace Skilly.Persistence.Implementation
                             CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                         });
                     }
+                    var chat = await _context.chats.FirstOrDefaultAsync(c => (c.FirstUserId == user.UserId || c.FirstUserId == service.providerId) && (c.SecondUserId == user.UserId || c.SecondUserId == service.providerId));
 
                     payment.PaymentStatus = "paid";
                     user.Points += 20;
                     await _context.SaveChangesAsync();
 
-                    return ("Success", service.providerId);
+                    return ("Success", service.providerId,chat.Id);
                 }
                 else
                 {
@@ -158,17 +161,19 @@ namespace Skilly.Persistence.Implementation
                                 CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                             });
                         }
-
+                        
                         emergencyRequest.Status = "paid";
                         emergencyRequest.Finalprice = 0;
                         var providerId = emergencyRequest.AssignedProviderId;
                         emergencyRequest.AssignedProviderId = "";
 
+                        var chat = await _context.chats.FirstOrDefaultAsync(c => (c.FirstUserId == user.UserId || c.FirstUserId == providerId) && (c.SecondUserId == user.UserId || c.SecondUserId == providerId));
+
                         payment.PaymentStatus = "paid";
                         user.Points += 20;
                         await _context.SaveChangesAsync();
 
-                        return ("Success", providerId);
+                        return ("Success", providerId,chat.Id);
                     }
                 }
             }
@@ -176,7 +181,7 @@ namespace Skilly.Persistence.Implementation
             payment.PaymentStatus = "paid";
             user.Points += 20;
             await _context.SaveChangesAsync();
-            return ("Success", null);
+            return ("Success", null,null);
         }
 
 
