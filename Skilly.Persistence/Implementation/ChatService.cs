@@ -119,14 +119,8 @@ namespace Skilly.Persistence.Implementation
                     return null;
                 }
             }
-
-
-
-
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
-
-
             chat.LastUpdatedAt = DateTime.Now;
             _context.chats.Update(chat);
             await _context.SaveChangesAsync();

@@ -1,4 +1,4 @@
-﻿using Skilly.Application.DTOs;
+﻿using Skilly.Application.DTOs.ServiceProvider;
 using Skilly.Core.Entities;
 using System;
 using System.Collections.Generic;

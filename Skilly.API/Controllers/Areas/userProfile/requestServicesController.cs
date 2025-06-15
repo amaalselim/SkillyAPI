@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Exchange.WebServices.Data;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.User;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
@@ -120,6 +121,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPost("AddrequestService")]
+        [Authorize]
         public async Task<IActionResult> AddService([FromForm] requestServiceDTO requestServiceDTO)
         {
             if (requestServiceDTO == null)
@@ -141,6 +143,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPut("EditrequestServiceBy/{serviceId}")]
+        [Authorize]
         public async Task<IActionResult> EditService([FromForm] EditRequestServiceDTO requestServiceDTO, [FromRoute] string serviceId)
         {
             if (requestServiceDTO == null)
@@ -166,27 +169,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
-
-        //[HttpDelete("delete-Img")]
-        //public async Task<IActionResult> DeleteService([FromBody] ServiceImageDTO serviceImageDTO)
-        //{
-        //    try
-        //    {
-        //        string userId = GetUserIdFromClaims();
-        //        if (string.IsNullOrEmpty(userId))
-        //        {
-        //            throw new UnauthorizedAccessException("User not authorized.");
-        //        }
-        //        await _unitOfWork._requestserviceRepository.EditServiceImageAsync(serviceImageDTO);
-
-        //        return StatusCode(StatusCodes.Status200OK, new { message = "Image deleted successfully." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
-        //    }
-        //}
-
+        [Authorize]
         [HttpDelete("DeleterequestServiceBy/{serviceId}")]
         public async Task<IActionResult> DeleteService([FromRoute] string serviceId)
         {

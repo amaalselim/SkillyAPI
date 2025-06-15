@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Skilly.Application.DTOs
+namespace Skilly.Application.DTOs.ServiceProvider
 {
     public class servicegalleryDTO
     {

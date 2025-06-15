@@ -19,12 +19,9 @@ namespace Skilly.Core.Entities
         public string Feedback { get; set; }
         [Range(0.0, 5.0)]
         public decimal Rating { get; set; }
-
-
         [ForeignKey("ServiceProvider")]
         public string? ProviderId { get; set; }
         [ForeignKey("ProviderServices")]
-
         public string? serviceId { get; set; }
         [JsonIgnore]
         public virtual ServiceProvider? ServiceProvider { get; set; }
@@ -36,8 +33,5 @@ namespace Skilly.Core.Entities
         public string? requestId { get; set; } 
         [JsonIgnore]
         public virtual RequestService? RequestService { get; set; } 
-        //public virtual UserProfile? UserProfile { get; set; }
-
-
     }
 }

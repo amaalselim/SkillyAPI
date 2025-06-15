@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.ServiceProvider;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
@@ -62,7 +62,6 @@ namespace Skilly.API.Controllers.Areas.Provider
         [HttpGet("GetAllServicegalleryBy/{providerId}")]
         public async Task<IActionResult> GetservicesbyproviderId(string providerId)
         {
-            //string userId = GetUserIdFromClaims();
             var servicesgallery = await _unitOfWork.servicegalleryRepository.GetAllgalleryByPProviderId(providerId);
             if (servicesgallery == null)
             {

@@ -32,12 +32,8 @@ namespace Skilly.API
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            //builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
-
-
 
             builder.Services.Configure<PaymobSettings>(builder.Configuration.GetSection("Paymob"));
 
@@ -99,9 +95,7 @@ namespace Skilly.API
             builder.Services.AddScoped<PaymobService>();
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-            // builder.Services.AddTransient<ExceptionMiddleware>();
 
-            // Add services to the container.
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("MyPolicy", builder =>
@@ -165,19 +159,9 @@ namespace Skilly.API
                 options.EnableDetailedErrors = true;
 
             });
-            
-
-
-
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+           
             builder.Services.AddEndpointsApiExplorer();
-
-
-
-            /*-----------------------------Swagger Part-----------------------------*/
             #region Swagger REgion
-
-            // إضافة خدمات Swagger
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Skilly API", Version = "v1" });
@@ -216,7 +200,6 @@ namespace Skilly.API
             builder.Logging.AddConsole();
             var app = builder.Build();
 
-            //app.UseMiddleware<LocalizationMiddleware>();    
             app.UseRequestLocalization(options =>
             {
                 options.SetDefaultCulture("ar-EG")
@@ -230,8 +213,7 @@ namespace Skilly.API
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Skilly API v1");
 
-                // مهم جداً!
-                c.RoutePrefix = ""; // أو "" لو عايزة تكون في الصفحة الرئيسية
+                c.RoutePrefix = ""; 
             });
 
 

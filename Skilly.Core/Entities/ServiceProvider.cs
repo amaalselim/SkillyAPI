@@ -42,13 +42,9 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public ICollection<ProviderServices>? providerServices { get; set; } = new List<ProviderServices>();
         [JsonIgnore]
-
         public ICollection<Servicesgallery>? servicesgalleries { get; set; } = new List<Servicesgallery>();
         [JsonIgnore]
-
         public ICollection<Review>? Reviews { get; set; } = new List<Review>();
-
-
         [JsonIgnore]
         public bool IsEmergency { get; set; } = false;
         [JsonIgnore]

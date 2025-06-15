@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs.Emergency;
 using Skilly.Core.Entities;
@@ -30,6 +31,7 @@ namespace Skilly.API.Controllers
             return userId;
         }
         [HttpPost("create-emergency-request")]
+        [Authorize]
         public async Task<IActionResult> CreateEmergencyRequest([FromBody] EmergencyRequestDTO emergencyRequestDTO)
         {
             var userId = GetUserIdFromClaims();
@@ -74,6 +76,7 @@ namespace Skilly.API.Controllers
             return Ok(new { result });
         }
         [HttpPost("accept-offer")]
+        [Authorize]
         public async Task<IActionResult> AcceptEmergencyOffer([FromBody] EmergencyOfferDTO emergencyOfferDTO)
         {
             var userId = GetUserIdFromClaims();
@@ -93,6 +96,7 @@ namespace Skilly.API.Controllers
             return NotFound("Emergency request not found or already accepted.");
         }
         [HttpPost("reject-offer")]
+        [Authorize]
         public async Task<IActionResult> RejectEmergencyOffer([FromBody] EmergencyOfferDTO emergencyOfferDTO)
         {
             var userId = GetUserIdFromClaims();

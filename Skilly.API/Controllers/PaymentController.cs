@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Payment;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.Implementation;
 using System.Security.Claims;
@@ -29,6 +30,7 @@ namespace Skilly.API.Controllers
             return userId;
         }
         [HttpPost("start-payment")]
+        [Authorize]
         public async Task<IActionResult> StartPayment([FromBody] StartPaymentDTO paymentDTO)
         {
             {
@@ -57,6 +59,7 @@ namespace Skilly.API.Controllers
 
 
         [HttpPost("start-payment-URL")]
+        [Authorize]
         public async Task<IActionResult> StartPaymentURL([FromBody] StartPaymentURLDTO paymentDTO)
         {
             try
@@ -81,6 +84,7 @@ namespace Skilly.API.Controllers
         }
 
         [HttpGet("payment-callback")]
+        [Authorize]
         public async Task<IActionResult> PaymentCallbackCheck()
         {
             var orderId = HttpContext.Request.Query["order"].ToString();
@@ -117,6 +121,7 @@ namespace Skilly.API.Controllers
         }
 
         [HttpPost("payment-URl-callback/{orderId}")]
+        [Authorize]
         public async Task<IActionResult> PaymentCallbackPost(string orderId, [FromBody] CallbackDTO callbackDTO)
         {
             if (string.IsNullOrEmpty(orderId))

@@ -28,21 +28,16 @@ public class ChatHub : Hub
 
         Console.WriteLine($"Message sent from {senderId} to {receiverId}: {messageContent} - {imageUrl}");
     }
-
-
-
-
-
     public override async Task OnConnectedAsync()
     {
         var token = Context.GetHttpContext()?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
         if (!string.IsNullOrEmpty(token))
         {
-            var userId = await GetUserIdFromToken(token); // استخدم التوكين للحصول على معرف المستخدم
+            var userId = await GetUserIdFromToken(token);
             if (!string.IsNullOrEmpty(userId))
             {
-                Users[userId] = Context.ConnectionId; // تخزين الاتصال باستخدام userId
+                Users[userId] = Context.ConnectionId; 
                 Console.WriteLine($"User {userId} connected with connection ID: {Context.ConnectionId}");
             }
             else

@@ -5,14 +5,13 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Skilly.Application.DTOs
+namespace Skilly.Application.DTOs.Review
 {
-    public class ReviewServiceDTO
+    public class ReviewDTO
     {
-        public string serviceId { get; set; }
+        public string providerId { get; set; }
         public string Feedback { get; set; }
         public decimal Rating { get; set; }
-        [JsonIgnore]
-        public string? requestserviceId { get; set; }
     }
+
 }

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Skilly.Application.Abstract;
-using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
@@ -15,6 +14,8 @@ using System.Threading.Tasks;
 using ServiceProvider = Skilly.Core.Entities.ServiceProvider;
 using System.ComponentModel.DataAnnotations.Schema;
 using Skilly.Core.Enums;
+using Skilly.Application.DTOs.ServiceProvider;
+using Skilly.Application.DTOs.Payment;
 
 namespace Skilly.Persistence.Implementation
 {

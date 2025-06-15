@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Skilly.Application.DTOs;
@@ -12,6 +13,7 @@ namespace Skilly.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;
@@ -75,8 +77,6 @@ namespace Skilly.API.Controllers
             }
 
         }
-
-
         [HttpGet("GetChatsForUser")]
         public async Task<IActionResult> GetChatsForUser()
         {

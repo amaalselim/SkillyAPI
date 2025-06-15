@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.User;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
@@ -69,6 +69,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPost("addUserProfile")]
+        [Authorize]
         public async Task<IActionResult> AddUserProfile([FromForm] UserProfileDTO userProfileDTO)
         {
             try
@@ -99,6 +100,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPut("editUserProfile")]
+        [Authorize]
         public async Task<IActionResult> EditUserProfile([FromForm] edituserProfileDTO userProfileDTO)
         {
             try
@@ -133,6 +135,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpDelete("deleteProfileByuserId")]
+        [Authorize]
         public async Task<IActionResult> DeleteUserProfile()
         {
             try

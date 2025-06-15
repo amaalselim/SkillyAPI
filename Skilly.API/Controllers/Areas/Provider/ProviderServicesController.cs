@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Skilly.Application.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Skilly.Application.DTOs.ServiceProvider;
 using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
 using System.Globalization;
@@ -185,29 +186,6 @@ namespace Skilly.API.Controllers.Areas.Provider
                 return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
             }
         }
-
-
-        //[HttpDelete("delete-Img")]
-        //public async Task<IActionResult> DeleteService([FromBody] ServiceImageDTO serviceImageDTO)
-        //{
-        //    try
-        //    {
-        //        string userId = GetUserIdFromClaims();
-        //        if (string.IsNullOrEmpty(userId))
-        //        {
-        //            throw new UnauthorizedAccessException("User not authorized.");
-        //        }
-        //        await _unitOfWork.providerServiceRepository.EditServiceImageAsync(serviceImageDTO);
-
-        //        return StatusCode(StatusCodes.Status200OK, new { message = "Image deleted successfully." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
-        //    }
-        //}
-
-
 
         [HttpDelete("DeleteServiceBy/{serviceId}")]
         public async Task<IActionResult> DeleteService([FromRoute] string serviceId)

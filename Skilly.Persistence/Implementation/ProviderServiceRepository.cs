@@ -2,7 +2,7 @@
 using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using Skilly.Application.Abstract;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.ServiceProvider;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Core.Enums;

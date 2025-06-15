@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Review;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 
@@ -112,12 +112,6 @@ namespace Skilly.API.Controllers.Areas.Provider
             
             try
             {
-                //var providerId = GetUserIdFromClaims();
-                //if (string.IsNullOrEmpty(providerId))
-                //{
-                //    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
-                //}
-
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByproviderIdAsync(providerId);
                 return StatusCode(StatusCodes.Status200OK, new { reviews });
             }

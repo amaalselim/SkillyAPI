@@ -11,7 +11,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
     public class OfferSalaryController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -37,8 +36,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             try
             {
                 var offers = await _unitOfWork._OfferSalaryRepository.GetAllOffersAsync();
-
-                
                 return Ok(new { offers });
             }
             catch (Exception ex)
@@ -99,6 +96,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPost("AddOffer")]
+        [Authorize]
         public async Task<IActionResult> AddOffer([FromBody] createofferDTO offerSalaryDTO)
         {
             if (offerSalaryDTO == null)
@@ -129,6 +127,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
 
 
         [HttpPut("EditOfferBy/{offerId}")]
+        [Authorize]
         public async Task<IActionResult> EditOffer([FromBody] offersalaryDTO offerSalaryDTO, [FromRoute] string offerId)
         {
             if (offerSalaryDTO == null)
@@ -155,6 +154,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpDelete("DeleteOfferBy/{offerId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteOffer([FromRoute] string offerId)
         {
             try
@@ -175,6 +175,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
         }
         [HttpPost("AcceptOffer/{id}")]
+        [Authorize]
         public async Task<IActionResult> AcceptOffer(string id)
         {
             var result = await _unitOfWork._OfferSalaryRepository.AcceptOfferAsync(id);
@@ -185,6 +186,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
         }
 
         [HttpPost("RejectOffer/{id}")]
+        [Authorize]
         public async Task<IActionResult> RejectOffer(string id)
         {
             var result = await _unitOfWork._OfferSalaryRepository.RejectOfferAsync(id);

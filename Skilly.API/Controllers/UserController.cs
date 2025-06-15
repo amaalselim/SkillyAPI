@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
@@ -10,6 +11,7 @@ namespace Skilly.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -60,7 +62,6 @@ namespace Skilly.API.Controllers
         [HttpDelete("DeleteUserBy/{Id}")]
         public async Task<IActionResult> DeleteUser(string Id)
         {
-            //var userId= GetUserIdFromClaims();
             var user = await _unitOfWork.Users.GetByIdAsync(Id);
             if (user == null)
             {

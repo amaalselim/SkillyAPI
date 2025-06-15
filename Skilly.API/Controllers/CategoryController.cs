@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs;
 using Skilly.Application.Exceptions;
@@ -63,6 +64,7 @@ namespace Skilly.API.Controllers
         }
 
         [HttpPost("AddCategory")]
+        [Authorize]
         public async Task<IActionResult> AddCategory([FromForm] CategoryDTO categoryDTO)
         {
             if (categoryDTO == null)
@@ -82,6 +84,7 @@ namespace Skilly.API.Controllers
         }
 
         [HttpPut("EditCategoryBy/{categoryId}")]
+        [Authorize]
         public async Task<IActionResult> EditCategory([FromForm] CategoryDTO categoryDTO, [FromRoute] string categoryId)
         {
             if (categoryDTO == null)
@@ -108,6 +111,7 @@ namespace Skilly.API.Controllers
         }
 
         [HttpDelete("DeleteCategoryBy/{categoryId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCategory([FromRoute] string categoryId)
         {
             try

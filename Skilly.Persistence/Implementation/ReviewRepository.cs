@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Review;
 using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;

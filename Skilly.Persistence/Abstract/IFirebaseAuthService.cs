@@ -11,7 +11,6 @@ namespace Skilly.Application.Abstract
     public interface IFirebaseAuthService
     {
         Task<FirebaseUserInfoDTO> VerifyGoogleTokenAsync (string idToken);
-        //Task<bool> VerifyOtpAsync(string phoneNumber, int otpCode);
 
 
     }

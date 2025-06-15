@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Skilly.Application.DTOs
+namespace Skilly.Application.DTOs.Payment
 {
     public class PaymobCallbackDTO
     {

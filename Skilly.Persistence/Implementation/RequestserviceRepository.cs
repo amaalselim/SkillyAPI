@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
 using Skilly.Application.Abstract;
-using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.User;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
 using Skilly.Core.Enums;
@@ -66,7 +66,6 @@ namespace Skilly.Persistence.Implementation
 
             };
             var sid = service.Id;
-            //service.userId = user.Id;
             service.ServiceRequestTime = DateOnly.FromDateTime(DateTime.Now);
             service.userImg = user.Img;
             service.uId = user.UserId;
@@ -101,7 +100,6 @@ namespace Skilly.Persistence.Implementation
                     requestServiceId = service.Id
                 }).ToList();
             }
-            //user.Points += 20;
             await _context.SaveChangesAsync();
 
 
@@ -212,8 +210,6 @@ namespace Skilly.Persistence.Implementation
                 }
                 await _context.SaveChangesAsync();
             }
-
-            //_mapper.Map(requestServiceDTO, service);
 
             service.Name = requestServiceDTO.Name;
             service.Price = requestServiceDTO.Price;
@@ -529,9 +525,7 @@ namespace Skilly.Persistence.Implementation
             {
                 throw new Exception("Service not found.");
             }
-            service.providerId = user.UserId; //asssign provider who accept service
-
-            //var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
+            service.providerId = user.UserId; 
             string title = "قبول خدمة";
             string body = $"تم قبول خدمتك {service.Name} من قبل موفر الخدمة {user.FirstName} {user.LastName}، برجاء الذهاب للدفع.";
             

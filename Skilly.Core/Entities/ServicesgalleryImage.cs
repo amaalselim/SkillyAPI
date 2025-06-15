@@ -15,9 +15,7 @@ namespace Skilly.Core.Entities
         public string Img {  get; set; }
         [JsonIgnore]
         [ForeignKey("Servicesgallery")]
-
         public string galleryId { get; set; }
-
         [JsonIgnore]
         public Servicesgallery? Servicesgallery { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs;
 using Skilly.Persistence.Abstract;
@@ -9,6 +10,7 @@ namespace Skilly.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BannerController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;

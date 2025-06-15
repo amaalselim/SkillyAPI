@@ -11,10 +11,6 @@ namespace Skilly.Core.Entities
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
-
-
-
-       // public string Description { get; set; }
         public string Img { get; set; }
         public string ProfessionName { get; set; }
         [JsonIgnore]

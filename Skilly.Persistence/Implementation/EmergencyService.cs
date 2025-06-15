@@ -36,7 +36,6 @@ namespace Skilly.Persistence.Implementation
             request.Status = "Pending";
             await _context.emergencyRequests.AddAsync(request);
             await _context.SaveChangesAsync();
-
             return request.Id; 
         }
 

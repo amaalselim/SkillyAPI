@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Skilly.Application.DTOs;
 using Skilly.Application.DTOs.Emergency;
+using Skilly.Application.DTOs.Payment;
+using Skilly.Application.DTOs.Review;
+using Skilly.Application.DTOs.ServiceProvider;
+using Skilly.Application.DTOs.User;
 using Skilly.Core.Entities;
 
 public class MappingProfile : Profile
@@ -59,23 +63,6 @@ public class MappingProfile : Profile
         CreateMap<requestServiceDTO, RequestService>()
             .ForMember(dest => dest.requestServiceImages, opt => opt.Ignore());
 
-
-    //    CreateMap<ProviderServices, EditProviderServiceDTO>()
-    //.ForMember(dest => dest.Images, opt => opt.Ignore())
-    //.ForMember(dest => dest.ImagesToDeleteIds, opt => opt.Ignore())
-    //.ForMember(dest => dest.video, opt => opt.Ignore());
-
-        //CreateMap<EditProviderServiceDTO, ProviderServices>()
-        //    .ForMember(dest => dest.ServicesImages, opt => opt.Ignore())
-        //    .ForMember(dest => dest.video, opt => opt.Ignore());
-
-
-        //CreateMap<EditRequestServiceDTO, RequestService>()
-        //   .ForMember(dest => dest.requestServiceImages, opt => opt.Ignore());
-
-        //CreateMap<RequestService, EditRequestServiceDTO>();
-
-        // Review
         CreateMap<Review, ReviewDTO>();
         CreateMap<ReviewDTO, Review>();
 
