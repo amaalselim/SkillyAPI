@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.Implementation;
+using Skilly.Core.Entities;
 using Skilly.Core.Enums;
+using Skilly.Persistence.Abstract;
+using System.Security.Claims;
 using Vonage.Common;
 
 namespace Skilly.API.Controllers
@@ -14,10 +17,12 @@ namespace Skilly.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IGenericRepository<User> _user;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService,IGenericRepository<User> user)
         {
             _authService = authService;
+            _user = user;
         }
 
         [HttpPost("Register")]
@@ -170,6 +175,37 @@ namespace Skilly.API.Controllers
                     Errors = result.Errors
                 });
             }
+        }
+        private string GetUserIdFromClaims()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User not authorized.");
+            }
+            return userId;
+        }
+        [HttpPost("Addlocation")]
+        public async Task<IActionResult> SaveUserLocation([FromBody] LocationDTO location)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { status = "error", message = "User not authorized." });
+
+            var user = await _user.GetByIdAsync(userId);
+
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+
+            user.Latitude = location.Latitude;
+            user.Longitude = location.Longitude;
+
+            await _user.UpdateAsync(user);
+
+            return Ok(new { message = "Location saved successfully." });
         }
     }
 }
