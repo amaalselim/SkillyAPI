@@ -15,7 +15,7 @@
             const id_token = response.credential;
             console.log('ID Token: ' + id_token);
 
-            fetch('http://localhost:5271/api/Auth/login-google', {
+            fetch('https://skilly.runasp.net/api/Auth/login-google', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

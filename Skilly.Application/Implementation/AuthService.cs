@@ -211,7 +211,8 @@ namespace Skilly.Application.Implementation
                     FirstName= payload.Name,
                     LastName = payload.FamilyName,
                     UserName = payload.Email,
-                    Email = payload.Email
+                    Email = payload.Email,
+                    PhoneNumber=payload.Email
                 };
 
                 var createResult = await _usermanager.CreateAsync(user);
@@ -227,6 +228,7 @@ namespace Skilly.Application.Implementation
                 Success = true,
                 Message = "Login successful.",
                 Token = token,
+                UserType = user.UserType.ToString(),
                 Expire = DateTime.Now.AddHours(20)
             };
         }

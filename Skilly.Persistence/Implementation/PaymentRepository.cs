@@ -116,8 +116,6 @@ namespace Skilly.Persistence.Implementation
                     video = providerService.video
                 };
                 _context.requestServices.Add(request);
-                await _context.SaveChangesAsync();
-
 
                 var chat = await _context.chats.FirstOrDefaultAsync(c =>
                     (c.FirstUserId == user.UserId || c.FirstUserId == providerService.uId) &&
