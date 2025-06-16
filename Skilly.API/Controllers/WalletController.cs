@@ -27,7 +27,7 @@ namespace Skilly.API.Controllers
             return userId;
         }
 
-        [HttpPost("provider-wallet/{paymentId}")]
+        [HttpGet("get-Balance/{paymentId}")]
         [Authorize]
         public async Task<IActionResult> ProcessPayment(string paymentId)
         {
