@@ -36,8 +36,7 @@ namespace Skilly.Persistence.DataContext
         public DbSet<Banner> banners{ get; set; }
         public DbSet<Payment> payments{ get; set; }
         public DbSet<EmergencyRequest> emergencyRequests { get; set; }
-
-
+        public DbSet<Wallet> wallets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
