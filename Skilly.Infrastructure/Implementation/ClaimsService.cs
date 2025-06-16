@@ -38,5 +38,24 @@ namespace Skilly.Infrastructure.Implementation
             }
             return claims;
         }
+        public async Task<List<Claim>> GetClaimsAsync2(string email, string userId)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+            }
+            return claims;
+        }
     }
 }
