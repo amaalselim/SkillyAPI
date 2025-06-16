@@ -1,4 +1,5 @@
-﻿using Skilly.Core.Entities;
+﻿using Skilly.Application.DTOs.Payment;
+using Skilly.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,7 @@ namespace Skilly.Persistence.Abstract
         Task<object> StartPaymentAsync(string serviceId, string redirectUrl);
         Task<(string result, string? providerId,string? chatId)> HandlePaymentCallbackAsync(string id, bool success);
         Task<IEnumerable<Payment>> GetAllTransactions();
+        Task<Wallet> ProcessPaymentAsync(string paymentId);
+        Task<List<GroupedTransactionsDTO>> GetTransactionsGroupedByDate(string providerId);
     }
 }
