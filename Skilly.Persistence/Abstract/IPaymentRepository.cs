@@ -16,5 +16,6 @@ namespace Skilly.Persistence.Abstract
         Task<IEnumerable<Payment>> GetAllTransactions();
         Task<Wallet> ProcessPaymentAsync(string paymentId);
         Task<List<GroupedTransactionsDTO>> GetTransactionsGroupedByDate(string providerId);
+        Task<string> RequestWithdrawAsync(WithdrawRequestDTO request);
     }
 }

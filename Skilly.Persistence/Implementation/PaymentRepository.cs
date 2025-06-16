@@ -556,40 +556,54 @@ namespace Skilly.Persistence.Implementation
 
             return grouped.Where(g => g.Transactions.Any()).ToList();
         }
+        public string GetUserId()
+        {
+            var userId = _httpContextAccessor.HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return userId;
+        }
+        public async Task<string> RequestWithdrawAsync(WithdrawRequestDTO request)
+        {
+            var providerId = GetUserId();
+            request.ProviderId = providerId;
+            var wallet = await _context.wallets
+                .FirstOrDefaultAsync(w => w.ProviderId == request.ProviderId);
+            request.Amount = wallet.Balance;
 
-        //public async Task<TransactionDTO> GetAllTransactionsByProviderId(string providerId)
-        //{
-        //    var trans = await _context.payments
-        //        .Include(p => p.User)
-        //        .Include(p=>p.ProviderService)
-        //        .Include(p => p.RequestService)
-        //        .Include(p => p.EmergencyRequest)
-        //        .FirstOrDefaultAsync(p => p.ProviderId == providerId);
+            if (wallet == null)
+                throw new Exception("Wallet not found.");
 
-        //    if (trans == null)
-        //    {
-        //        return null;
-        //    }
-        //    var culture = new CultureInfo("ar-EG");
-        //    var formattedDate = trans.CreatedAt.ToString("dd MMMM yyyy - hh:mm tt", culture);
+            if (wallet.Balance < request.Amount)
+                throw new Exception("Insufficient balance.");
 
-        //    formattedDate = formattedDate.Replace("AM", "صباحًا").Replace("PM", "مساءً");
+            if (request.WithdrawMethod == "محفظه" && string.IsNullOrEmpty(request.PhoneNumber))
+                throw new Exception("Phone number is required for wallet withdrawal.");
 
-        //    var transDto = new TransactionDTO
-        //    {
-        //        Id = trans.Id,
-        //        FormattedCreatedAt = formattedDate,
-        //        UserId = trans.UserId,
-        //        UserName = trans.User?.FirstName + " " + trans.User?.LastName,
-        //        Amount = trans.Amount,
-        //        Message = $"لقد استلمت {trans.Amount} ج.م بنجاح مقابل خدمة " +
-        //       (trans.ProviderService != null ? trans.ProviderService.Name :
-        //        trans.RequestService != null ? trans.RequestService.Name :
-        //        trans.EmergencyRequest != null ? trans.EmergencyRequest.ProblemDescription :
-        //        "غير معروفة") + "."
-        //    };
-        //    return transDto;
-        //}
+            if (request.WithdrawMethod == "INSTAPAY" && string.IsNullOrEmpty(request.InstapayEmail))
+                throw new Exception("Instapay email is required.");
+
+            var lastPayment = await _context.payments
+                .Where(p => p.ProviderId == request.ProviderId && p.PaymentStatus == "paid")
+                .OrderByDescending(p => p.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (lastPayment != null)
+            {
+                lastPayment.WithdrawMethod = request.WithdrawMethod;
+
+                if (request.WithdrawMethod == "محفظه")
+                    lastPayment.PhoneNumber = request.PhoneNumber;
+
+                if (request.WithdrawMethod == "INSTAPAY")
+                    lastPayment.InstapayEmail = request.InstapayEmail;
+            }
+
+            wallet.Balance -= request.Amount ?? 0;
+
+            await _context.SaveChangesAsync();
+
+            return "Withdrawal request submitted Successfully";
+        }
+
 
     }
 }

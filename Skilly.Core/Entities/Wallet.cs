@@ -18,5 +18,7 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public virtual User? provider { get; set; }
         public decimal Balance { get; set; }
+
+
     }
 }

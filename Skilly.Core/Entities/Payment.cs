@@ -35,12 +35,12 @@ namespace Skilly.Core.Entities
         public string? TransactionId { get; set; }
 
         public string UserId { get; set; }
-        [NotMapped]
-        public string UserName { get; set; }
         [JsonIgnore]
         public virtual User User { get; set; }
-        [NotMapped]
-        public string? message { get; set; } = null;
         public bool IsProcessed { get; set; }
+
+        public string? WithdrawMethod { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? InstapayEmail { get; set; }
     }
 }
