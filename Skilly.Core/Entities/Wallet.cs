@@ -18,6 +18,8 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public virtual User? provider { get; set; }
         public decimal Balance { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;  
+        public bool IsTransmitted{ get; set; } = false;
 
 
     }

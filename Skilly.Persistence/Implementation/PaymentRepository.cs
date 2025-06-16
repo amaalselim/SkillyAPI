@@ -596,8 +596,7 @@ namespace Skilly.Persistence.Implementation
                 if (request.WithdrawMethod == "INSTAPAY")
                     lastPayment.InstapayEmail = request.InstapayEmail;
             }
-
-            wallet.Balance -= request.Amount ?? 0;
+            wallet.IsTransmitted = true;
 
             await _context.SaveChangesAsync();
 
