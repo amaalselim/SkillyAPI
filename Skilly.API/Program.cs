@@ -125,6 +125,7 @@ namespace Skilly.API
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
                 };
+
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>
@@ -139,7 +140,12 @@ namespace Skilly.API
                         return Task.CompletedTask;
                     }
                 };
+            }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
             });
+
             builder.Services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = long.MaxValue;
