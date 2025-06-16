@@ -53,7 +53,7 @@ namespace Skilly.Infrastructure.Implementation
             {
                 auth_token = authToken,
                 delivery_needed = false,
-                amount_cents =(amountCents),
+                amount_cents = (int)(amountCents * 100),
                 currency = "EGP",
                 items = new object[] { }
             };

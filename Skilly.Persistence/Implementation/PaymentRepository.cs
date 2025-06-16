@@ -224,7 +224,8 @@ namespace Skilly.Persistence.Implementation
                         emergencyRequest.Status = "paid";
                         emergencyRequest.Finalprice = 0;
                         var providerId = emergencyRequest.AssignedProviderId;
-                        emergencyRequest.AssignedProviderId = "";
+                        emergencyRequest.AssignedProviderId = null;
+
 
                         var emergencyAsRequest = new RequestService
                         {
@@ -241,7 +242,6 @@ namespace Skilly.Persistence.Implementation
                             providerId = providerId
                         };
                         _context.requestServices.Add(emergencyAsRequest);
-                        await _context.SaveChangesAsync();
 
                         var chat = await _context.chats.FirstOrDefaultAsync(c =>
                             (c.FirstUserId == user.UserId || c.FirstUserId == providerId) &&

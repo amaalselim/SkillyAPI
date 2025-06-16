@@ -85,7 +85,6 @@ namespace Skilly.API.Controllers
         }
 
         [HttpGet("payment-callback")]
-        [Authorize]
         public async Task<IActionResult> PaymentCallbackCheck()
         {
             var orderId = HttpContext.Request.Query["order"].ToString();
