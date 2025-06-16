@@ -21,7 +21,7 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [JsonIgnore]
-        public bool IsTransmitted{ get; set; } = false;
+        public bool IsTransmitted{ get; set; }
 
 
     }

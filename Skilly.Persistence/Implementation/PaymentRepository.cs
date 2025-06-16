@@ -322,6 +322,13 @@ namespace Skilly.Persistence.Implementation
 
             _context.payments.Add(payment);
             await _context.SaveChangesAsync();
+           
+            var wallet = await _context.wallets.FirstOrDefaultAsync(w => w.ProviderId == providerId);
+            if (wallet != null)
+            {
+                wallet.IsTransmitted = false;
+            }
+
 
             var iframeUrl = $"https://accept.paymob.com/api/acceptance/iframes/{_paymobService.IframeId}?payment_token={paymentToken}";
 
@@ -420,6 +427,11 @@ namespace Skilly.Persistence.Implementation
             };
 
             _context.payments.Add(payment);
+            var wallet = await _context.wallets.FirstOrDefaultAsync(w => w.ProviderId == providerId);
+            if (wallet != null)
+            {
+                wallet.IsTransmitted = false;
+            }
             await _context.SaveChangesAsync();
 
             var iframeUrl = $"https://accept.paymob.com/api/acceptance/iframes/{_paymobService.IframeId}?payment_token={paymentToken}";
@@ -489,7 +501,6 @@ namespace Skilly.Persistence.Implementation
             {
                 payment.IsProcessed = true;
             }
-
             await _context.SaveChangesAsync();
             string providerName = providerWallet.provider != null
                ? providerWallet.provider.FirstName + " " + providerWallet.provider.LastName
@@ -498,7 +509,7 @@ namespace Skilly.Persistence.Implementation
             {
                 ProviderId = providerId,
                 ProviderName=providerName,
-                Balance = !providerWallet.IsTransmitted ? providerWallet.Balance : 0.00m
+                Balance = !providerWallet.IsTransmitted ? providerWallet.Balance :totalProviderAmount
             };
         }
 
@@ -603,6 +614,7 @@ namespace Skilly.Persistence.Implementation
                     lastPayment.InstapayEmail = request.InstapayEmail;
             }
             wallet.IsTransmitted = true;
+            wallet.Balance = 0;
 
             await _context.SaveChangesAsync();
 
