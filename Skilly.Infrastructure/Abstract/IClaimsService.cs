@@ -10,5 +10,7 @@ namespace Skilly.Application.Abstract
     public interface IClaimsService
     {
         Task<List<Claim>> GetClaimsAsync(string PhoneNumber, string userId);
+        Task<List<Claim>> GetClaimsAsync2(string PhoneNumber, string userId);
+
     }
 }
