@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Auth;
 using Skilly.Application.Implementation;
 using Skilly.Core.Entities;
 using Skilly.Core.Enums;
@@ -184,6 +185,16 @@ namespace Skilly.API.Controllers
                 throw new UnauthorizedAccessException("User not authorized.");
             }
             return userId;
+        }
+        [HttpPost("login-google")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] LoginGoogleDTO LogingoogleDTO)
+        {
+            var result = await _authService.LoginWithGoogleAsync(LogingoogleDTO);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest(new { message = "Invalid Google login." });
         }
         [HttpPost("Addlocation")]
         public async Task<IActionResult> SaveUserLocation([FromBody] LocationDTO location)
