@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Auth;
 using Skilly.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,6 @@ namespace Skilly.Application.Abstract
         Task<string> GeneratePasswordResetTokenAsync(ForgetPasswordDTO forgetPasswordDTO);
         Task<User> FindByEmailAsync(string email);
         Task<string> VerifyEmailCodeAsync(VerficationCodeDTO verficationCodeDTO);
+        Task<object> LoginWithGoogleAsync(LoginGoogleDTO loginGoogleDTO);
     }
 }
