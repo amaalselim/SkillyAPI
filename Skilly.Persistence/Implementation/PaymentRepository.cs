@@ -504,7 +504,7 @@ namespace Skilly.Persistence.Implementation
                 {
                     ProviderId = payment.ProviderId,
                     ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
-                    Balance = 0
+                    Balance = 0.00m
                 };
             }
             
