@@ -370,7 +370,7 @@ namespace Skilly.Persistence.Implementation
                 providerService.userprofileId = userId;
                 relatedId = providerService.Id;
                 serviceType = "provider";
-                providerId = providerService.serviceProviderId;
+                providerId = providerService.uId;
             }
             else
             {
@@ -415,7 +415,8 @@ namespace Skilly.Persistence.Implementation
                 RequestServiceId = (serviceType == "Request") ? relatedId : null,
                 EmergencyRequestId = (serviceType == "Emergency") ? relatedId : null,
                 CreatedAt = DateTime.UtcNow,
-                UserId = userId
+                UserId = userId,
+                ProviderId=providerId
             };
 
             _context.payments.Add(payment);
