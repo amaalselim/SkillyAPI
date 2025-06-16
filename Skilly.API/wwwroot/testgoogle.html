@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <h2>Google Login</h2>
+    <div id="buttonDiv"></div>
+
+    <script>
+        function onSignIn(response) {
+            const id_token = response.credential;
+            console.log('ID Token: ' + id_token);
+
+            fetch('http://localhost:5271/api/Auth/login-google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idToken: id_token }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response from backend:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "755886840702-gpe6qekulgoil3oll86btc4cbpvgmr5i.apps.googleusercontent.com",
+                callback: onSignIn
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("buttonDiv"),
+                { theme: "outline", size: "large" }
+            );
+        };
+    </script>
+</body>
+</html>
