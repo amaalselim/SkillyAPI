@@ -19,6 +19,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Vonage.Accounts;
 using Vonage.SubAccounts;
 
 namespace Skilly.Persistence.Implementation
@@ -488,13 +489,25 @@ namespace Skilly.Persistence.Implementation
             payment.IsProcessed = true;
 
             await _context.SaveChangesAsync();
-
-            return new Wallet
+            if (providerWallet.IsTransmitted)
             {
-                ProviderId = payment.ProviderId,
-                ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
-                Balance= providerWallet.Balance
-            };
+                return new Wallet
+                {
+                    ProviderId = payment.ProviderId,
+                    ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
+                    Balance = providerWallet.Balance
+                };
+            }
+            else
+            {
+                return new Wallet
+                {
+                    ProviderId = payment.ProviderId,
+                    ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
+                    Balance = 0
+                };
+            }
+            
         }
 
         public async Task<List<GroupedTransactionsDTO>> GetTransactionsGroupedByDate(string providerId)
