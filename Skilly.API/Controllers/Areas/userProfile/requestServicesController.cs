@@ -205,5 +205,19 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+
+        [HttpGet("track-request-service/{serviceId}")]
+        public async Task<IActionResult> TrackRequestService(string serviceId)
+        {
+            string userId = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authorized");
+            var result = await _unitOfWork._requestserviceRepository.TrackRequestServiceAsync(serviceId,userId);
+            if (result == null)
+                return NotFound("Request service not found");
+
+            return Ok(new { result });
+        }
+
     }
 }

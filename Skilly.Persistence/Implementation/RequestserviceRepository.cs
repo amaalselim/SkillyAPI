@@ -551,5 +551,38 @@ namespace Skilly.Persistence.Implementation
             }
             await _context.SaveChangesAsync();
         }
+        public async Task<object?> TrackRequestServiceAsync(string serviceId,string userId)
+        {
+            var requestService = await _context.requestServices
+                .Include(r => r.UserProfile)
+                .FirstOrDefaultAsync(r => r.Id == serviceId &&r.uId==userId);
+
+            if (requestService == null)
+                return null;
+
+            return new
+            {
+                ServiceId = requestService.Id,
+                ServiceName = requestService.Name,
+                Status = requestService.ServiceStatus,
+                StatusArabic = GetArabicStatus(requestService.ServiceStatus),
+                UserId = requestService.userId,
+                UserName = requestService.UserProfile.FirstName + " " + requestService.UserProfile.LastName,
+                UpdatedAt = DateTime.Now
+            };
+        }
+
+        private string GetArabicStatus(ServiceStatus status)
+        {
+            return status switch
+            {
+                ServiceStatus.Posted => "تم النشر",
+                ServiceStatus.Paid => "تم الدفع",
+                ServiceStatus.InProgress => "قيد التنفيذ",
+                ServiceStatus.Completed => "تم التنفيذ",
+                ServiceStatus.Delivered => "تم الاستلام",
+                _ => "غير معروف"
+            };
+        }
     }
 }

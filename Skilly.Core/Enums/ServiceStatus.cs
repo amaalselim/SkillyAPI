@@ -9,8 +9,11 @@ namespace Skilly.Core.Enums
     public enum ServiceStatus
     {
         Posted,     
-        Paid,       
-        Completed   
+        Paid,
+        InProgress,
+        Completed,
+        Delivered,
+
     }
 
 }

@@ -660,6 +660,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(c => c.Category)
                 .Where(c => c.serviceProviderId == user.Id && c.ServiceStatus == ServiceStatus.Paid)
                 .ToListAsync();
+            
 
             var reviews = await _context.reviews
                 .ToListAsync();
@@ -669,6 +670,8 @@ namespace Skilly.Persistence.Implementation
                 
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted);
+
+                item.ServiceStatus = ServiceStatus.InProgress;
 
                 var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
                 var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
@@ -712,6 +715,7 @@ namespace Skilly.Persistence.Implementation
             {
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted);
+                item.ServiceStatus = ServiceStatus.InProgress;
 
                 return new RequestService
                 {
@@ -753,11 +757,12 @@ namespace Skilly.Persistence.Implementation
                 .Include(c => c.serviceProvider)
                 .Include(g => g.ServicesImages)
                 .Include(g => g.offerSalaries)
-                .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.Paid);
+                .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.InProgress);
             var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
            
             if (service != null)
             {
+                service.ServiceStatus = ServiceStatus.Completed;
                 var payment = await _context.payments.FirstOrDefaultAsync(p => p.ProviderServiceId == serviceId);
                 var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
                 service.ServiceStatus = ServiceStatus.Completed;
@@ -829,11 +834,12 @@ namespace Skilly.Persistence.Implementation
                    .Include(g => g.requestServiceImages)
                    .Include(g => g.UserProfile)
                    .Include(g => g.offerSalaries)
-                   .FirstOrDefaultAsync(g => g.Id == serviceId && g.providerId==userId && g.ServiceStatus == ServiceStatus.Paid);
+                   .FirstOrDefaultAsync(g => g.Id == serviceId && g.providerId==userId && g.ServiceStatus == ServiceStatus.InProgress);
 
                 
                 if (request != null)
                 {
+                    service.ServiceStatus = ServiceStatus.Completed;
                     var payment = await _context.payments.FirstOrDefaultAsync(p => p.RequestServiceId == serviceId);
                     var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
                     request.ServiceStatus = ServiceStatus.Completed;

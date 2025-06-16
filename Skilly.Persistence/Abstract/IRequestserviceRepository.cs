@@ -20,5 +20,6 @@ namespace Skilly.Persistence.Abstract
         Task DeleteRequestServiceAsync(string requestId, string userId);
         Task<IEnumerable<RequestService>> GetAllRequestsByCategoryId(string userId, string sortBy, double? userLat = null, double? userLon = null);
         Task AcceptService(string requestId, string userId);
+        Task<object?> TrackRequestServiceAsync(string serviceId, string userId);
     }
 }

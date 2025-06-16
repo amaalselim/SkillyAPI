@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Skilly.Persistence")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+19584461597e4e68df74b4af7c26b60cdce3a4d9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac68529709f36b47745b2a5cd2aa44b86befec49")]
 [assembly: System.Reflection.AssemblyProductAttribute("Skilly.Persistence")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Skilly.Persistence")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

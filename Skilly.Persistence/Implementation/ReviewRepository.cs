@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Skilly.Application.DTOs;
 using Skilly.Application.DTOs.Review;
 using Skilly.Core.Entities;
+using Skilly.Core.Enums;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using Skilly.Persistence.Migrations;
@@ -43,6 +44,7 @@ namespace Skilly.Persistence.Implementation
                 var services = await _context.providerServices
                     .Where(s => s.Id == id)
                     .FirstOrDefaultAsync();
+                services.ServiceStatus = ServiceStatus.Delivered;
 
                 review.ProviderId = services.serviceProviderId;
             }
@@ -50,6 +52,14 @@ namespace Skilly.Persistence.Implementation
             {
                 review.requestId = id;
                 review.serviceId = null;
+                var services = await _context.requestServices
+                    .Where(s => s.Id == id)
+                    .FirstOrDefaultAsync();
+
+                services.ServiceStatus = ServiceStatus.Delivered;
+
+                review.ProviderId = services.providerId;
+
             }
             else
             {

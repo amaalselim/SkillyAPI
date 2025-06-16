@@ -44,23 +44,22 @@ namespace Skilly.Persistence.Implementation
             _mapper = mapper;
         }
 
-        public async Task<(string result, string? providerId,string? chatId)> HandlePaymentCallbackAsync(string id, bool success)
+        public async Task<(string result, string? providerId, string? chatId)> HandlePaymentCallbackAsync(string id, bool success)
         {
             var payment = await _context.payments.FirstOrDefaultAsync(p => p.PaymobOrderId == id);
             if (payment == null)
-                return ("Payment not found", null,null);
+                return ("Payment not found", null, null);
 
             if (!success)
             {
                 payment.PaymentStatus = "Failed";
-                return ("Failed", null,null);
+                return ("Failed", null, null);
             }
 
             var user = await _context.userProfiles.FirstOrDefaultAsync(u => u.UserId == payment.UserId);
             var userprofile = user;
 
             var providerService = await _context.providerServices.FirstOrDefaultAsync(p => p.Id == payment.ProviderServiceId);
-
             if (providerService != null)
             {
                 var provider = await _context.users.FirstOrDefaultAsync(p => p.Id == providerService.uId);
@@ -77,7 +76,6 @@ namespace Skilly.Persistence.Implementation
                 if (providerService?.Id != null)
                 {
                     await _firebase.SendNotificationAsync(provider.FcmToken, title, body);
-
                     _context.notifications.Add(new Notifications
                     {
                         UserId = providerService.uId,
@@ -88,9 +86,42 @@ namespace Skilly.Persistence.Implementation
                         CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                     });
                 }
+
                 userprofile.useDiscount = false;
 
-                var chat = await _context.chats.FirstOrDefaultAsync(c =>( c.FirstUserId == user.UserId || c.FirstUserId == providerService.uId) && (c.SecondUserId==user.UserId || c.SecondUserId == providerService.uId));
+                var imageUrls = await _context.providerServicesImages
+                .Where(img => img.serviceId == providerService.Id)
+                .Select(img => img.Img)
+                .ToListAsync();
+
+                var requestImages = imageUrls.Select(url => new requestServiceImage
+                {
+                    Img = url
+                }).ToList();
+
+                var request = new RequestService
+                {
+                    Name = providerService.Name,
+                    Price = payment.Amount,
+                    Deliverytime = providerService.Deliverytime,
+                    startDate = DateOnly.FromDateTime(DateTime.Now),
+                    categoryId = providerService.categoryId,
+                    Notes = providerService.Notes,
+                    userId = userprofile.Id,
+                    uId = payment.UserId,
+                    userImg = user.Img,
+                    ServiceStatus = ServiceStatus.Paid,
+                    providerId = providerService.uId,
+                    Images = requestImages,
+                    video = providerService.video
+                };
+                _context.requestServices.Add(request);
+                await _context.SaveChangesAsync();
+
+
+                var chat = await _context.chats.FirstOrDefaultAsync(c =>
+                    (c.FirstUserId == user.UserId || c.FirstUserId == providerService.uId) &&
+                    (c.SecondUserId == user.UserId || c.SecondUserId == providerService.uId));
                 if (chat == null)
                 {
                     var createChatDto = new CreateChatDTO
@@ -98,9 +129,7 @@ namespace Skilly.Persistence.Implementation
                         FirstUserId = user.UserId,
                         SecondUserId = providerService.uId
                     };
-
                     var createdChat = await _chat.CreateChatAsync(createChatDto);
-
                     chat = _mapper.Map<Chat>(createdChat);
                 }
 
@@ -108,7 +137,7 @@ namespace Skilly.Persistence.Implementation
                 user.Points += 20;
                 await _context.SaveChangesAsync();
 
-                return ("Success", providerService.uId,chat.Id);
+                return ("Success", providerService.uId, chat.Id);
             }
             else
             {
@@ -129,7 +158,6 @@ namespace Skilly.Persistence.Implementation
                     if (service?.Id != null)
                     {
                         await _firebase.SendNotificationAsync(userrr.FcmToken, title, body);
-
                         _context.notifications.Add(new Notifications
                         {
                             UserId = userrr.Id,
@@ -140,7 +168,10 @@ namespace Skilly.Persistence.Implementation
                             CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                         });
                     }
-                    var chat = await _context.chats.FirstOrDefaultAsync(c => (c.FirstUserId == user.UserId || c.FirstUserId == service.providerId) && (c.SecondUserId == user.UserId || c.SecondUserId == service.providerId));
+
+                    var chat = await _context.chats.FirstOrDefaultAsync(c =>
+                        (c.FirstUserId == user.UserId || c.FirstUserId == service.providerId) &&
+                        (c.SecondUserId == user.UserId || c.SecondUserId == service.providerId));
                     if (chat == null)
                     {
                         var createChatDto = new CreateChatDTO
@@ -148,9 +179,7 @@ namespace Skilly.Persistence.Implementation
                             FirstUserId = user.UserId,
                             SecondUserId = service.uId
                         };
-
                         var createdChat = await _chat.CreateChatAsync(createChatDto);
-
                         chat = _mapper.Map<Chat>(createdChat);
                     }
 
@@ -158,12 +187,11 @@ namespace Skilly.Persistence.Implementation
                     user.Points += 20;
                     await _context.SaveChangesAsync();
 
-                    return ("Success", service.providerId,chat.Id);
+                    return ("Success", service.providerId, chat.Id);
                 }
                 else
                 {
                     var emergencyRequest = await _context.emergencyRequests.FirstOrDefaultAsync(s => s.Id == payment.EmergencyRequestId);
-
                     if (emergencyRequest != null)
                     {
                         var userr = await _context.users.FirstOrDefaultAsync(s => s.Id == emergencyRequest.UserId);
@@ -182,7 +210,6 @@ namespace Skilly.Persistence.Implementation
                         if (emergencyRequest?.Id != null)
                         {
                             await _firebase.SendNotificationAsync(userrequest.User.FcmToken, title, body);
-
                             _context.notifications.Add(new Notifications
                             {
                                 UserId = userrequest.UserId,
@@ -193,13 +220,32 @@ namespace Skilly.Persistence.Implementation
                                 CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                             });
                         }
-                        
+
                         emergencyRequest.Status = "paid";
                         emergencyRequest.Finalprice = 0;
                         var providerId = emergencyRequest.AssignedProviderId;
                         emergencyRequest.AssignedProviderId = "";
 
-                        var chat = await _context.chats.FirstOrDefaultAsync(c => (c.FirstUserId == user.UserId || c.FirstUserId == providerId) && (c.SecondUserId == user.UserId || c.SecondUserId == providerId));
+                        var emergencyAsRequest = new RequestService
+                        {
+                            Name = "طلب طارئ - " + emergencyRequest.ProblemDescription,
+                            Price = payment.Amount,
+                            Deliverytime = "فوري",
+                            startDate = DateOnly.FromDateTime(DateTime.Now),
+                            categoryId = emergencyRequest.CategoryId,
+                            Notes = emergencyRequest.ProblemDescription,
+                            userId = userprofile.Id,
+                            uId = payment.UserId,
+                            userImg = user.Img,
+                            ServiceStatus = ServiceStatus.Paid,
+                            providerId = providerId
+                        };
+                        _context.requestServices.Add(emergencyAsRequest);
+                        await _context.SaveChangesAsync();
+
+                        var chat = await _context.chats.FirstOrDefaultAsync(c =>
+                            (c.FirstUserId == user.UserId || c.FirstUserId == providerId) &&
+                            (c.SecondUserId == user.UserId || c.SecondUserId == providerId));
                         if (chat == null)
                         {
                             var createChatDto = new CreateChatDTO
@@ -207,16 +253,15 @@ namespace Skilly.Persistence.Implementation
                                 FirstUserId = user.UserId,
                                 SecondUserId = providerId
                             };
-
                             var createdChat = await _chat.CreateChatAsync(createChatDto);
-
                             chat = _mapper.Map<Chat>(createdChat);
                         }
+
                         payment.PaymentStatus = "paid";
                         user.Points += 20;
                         await _context.SaveChangesAsync();
 
-                        return ("Success", providerId,chat.Id);
+                        return ("Success", providerId, chat.Id);
                     }
                 }
             }
@@ -224,8 +269,9 @@ namespace Skilly.Persistence.Implementation
             payment.PaymentStatus = "paid";
             user.Points += 20;
             await _context.SaveChangesAsync();
-            return ("Success", null,null);
+            return ("Success", null, null);
         }
+
         public async Task<object> StartPaymentAsync(string serviceId)
         {
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
