@@ -153,7 +153,6 @@ namespace Skilly.Persistence.Implementation
                 galleryName= item.galleryName,
                 Description = item.Description,
                 Deliverytime = item.Deliverytime,
-                
                 serviceProviderId = item.serviceProviderId,
                 Images = item.galleryImages?.Select(img => new ServicesgalleryImage
                 {
