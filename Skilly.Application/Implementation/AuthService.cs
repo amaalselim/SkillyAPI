@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Auth;
 using Skilly.Core.Entities;
 using Skilly.Infrastructure.Abstract;
 using Skilly.Infrastructure.Implementation;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -69,8 +73,7 @@ namespace Skilly.Application.Implementation
                     {
                         Success = true,
                         Message = "Login successful.",
-
-                        Token = token.Result,
+                        Token = token.re,
                         UserType=user.UserType.ToString(),
                         Expire = loginDTO.RememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddHours(20)
                     };
@@ -191,6 +194,41 @@ namespace Skilly.Application.Implementation
             }
 
             return null;
+        }
+
+        public async Task<object> LoginWithGoogleAsync(LoginGoogleDTO googleLoginDTO)
+        {
+            var payload = await GoogleJsonWebSignature.ValidateAsync(googleLoginDTO.IdToken);
+            if (payload == null)
+                throw new Exception("Invalid Google ID Token");
+
+            var user = await _usermanager.FindByEmailAsync(payload.Email);
+
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName= payload.Name,
+                    LastName = payload.FamilyName,
+                    UserName = payload.Email,
+                    Email = payload.Email
+                };
+
+                var createResult = await _usermanager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                    throw new Exception("Failed to create user");
+            }
+
+            var claims = await _claimsService.GetClaimsAsync2(user.Email, user.Id);
+            var token = await _tokenService.CreateTokenAsync(claims, false);
+
+            return new
+            {
+                Success = true,
+                Message = "Login successful.",
+                Token = token,
+                Expire = DateTime.Now.AddHours(20)
+            };
         }
 
 
