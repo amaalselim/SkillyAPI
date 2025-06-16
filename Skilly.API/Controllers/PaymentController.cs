@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Skilly.Application.DTOs.Payment;
 using Skilly.Persistence.Abstract;
@@ -148,6 +149,8 @@ namespace Skilly.API.Controllers
                 chatId=result.chatId
             });
         }
+
+
         [HttpGet("GetAllTransactions")]
         public async Task<IActionResult> GetAllTransactions()
         {
@@ -160,6 +163,34 @@ namespace Skilly.API.Controllers
                     return NotFound(new { message = "No Transactions found." });
                 }
                 return Ok(new { trans});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+        [HttpGet("get-all-Transactions-by-providerId")]
+        public async Task<IActionResult> GetAllTransactionsbyProviderId()
+        {
+            try
+            {
+                var providerId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(providerId))
+                {
+                    return Unauthorized(new { message = "User not authorized." });
+                }
+                var trans = await _unitOfWork._paymentRepository.GetTransactionsGroupedByDate(providerId);
+
+                if (trans == null)
+                {
+                    return NotFound(new { message = "No Transactions found." });
+                }
+                return Ok(new { trans });
             }
             catch (Exception ex)
             {
