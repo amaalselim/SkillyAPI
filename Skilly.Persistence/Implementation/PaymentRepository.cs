@@ -2,9 +2,9 @@
 using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Exchange.WebServices.Data;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
+using Skilly.Application.DTOs.Payment;
 using Skilly.Core.Entities;
 using Skilly.Core.Enums;
 using Skilly.Infrastructure.Implementation;
@@ -12,6 +12,7 @@ using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Security.Claims;
@@ -261,7 +262,7 @@ namespace Skilly.Persistence.Implementation
                 providerService.userprofileId = userId;
                 relatedId = providerService.Id;
                 serviceType = "provider";
-                providerId = providerService.serviceProviderId;
+                providerId = providerService.uId;
             }
             else
             {
@@ -313,7 +314,8 @@ namespace Skilly.Persistence.Implementation
                 RequestServiceId = (serviceType == "Request") ? relatedId : null,
                 EmergencyRequestId = (serviceType == "Emergency") ? relatedId : null,
                 CreatedAt = DateTime.UtcNow,
-                UserId = userId
+                UserId = userId,
+                ProviderId = providerId
             };
 
             _context.payments.Add(payment);
@@ -455,6 +457,139 @@ namespace Skilly.Persistence.Implementation
             return trans;
         }
 
+        //Wallet
+        public async Task<Wallet> ProcessPaymentAsync(string paymentId)
+        {
+            var payment = await _context.payments.FindAsync(paymentId);
+
+            if (payment == null)
+                throw new Exception("Payment not found.");
+
+            var providerWallet = await _context.wallets
+                .Include(p=>p.provider)
+                .FirstOrDefaultAsync(w => w.ProviderId == payment.ProviderId);
+
+            if (providerWallet == null)
+            {
+                providerWallet = new Wallet
+                {
+                    ProviderId = payment.ProviderId,
+                    Balance = 0
+                };
+                _context.wallets.Add(providerWallet);
+            }
+            if (!payment.IsProcessed)
+            {
+                decimal providerShare = payment.Amount * 0.8m;
+                providerWallet.Balance += providerShare;
+            }
+            
+
+            payment.IsProcessed = true;
+
+            await _context.SaveChangesAsync();
+
+            return new Wallet
+            {
+                ProviderId = payment.ProviderId,
+                ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
+                Balance= providerWallet.Balance
+            };
+        }
+
+        public async Task<List<GroupedTransactionsDTO>> GetTransactionsGroupedByDate(string providerId)
+        {
+            var transactions = await _context.payments
+                .Include(p => p.User)
+                .Include(p => p.ProviderService)
+                .Include(p => p.RequestService)
+                .Include(p => p.EmergencyRequest)
+                .Where(p => p.ProviderId == providerId)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            var culture = new CultureInfo("ar-EG");
+            var today = DateTime.Today;
+            var yesterday = today.AddDays(-1);
+
+            var transactionDtos = transactions.Select(trans => new TransactionDTO
+            {
+                Id = trans.Id,
+                UserId = trans.UserId,
+                CreatedAt = trans.CreatedAt,
+                UserName = trans.User?.FirstName + " " + trans.User?.LastName,
+                Amount = trans.Amount,
+                Message = $"لقد استلمت {trans.Amount} ج.م بنجاح مقابل خدمة " +
+                    (trans.ProviderService != null ? trans.ProviderService.Name :
+                     trans.RequestService != null ? trans.RequestService.Name :
+                     trans.EmergencyRequest != null ? trans.EmergencyRequest.ProblemDescription :
+                     "غير معروفة") + ".",
+                FormattedCreatedAt = trans.CreatedAt
+                    .ToString("dd MMMM yyyy - hh:mm tt", culture)
+                    .Replace("AM", "صباحًا").Replace("PM", "مساءً")
+            }).ToList();
+
+            var grouped = new List<GroupedTransactionsDTO>
+            {
+                new GroupedTransactionsDTO
+                {
+                    Title = "اليوم",
+                    Transactions = transactionDtos
+                        .Where(t => t.CreatedAt.Date == today)
+                        .ToList()
+                },
+                new GroupedTransactionsDTO
+                {
+                    Title = "أمس",
+                    Transactions = transactionDtos
+                        .Where(t => t.CreatedAt.Date == yesterday)
+                        .ToList()
+                },
+                new GroupedTransactionsDTO
+                {
+                    Title = "منذ أيام",
+                    Transactions = transactionDtos
+                        .Where(t => t.CreatedAt.Date < yesterday)
+                        .ToList()
+                }
+            };
+
+            return grouped.Where(g => g.Transactions.Any()).ToList();
+        }
+
+        //public async Task<TransactionDTO> GetAllTransactionsByProviderId(string providerId)
+        //{
+        //    var trans = await _context.payments
+        //        .Include(p => p.User)
+        //        .Include(p=>p.ProviderService)
+        //        .Include(p => p.RequestService)
+        //        .Include(p => p.EmergencyRequest)
+        //        .FirstOrDefaultAsync(p => p.ProviderId == providerId);
+
+        //    if (trans == null)
+        //    {
+        //        return null;
+        //    }
+        //    var culture = new CultureInfo("ar-EG");
+        //    var formattedDate = trans.CreatedAt.ToString("dd MMMM yyyy - hh:mm tt", culture);
+
+        //    formattedDate = formattedDate.Replace("AM", "صباحًا").Replace("PM", "مساءً");
+
+        //    var transDto = new TransactionDTO
+        //    {
+        //        Id = trans.Id,
+        //        FormattedCreatedAt = formattedDate,
+        //        UserId = trans.UserId,
+        //        UserName = trans.User?.FirstName + " " + trans.User?.LastName,
+        //        Amount = trans.Amount,
+        //        Message = $"لقد استلمت {trans.Amount} ج.م بنجاح مقابل خدمة " +
+        //       (trans.ProviderService != null ? trans.ProviderService.Name :
+        //        trans.RequestService != null ? trans.RequestService.Name :
+        //        trans.EmergencyRequest != null ? trans.EmergencyRequest.ProblemDescription :
+        //        "غير معروفة") + "."
+        //    };
+        //    return transDto;
+        //}
 
     }
 }
