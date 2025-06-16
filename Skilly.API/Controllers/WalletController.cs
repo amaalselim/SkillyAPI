@@ -27,13 +27,17 @@ namespace Skilly.API.Controllers
             return userId;
         }
 
-        [HttpGet("get-Balance/{paymentId}")]
-        [Authorize]
-        public async Task<IActionResult> ProcessPayment(string paymentId)
+        [HttpGet("get-Balance")]
+        public async Task<IActionResult> ProcessPayment()
         {
             try
             {
-                var result = await _unitOfWork._paymentRepository.ProcessPaymentAsync(paymentId);
+                var providerId = GetUserIdFromClaims();
+                if (string.IsNullOrEmpty(providerId))
+                {
+                    return Unauthorized(new { message = "User not authorized." });
+                }
+                var result = await _unitOfWork._paymentRepository.ProcessPaymentAsync(providerId);
                 return Ok(new { result });
             }
             catch (Exception ex)

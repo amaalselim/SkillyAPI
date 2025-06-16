@@ -10,6 +10,7 @@ using Skilly.Core.Enums;
 using Skilly.Infrastructure.Implementation;
 using Skilly.Persistence.Abstract;
 using Skilly.Persistence.DataContext;
+using Skilly.Persistence.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -459,56 +460,47 @@ namespace Skilly.Persistence.Implementation
         }
 
         //Wallet
-        public async Task<Wallet> ProcessPaymentAsync(string paymentId)
+        public async Task<Wallet> ProcessPaymentAsync(string providerId)
         {
-            var payment = await _context.payments.FindAsync(paymentId);
+            var payments = await _context.payments
+                .Where(p => p.ProviderId == providerId && p.PaymentStatus == "paid" && !p.IsProcessed)
+                .ToListAsync();
 
-            if (payment == null)
-                throw new Exception("Payment not found.");
+            decimal totalProviderAmount = payments.Sum(p => p.Amount * 0.8m);
 
             var providerWallet = await _context.wallets
-                .Include(p=>p.provider)
-                .FirstOrDefaultAsync(w => w.ProviderId == payment.ProviderId);
+                .Include(w => w.provider)
+                .FirstOrDefaultAsync(w => w.ProviderId == providerId);
 
             if (providerWallet == null)
             {
                 providerWallet = new Wallet
                 {
-                    ProviderId = payment.ProviderId,
+                    ProviderId = providerId,
                     Balance = 0
                 };
                 _context.wallets.Add(providerWallet);
             }
-            if (!payment.IsProcessed)
-            {
-                decimal providerShare = payment.Amount * 0.8m;
-                providerWallet.Balance += providerShare;
-            }
-            
 
-            payment.IsProcessed = true;
+            providerWallet.Balance += totalProviderAmount;
+
+            foreach (var payment in payments)
+            {
+                payment.IsProcessed = true;
+            }
 
             await _context.SaveChangesAsync();
-            if (providerWallet.IsTransmitted)
+            string providerName = providerWallet.provider != null
+               ? providerWallet.provider.FirstName + " " + providerWallet.provider.LastName
+               : "Unknown Provider";
+            return new Wallet
             {
-                return new Wallet
-                {
-                    ProviderId = payment.ProviderId,
-                    ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
-                    Balance = providerWallet.Balance
-                };
-            }
-            else
-            {
-                return new Wallet
-                {
-                    ProviderId = payment.ProviderId,
-                    ProviderName = providerWallet.provider.FirstName + " " + providerWallet.provider.LastName,
-                    Balance = 0.00m
-                };
-            }
-            
+                ProviderId = providerId,
+                ProviderName=providerName,
+                Balance = !providerWallet.IsTransmitted ? providerWallet.Balance : 0.00m
+            };
         }
+
 
         public async Task<List<GroupedTransactionsDTO>> GetTransactionsGroupedByDate(string providerId)
         {
