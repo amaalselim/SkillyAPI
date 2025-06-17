@@ -658,7 +658,7 @@ namespace Skilly.Persistence.Implementation
                     lastPayment.InstapayEmail = request.InstapayEmail;
             }
             wallet.IsTransmitted = true;
-            wallet.Balance = 0;
+            //wallet.Balance = 0;
 
             await _context.SaveChangesAsync();
 
