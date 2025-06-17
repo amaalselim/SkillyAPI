@@ -236,9 +236,16 @@ namespace Skilly.Persistence.Implementation
                 .OrderBy(m => m.SentAt)
                 .Include(m => m.Sender)   
                 .Include(m => m.Receiver) 
-
-
                 .ToListAsync();
+            foreach (var message in messages)
+            {
+                if (message.ReceiverId == userId)
+                {
+                    message.IsRead = true;
+                    message.ReadAt = DateTime.Now;
+                }
+            }
+            await _context.SaveChangesAsync();
 
             var messageDtos = _mapper.Map<List<MessageResponseDto>>(messages);
 
@@ -277,6 +284,7 @@ namespace Skilly.Persistence.Implementation
                 messageDtos[i].ReceiverImg = receiverImg;
                 messageDtos[i].ImageUrl = message.Img;
                 messageDtos[i].Content = string.IsNullOrWhiteSpace(message.Content) ? null : message.Content;
+                messageDtos[i].IsRead = message.IsRead;
 
             }
 
@@ -304,6 +312,15 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
 
             return message.Id;
+        }
+
+        public async Task<int> GetUnreadMessagesCountAsync(string userId)
+        {
+            var unreadCount = await _context.Messages
+                .Where(m => m.ReceiverId == userId && !m.IsRead)
+                .CountAsync();
+
+            return unreadCount;
         }
     }
 }

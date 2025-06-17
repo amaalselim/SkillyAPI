@@ -155,8 +155,6 @@ namespace Skilly.API
                 options.Limits.MaxRequestBodySize = null; 
                 options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
             });
-            builder.Services.AddLogging();
-
 
             builder.Services.AddControllers();
 

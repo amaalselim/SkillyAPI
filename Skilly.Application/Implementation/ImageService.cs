@@ -30,8 +30,6 @@ namespace Skilly.Application.Implementation
 
             
             var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
-
-        
             if (File.Exists(fullPath))
             {
                 File.Delete(fullPath);

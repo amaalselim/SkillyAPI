@@ -10,6 +10,7 @@ namespace Skilly.Persistence.Abstract
 {
     public interface IChatService
     {
+        Task<int> GetUnreadMessagesCountAsync(string userId);
         Task<ChatDTO> CreateChatAsync(CreateChatDTO dto);
         Task<Message> SendMessageAsync(MessageDTO dto);
         Task<List<ChatDTO>> GetChatsForUserAsync(string userId);

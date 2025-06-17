@@ -159,5 +159,16 @@ namespace Skilly.API.Controllers
                 return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
+        [HttpGet("GetUnreadMessagesCount")]
+        public async Task<IActionResult> GetUnreadMessagesCount()
+        {
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { status = "error", message = "User not authenticated" });
+            }
+            var count = await _chatService.GetUnreadMessagesCountAsync(userId);
+            return Ok(new { unreadMessages = count });
+        }
     }
 }
