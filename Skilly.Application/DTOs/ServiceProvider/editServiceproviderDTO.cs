@@ -10,8 +10,6 @@ namespace Skilly.Application.DTOs.ServiceProvider
 {
     public class editServiceproviderDTO
     {
-        public string Email {  get; set; }
-        public string phoneNumber { get; set; }
         public string Governorate { get; set; }
         public string City { get; set; }
         public string StreetName { get; set; }
