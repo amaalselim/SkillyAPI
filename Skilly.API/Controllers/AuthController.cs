@@ -218,5 +218,35 @@ namespace Skilly.API.Controllers
 
             return Ok(new { message = "Location saved successfully." });
         }
+        [HttpPost("CompleteGoogleData")]
+        public async Task<IActionResult> CompleteGoogleData([FromBody] CompleteGoogleDataDTO completeGoogleDataDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Invalid data provided.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+            try
+            {
+                await _authService.CompleteDataAsync(completeGoogleDataDTO);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Google data completed successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = $"An error occurred while completing Google data: {ex.Message}"
+                });
+            }
+        }
     }
 }

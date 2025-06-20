@@ -74,7 +74,7 @@ namespace Skilly.Application.Implementation
                         Success = true,
                         Message = "Login successful.",
                         Token = token.Result,
-                        UserType=user.UserType.ToString(),
+                        UserType = user.UserType.ToString(),
                         Expire = loginDTO.RememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddHours(20)
                     };
                 }
@@ -157,12 +157,12 @@ namespace Skilly.Application.Implementation
         public async Task<IdentityResult> UpdatePasswordAsync(UpdatePasswordDTO updatePasswordDTO)
         {
             var user = await _usermanager.FindByEmailAsync(updatePasswordDTO.Email);
-            if(user == null)
+            if (user == null)
             {
                 return IdentityResult.Failed(new IdentityError { Description = "User not found." });
             }
             var token = await _usermanager.GeneratePasswordResetTokenAsync(user);
-            var result= await _usermanager.ResetPasswordAsync(user, token, updatePasswordDTO.NewPassword);
+            var result = await _usermanager.ResetPasswordAsync(user, token, updatePasswordDTO.NewPassword);
 
             if (result.Succeeded)
             {
@@ -184,13 +184,13 @@ namespace Skilly.Application.Implementation
             }
             var claims = await _claimsService.GetClaimsAsync(user.PhoneNumber, user.Id);
 
-            var token = _tokenService.CreateTokenAsync(claims,false);
+            var token = _tokenService.CreateTokenAsync(claims, false);
             if (user.verificationCode.ToString() == verficationCodeDTO.code)
             {
                 user.EmailConfirmed = true;
                 user.verificationCode = null;
                 await _usermanager.UpdateAsync(user);
-                return token.Result;  
+                return token.Result;
             }
 
             return null;
@@ -208,11 +208,11 @@ namespace Skilly.Application.Implementation
             {
                 user = new User
                 {
-                    FirstName= payload.Name,
+                    FirstName = payload.Name,
                     LastName = payload.FamilyName,
                     UserName = payload.Email,
                     Email = payload.Email,
-                    PhoneNumber=payload.Email
+                    PhoneNumber = payload.Email
                 };
 
                 var createResult = await _usermanager.CreateAsync(user);
@@ -232,7 +232,21 @@ namespace Skilly.Application.Implementation
                 Expire = DateTime.Now.AddHours(20)
             };
         }
-
-
+        public async Task CompleteDataAsync(CompleteGoogleDataDTO completeGoogleDataDTO)
+        {
+            var user = await _usermanager.FindByEmailAsync(completeGoogleDataDTO.email);
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+            user.PhoneNumber = completeGoogleDataDTO.PhoneNumber;
+            user.UserType = completeGoogleDataDTO.UserType;
+            user.FcmToken = completeGoogleDataDTO.FcmToken;
+            var result = await _usermanager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                throw new Exception("Failed to update user data.");
+            }
+        }
     }
 }

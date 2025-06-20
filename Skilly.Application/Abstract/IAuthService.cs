@@ -20,5 +20,6 @@ namespace Skilly.Application.Abstract
         Task<User> FindByEmailAsync(string email);
         Task<string> VerifyEmailCodeAsync(VerficationCodeDTO verficationCodeDTO);
         Task<object> LoginWithGoogleAsync(LoginGoogleDTO loginGoogleDTO);
+        Task CompleteDataAsync(CompleteGoogleDataDTO completeGoogleDataDTO);
     }
 }
