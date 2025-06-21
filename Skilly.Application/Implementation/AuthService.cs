@@ -228,7 +228,6 @@ namespace Skilly.Application.Implementation
                 Success = true,
                 Message = "Login successful.",
                 Token = token,
-                UserType = user.UserType.ToString(),
                 Expire = DateTime.Now.AddHours(20)
             };
         }

@@ -665,13 +665,14 @@ namespace Skilly.Persistence.Implementation
             var reviews = await _context.reviews
                 .ToListAsync();
 
-            var serviceDtos = services.Select(item =>
+            var serviceDtos = services.Select(async item =>
             {
                 
                 var acceptedOffer = item.offerSalaries
                     .FirstOrDefault(o => o.Status == OfferStatus.Accepted);
 
                 item.ServiceStatus = ServiceStatus.InProgress;
+                await _context.SaveChangesAsync();
 
                 var relatedReviews = reviews.Where(r => r.ProviderId == item.serviceProviderId).ToList();
                 var avgRate = relatedReviews.Any() ? Math.Round(relatedReviews.Average(r => r.Rating), 2) : 0;
@@ -757,7 +758,7 @@ namespace Skilly.Persistence.Implementation
                 .Include(c => c.serviceProvider)
                 .Include(g => g.ServicesImages)
                 .Include(g => g.offerSalaries)
-                .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId && g.ServiceStatus==ServiceStatus.InProgress);
+                .FirstOrDefaultAsync(g => g.Id == serviceId &&g.uId==userId &&(g.ServiceStatus==ServiceStatus.InProgress || g.ServiceStatus==ServiceStatus.Paid));
             var provviderr = await _context.serviceProviders.FirstOrDefaultAsync(p => p.UserId == userId);
            
             if (service != null)
