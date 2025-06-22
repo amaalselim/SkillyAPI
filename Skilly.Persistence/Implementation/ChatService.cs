@@ -202,6 +202,10 @@ namespace Skilly.Persistence.Implementation
                         chatDto.lastMessage = chat.Messages
                             .OrderByDescending(m => m.SentAt)
                             .First().Content;
+                        chatDto.IsRead = chat.Messages
+                            .OrderByDescending(m => m.SentAt)
+                            .First().IsRead;
+
                     }
                     else
                     {

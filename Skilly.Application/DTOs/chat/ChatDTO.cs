@@ -20,7 +20,8 @@ namespace Skilly.Application.DTOs
         public DateTime LastUpdatedAt { get; set; }
 
         public string? SecondUserImg { get; set; }
-        public string? lastMessage { get; set; } 
+        public string? lastMessage { get; set; }
+        public bool IsRead { get; set; }
     }
 
 }
