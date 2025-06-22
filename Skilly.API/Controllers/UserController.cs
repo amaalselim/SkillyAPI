@@ -32,10 +32,10 @@ namespace Skilly.API.Controllers
         [HttpGet("GetAllUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-            
             var users = await _unitOfWork.Users.GetAllAsync();
             return Ok(new { users });
         }
+
         [HttpGet("GetUserById")]
         public async Task<ActionResult<User>> GetUserById()
         {
@@ -62,6 +62,23 @@ namespace Skilly.API.Controllers
         [HttpDelete("DeleteUserBy/{Id}")]
         public async Task<IActionResult> DeleteUser(string Id)
         {
+            var user = await _unitOfWork.Users.GetByIdAsync(Id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            await _unitOfWork.Users.DeleteAsync(Id);
+            return NoContent();
+        }
+
+        [HttpDelete("DeleteUserById")]
+        public async Task<IActionResult> DeleteUserByToken()
+        {
+            var Id = GetUserIdFromClaims();
+            if (string.IsNullOrEmpty(Id))
+            {
+                return BadRequest("User ID is required.");
+            }
             var user = await _unitOfWork.Users.GetByIdAsync(Id);
             if (user == null)
             {

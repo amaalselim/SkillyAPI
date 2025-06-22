@@ -31,6 +31,8 @@ namespace Skilly.Persistence.Implementation
             await _context.SaveChangesAsync();
         }
 
+
+
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _context.users.ToListAsync();
