@@ -81,6 +81,7 @@ namespace Skilly.API
             builder.Services.AddScoped<IOfferSalaryRepository, OfferSalaryRepository>();
 
 
+
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IClaimsService,ClaimsService>();
             builder.Services.AddScoped<IImageService,ImageService>();

@@ -11,7 +11,6 @@ namespace Skilly.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;

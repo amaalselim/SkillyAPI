@@ -118,10 +118,10 @@ namespace Skilly.Persistence.Implementation
         {
             var reviews = await _context.reviews
                 .Include(p => p.ProviderServices)
+                .ThenInclude(p => p.serviceProvider)
+                .Include(p => p.ProviderServices.ServicesImages)
                 .Where(r => r.ProviderServices != null)
                 .ToListAsync();
-
-
 
             var userIds = reviews.Select(r => r.UserId).Distinct().ToList();
 
@@ -137,6 +137,12 @@ namespace Skilly.Persistence.Implementation
                            users.FirstOrDefault(u => u.UserId == r.UserId)?.LastName,
                 userImage = users.FirstOrDefault(u => u.UserId == r.UserId)?.Img,
                 Feedback = r.Feedback,
+                providerName = r.ProviderServices.serviceProvider.FirstName + " " + r.ProviderServices.serviceProvider.LastName,
+                ServicesImages= r.ProviderServices.ServicesImages?.Select(img => new ProviderServicesImage
+                {
+                    Id = img.Id,
+                    Img = img.Img
+                }).ToList() ?? new List<ProviderServicesImage>(),
                 Rating = r.Rating,
 
 

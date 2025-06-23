@@ -73,6 +73,10 @@
               "target": "Package",
               "version": "[2.2.0, )"
             },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
             "Microsoft.Extensions.Identity.Core": {
               "target": "Package",
               "version": "[8.0.11, )"
@@ -162,6 +166,10 @@
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.6, )"
             }
           },
           "imports": [
@@ -237,6 +245,10 @@
             "FirebaseAdmin": {
               "target": "Package",
               "version": "[3.1.0, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.6, )"
             },
             "Microsoft.Extensions.Identity.Core": {
               "target": "Package",
@@ -324,6 +336,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Betalgo.Ranul.OpenAI": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
             "FirebaseAdmin": {
               "target": "Package",
               "version": "[3.1.0, )"
@@ -346,9 +362,9 @@
               "target": "Package",
               "version": "[8.0.11, )"
             },
-            "Microsoft.Exchange.WebServices": {
+            "Microsoft.Extensions.Http": {
               "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[9.0.6, )"
             }
           },
           "imports": [

@@ -84,10 +84,7 @@ namespace Skilly.API.Controllers.Areas.Provider
             var userLon = user.Longitude.Value;
 
             var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(userId,categoryId, sortBy, userLat, userLon);
-            if (service == null || !service.Any())
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this category." });
-            }
+           
 
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
@@ -102,10 +99,7 @@ namespace Skilly.API.Controllers.Areas.Provider
                 throw new UnauthorizedAccessException("User not authorized.");
             }
             var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
-            if (service == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
-            }
+           
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
 
@@ -115,10 +109,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             
             var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(providerId);
-            if (service == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
-            }
+          
             return StatusCode(StatusCodes.Status200OK, new { service });
         }
          

@@ -173,6 +173,7 @@ namespace Skilly.API.Controllers
                 });
             }
         }
+
         [HttpGet("get-all-Transactions-by-providerId")]
         public async Task<IActionResult> GetAllTransactionsbyProviderId()
         {
@@ -201,7 +202,7 @@ namespace Skilly.API.Controllers
                 });
             }
         }
-
+       
     }
 
 }

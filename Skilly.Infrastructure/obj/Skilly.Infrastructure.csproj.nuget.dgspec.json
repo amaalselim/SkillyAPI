@@ -53,6 +53,10 @@
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.6, )"
             }
           },
           "imports": [
@@ -128,6 +132,10 @@
             "FirebaseAdmin": {
               "target": "Package",
               "version": "[3.1.0, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.6, )"
             },
             "Microsoft.Extensions.Identity.Core": {
               "target": "Package",

@@ -30,6 +30,23 @@ namespace Skilly.API.Controllers.Areas.userProfile
             }
             return userId;
         }
+        [HttpGet("GetAllUsersProfile")]
+        public async Task<ActionResult<IEnumerable<UserProfile>>> GetAllUserProfile()
+        {
+            try
+            {
+                var users = await _unitOfWork.ProfileRepository.GetAllUserProfileAsync();
+                if (users == null || !users.Any())
+                {
+                    return NotFound(new { message = "No user profiles found." });
+                }
+                return Ok(new { users });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
 
         [HttpGet("GetUserProfileByuserId")]
         public async Task<ActionResult<UserProfile>> GetUserById()
@@ -140,5 +157,7 @@ namespace Skilly.API.Controllers.Areas.userProfile
                 return StatusCode(500, new { message = "An error occurred.", error = ex.Message }); // 500 Internal Server Error
             }
         }
+
+        
     }
 }

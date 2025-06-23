@@ -20,6 +20,8 @@ namespace Skilly.Core.Entities
         [JsonIgnore]
         public virtual ProviderServices? ProviderService { get; set; }
         public string ProviderId { get; set; }
+        [NotMapped]
+        public string ProviderName { get; set; }
 
         [ForeignKey("RequestService")]
         public string? RequestServiceId { get; set; }
@@ -35,9 +37,13 @@ namespace Skilly.Core.Entities
         public string? TransactionId { get; set; }
 
         public string UserId { get; set; }
+        [NotMapped]
+        public string UserName { get; set; }
         [JsonIgnore]
         public virtual User User { get; set; }
         public bool IsProcessed { get; set; }
+        [NotMapped]
+        public string providerserviceName { get; set; }
 
         public string? WithdrawMethod { get; set; }
         public string? PhoneNumber { get; set; }

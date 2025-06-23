@@ -16,6 +16,10 @@ namespace Skilly.Core.Entities
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string UserImg { get; set; }
+        [NotMapped]
+        public string providerName { get; set; }
+        [NotMapped]
+        public ICollection<ProviderServicesImage>? ServicesImages { get; set; } = new List<ProviderServicesImage>();
         public string Feedback { get; set; }
         [Range(0.0, 5.0)]
         public decimal Rating { get; set; }

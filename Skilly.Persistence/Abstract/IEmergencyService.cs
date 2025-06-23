@@ -16,6 +16,7 @@ namespace Skilly.Persistence.Abstract
         Task<bool> RejectEmergencyOfferAsync(string providerId, string requestId);
         Task<List<EmergencyRequest>> GetAllEmergencyRequestsAsync();
         Task<EmergencyRequest> GetEmergencyRequestByIdAsync(string requestId);
+        Task SendEmergencyToDashboardbyId(string emergencyId, decimal price);
 
     }
 }

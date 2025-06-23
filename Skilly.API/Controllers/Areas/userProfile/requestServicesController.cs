@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Exchange.WebServices.Data;
 using Skilly.Application.DTOs.User;
 using Skilly.Application.Exceptions;
 using Skilly.Core.Entities;
@@ -57,7 +56,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
         {
             try
             {
-
                 var services = await _unitOfWork._requestserviceRepository.GetAllRequests();
 
                 return StatusCode(StatusCodes.Status200OK, new { services });

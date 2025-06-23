@@ -90,6 +90,27 @@ namespace Skilly.Persistence.Implementation
 
             return sortedProviders;
         }
+        public async Task SendEmergencyToDashboardbyId(string emergencyId,decimal price)
+        {
+            var emergency = await _context.emergencyRequests
+                .Include(c=>c.AssignedProvider)
+                .FirstOrDefaultAsync(c=>c.Id==emergencyId);
+
+            if (emergency == null)
+            {
+                throw new Exception("Emergency request not found.");
+            }
+            var providers = await _context.serviceProviders
+                .Where(c => c.IsEmergency && c.categoryId == emergency.CategoryId)
+                .ToListAsync();
+
+            foreach (var provider in providers)
+            {
+                provider.PricePerEmergencyService = price;
+            }
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<EmergencyRequest>> GetAllEmergencyRequestsAsync()
         {
             var emergency= await _context.emergencyRequests
@@ -112,10 +133,8 @@ namespace Skilly.Persistence.Implementation
                 Finalprice = r.Finalprice
             }).ToList();
             return emer;
-
-
-
         }
+
         public async Task<EmergencyRequest> GetEmergencyRequestByIdAsync(string requestId)
         {
             var emergency = await _context.emergencyRequests

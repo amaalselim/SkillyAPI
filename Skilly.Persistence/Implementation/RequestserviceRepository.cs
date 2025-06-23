@@ -267,6 +267,7 @@ namespace Skilly.Persistence.Implementation
             var services = await _context.requestServices
                 .Include(c => c.UserProfile)
                 .ThenInclude(sp => sp.User)
+                .Include(c=>c.Category)
                 .Include(c => c.requestServiceImages)
                 .Include(c => c.offerSalaries)
                 .ToListAsync();
@@ -283,10 +284,11 @@ namespace Skilly.Persistence.Implementation
                 {
                     Id = item.Id,
                     Name = item.Name,
-                    Price =item.Price,
-                    Deliverytime =item.Deliverytime,
+                    Price = item.Price,
+                    Deliverytime = item.Deliverytime,
                     startDate = item.startDate,
                     categoryId = item.categoryId,
+                    categoryName = item.Category.Name,
                     Notes = item.Notes,
                     ServiceRequestTime = item.ServiceRequestTime,
                     userId = item.userId,
@@ -300,7 +302,7 @@ namespace Skilly.Persistence.Implementation
                     video = item.video,
                     offerSalaries = item.offerSalaries.Where(p => p.Status == 0)?.ToList() ?? new List<OfferSalary>(),
                     OffersCount = item.offerSalaries?.Count(p => p.Status == 0) ?? 0
-                   
+
                 };
             }).ToList();
             return serviceDtos;

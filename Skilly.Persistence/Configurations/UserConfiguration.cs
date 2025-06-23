@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Exchange.WebServices.Data;
 using Skilly.Core.Entities;
 using System;
 using System.Collections.Generic;

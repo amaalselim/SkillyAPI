@@ -20,6 +20,8 @@ namespace Skilly.Core.Entities
         public DateOnly? startDate { get; set; }
         [ForeignKey("Category")]
         public string categoryId { get; set; }
+        [NotMapped]
+        public string categoryName { get; set; }
         [JsonIgnore]
         public virtual Category? Category { get; set; }
         public string? Notes { get; set; }

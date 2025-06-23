@@ -50,9 +50,6 @@ namespace Skilly.API.Controllers.Areas.userProfile
             try
             {
                 var offers = await _unitOfWork._OfferSalaryRepository.GetAllOffersByServiceId(serviceId);
-
-               
-
                 return Ok(new { offers });
             }
             catch (Exception ex)

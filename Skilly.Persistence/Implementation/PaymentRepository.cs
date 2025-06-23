@@ -297,7 +297,9 @@ namespace Skilly.Persistence.Implementation
                 if (providerService.PriceDiscount != null && userprofile.useDiscount==true)
                 {
                     amount = (decimal)providerService.PriceDiscount;
-                }else if(offers != null)
+                    userprofile.Points -= 100;
+                }
+                else if(offers != null)
                 {
                     amount = offers.Salary;
                 }
@@ -490,7 +492,14 @@ namespace Skilly.Persistence.Implementation
         public async Task<IEnumerable<Payment>> GetAllTransactions()
         {
             var trans = await _context.payments
-                .Include(p=>p.User)
+                .Include(p => p.User)
+                .Include(p => p.ProviderService)
+                .ThenInclude(navigationPropertyPath => navigationPropertyPath.serviceProvider)
+                .Include(p => p.RequestService)
+                .ThenInclude(cp => cp.ServiceProvider)
+                .Include(p => p.EmergencyRequest)
+                .ThenInclude(p => p.AssignedProvider)
+                .Where(p => p.PaymentStatus == "paid")
                 .ToListAsync();
 
             if (trans == null || !trans.Any())
@@ -506,15 +515,37 @@ namespace Skilly.Persistence.Implementation
                 PaymentMethod = item.PaymentMethod,
                 CreatedAt = item.CreatedAt,
                 ProviderServiceId = item.ProviderServiceId,
+                providerserviceName=
+                item.ProviderService?.Name??
+                     item.RequestService?.Name ??
+                      item.EmergencyRequest?.ProblemDescription??
+                      "Unknown Service",
+
                 RequestServiceId = item.RequestServiceId,
                 EmergencyRequestId = item.EmergencyRequestId,
                 PaymobOrderId = item.PaymobOrderId,
                 TransactionId = item.TransactionId,
                 UserId = item.UserId,
+                UserName = item.User != null
+                    ? $"{item.User.FirstName} {item.User.LastName}"
+                    : "Unknown User",
+                ProviderId = item.ProviderId,
+                WithdrawMethod = item.WithdrawMethod,
+                PhoneNumber = item.PhoneNumber,
+                InstapayEmail = item.InstapayEmail,
+
+                ProviderName = item.ProviderService?.serviceProvider != null
+                    ? $"{item.ProviderService.serviceProvider.FirstName} {item.ProviderService.serviceProvider.LastName}"
+                    : item.RequestService?.ServiceProvider != null
+                        ? $"{item.RequestService.ServiceProvider.FirstName} {item.RequestService.ServiceProvider.LastName}"
+                        : item.EmergencyRequest?.AssignedProvider != null
+                            ? $"{item.EmergencyRequest.AssignedProvider.FirstName} {item.EmergencyRequest.AssignedProvider.LastName}"
+                            : "Unknown"
             }).ToList();
 
-            return trans;
+            return transDtos;
         }
+
 
         //Wallet
         public async Task<Wallet> ProcessPaymentAsync(string providerId)
@@ -639,8 +670,8 @@ namespace Skilly.Persistence.Implementation
             if (request.WithdrawMethod == "محفظه" && string.IsNullOrEmpty(request.PhoneNumber))
                 throw new Exception("Phone number is required for wallet withdrawal.");
 
-            if (request.WithdrawMethod == "INSTAPAY" && string.IsNullOrEmpty(request.InstapayEmail))
-                throw new Exception("Instapay email is required.");
+            //if (request.WithdrawMethod == "INSTAPAY" && string.IsNullOrEmpty(request.InstapayEmail))
+            //    throw new Exception("Instapay email is required.");
 
             var lastPayment = await _context.payments
                 .Where(p => p.ProviderId == request.ProviderId && p.PaymentStatus == "paid")
@@ -665,6 +696,26 @@ namespace Skilly.Persistence.Implementation
             return "Withdrawal request submitted Successfully";
         }
 
+        public async Task<IEnumerable<Wallet>> GetWalletsAsync()
+        {
+            var wallet= await _context.wallets
+                .Include(w => w.provider)
+                .ToListAsync();
+            if (wallet == null || !wallet.Any())
+            {
+                return new List<Wallet>();
+            }
+            var walletDtos = wallet.Select(item => new Wallet
+            {
+                Id = item.Id,
+                ProviderId = item.ProviderId,
+                Balance = item.Balance,
+                ProviderName = item.provider != null
+                    ? $"{item.provider.FirstName} {item.provider.LastName}"
+                    : "Unknown Provider"
 
+            }).ToList();
+            return walletDtos;
+        }
     }
 }

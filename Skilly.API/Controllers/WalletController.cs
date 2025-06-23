@@ -26,6 +26,19 @@ namespace Skilly.API.Controllers
             }
             return userId;
         }
+        [HttpGet("get-all-balance")]
+        public async Task<IActionResult> GetWalletBalance()
+        {
+            try
+            {
+                var balance = await _unitOfWork._paymentRepository.GetWalletsAsync();
+                return Ok(new { balance });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         [HttpGet("get-Balance")]
         public async Task<IActionResult> ProcessPayment()

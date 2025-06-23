@@ -59,6 +59,19 @@ namespace Skilly.API.Controllers
             }
 
         }
+        [HttpPost("SendAvailableproviders")]
+        public async Task<IActionResult> SendAvailableproviders(emergencyDashboardDTO request)
+        {
+            try
+            {
+                await _emergencyService.SendEmergencyToDashboardbyId(request.emergencyId, request.price);
+                return Ok(new { message = "Emergency requests sent to dashboard successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
+        }
 
         [HttpGet("nearby-providers/{requestId}")]
         public async Task<IActionResult> GetNearbyProviders(string requestId)
