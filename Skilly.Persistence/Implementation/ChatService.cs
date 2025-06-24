@@ -248,6 +248,10 @@ namespace Skilly.Persistence.Implementation
                     message.IsRead = true;
                     message.ReadAt = DateTime.Now;
                 }
+                if (message.SenderId == userId)
+                {
+                    message.IsRead = false;
+                }
             }
             await _context.SaveChangesAsync();
 

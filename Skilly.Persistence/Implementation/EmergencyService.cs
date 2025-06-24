@@ -121,6 +121,7 @@ namespace Skilly.Persistence.Implementation
 
             var emer = emergency.Select(r => new EmergencyRequest
             {
+                Id=r.Id,
                 UserId = r.UserId,
                 UserName = $"{r.User.FirstName} {r.User.LastName}",
                 CategoryId = r.CategoryId,

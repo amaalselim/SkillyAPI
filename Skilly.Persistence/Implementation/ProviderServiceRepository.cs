@@ -769,8 +769,6 @@ namespace Skilly.Persistence.Implementation
             };
         }
 
-       
-
         public async Task CompleteAsync(string serviceId,string userId)
         {
             var service = await _context.providerServices
@@ -782,7 +780,6 @@ namespace Skilly.Persistence.Implementation
            
             if (service != null)
             {
-                service.ServiceStatus = ServiceStatus.Completed;
                 var payment = await _context.payments.FirstOrDefaultAsync(p => p.ProviderServiceId == serviceId);
                 var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
                 service.ServiceStatus = ServiceStatus.Completed;
@@ -854,15 +851,14 @@ namespace Skilly.Persistence.Implementation
                    .Include(g => g.requestServiceImages)
                    .Include(g => g.UserProfile)
                    .Include(g => g.offerSalaries)
-                   .FirstOrDefaultAsync(g => g.Id == serviceId && g.providerId==userId && g.ServiceStatus == ServiceStatus.InProgress);
+                   .FirstOrDefaultAsync(g => g.Id == serviceId && g.providerId==userId && (g.ServiceStatus == ServiceStatus.InProgress || g.ServiceStatus==ServiceStatus.Paid));
 
                 
                 if (request != null)
                 {
-                    service.ServiceStatus = ServiceStatus.Completed;
+                    request.ServiceStatus = ServiceStatus.Completed;
                     var payment = await _context.payments.FirstOrDefaultAsync(p => p.RequestServiceId == serviceId);
                     var user = await _context.users.FirstOrDefaultAsync(u => u.Id == payment.UserId);
-                    request.ServiceStatus = ServiceStatus.Completed;
                     var offers = await _context.offerSalaries.FirstOrDefaultAsync(o => o.requestserviceId == request.Id && o.Status == OfferStatus.Accepted);
 
                     if (offers != null)

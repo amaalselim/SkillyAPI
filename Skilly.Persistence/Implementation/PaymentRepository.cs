@@ -94,29 +94,7 @@ namespace Skilly.Persistence.Implementation
                 .Select(img => img.Img)
                 .ToListAsync();
 
-                var requestImages = imageUrls.Select(url => new requestServiceImage
-                {
-                    Img = url
-                }).ToList();
-
-                var request = new RequestService
-                {
-                    Name = providerService.Name,
-                    Price = payment.Amount,
-                    Deliverytime = providerService.Deliverytime,
-                    startDate = DateOnly.FromDateTime(DateTime.Now),
-                    categoryId = providerService.categoryId,
-                    Notes = providerService.Notes,
-                    userId = userprofile.Id,
-                    uId = payment.UserId,
-                    userImg = user.Img,
-                    ServiceStatus = ServiceStatus.Paid,
-                    providerId = providerService.uId,
-                    Images = requestImages,
-                    video = providerService.video
-                };
-                _context.requestServices.Add(request);
-
+                
                 var chat = await _context.chats.FirstOrDefaultAsync(c =>
                     (c.FirstUserId == user.UserId || c.FirstUserId == providerService.uId) &&
                     (c.SecondUserId == user.UserId || c.SecondUserId == providerService.uId));
@@ -218,28 +196,9 @@ namespace Skilly.Persistence.Implementation
                                 CreatedAt = DateOnly.FromDateTime(DateTime.Now)
                             });
                         }
-
-                        emergencyRequest.Status = "paid";
                         emergencyRequest.Finalprice = 0;
                         var providerId = emergencyRequest.AssignedProviderId;
                         emergencyRequest.AssignedProviderId = null;
-
-
-                        var emergencyAsRequest = new RequestService
-                        {
-                            Name = "طلب طارئ - " + emergencyRequest.ProblemDescription,
-                            Price = payment.Amount,
-                            Deliverytime = "فوري",
-                            startDate = DateOnly.FromDateTime(DateTime.Now),
-                            categoryId = emergencyRequest.CategoryId,
-                            Notes = emergencyRequest.ProblemDescription,
-                            userId = userprofile.Id,
-                            uId = payment.UserId,
-                            userImg = user.Img,
-                            ServiceStatus = ServiceStatus.Paid,
-                            providerId = providerId
-                        };
-                        _context.requestServices.Add(emergencyAsRequest);
 
                         var chat = await _context.chats.FirstOrDefaultAsync(c =>
                             (c.FirstUserId == user.UserId || c.FirstUserId == providerId) &&
