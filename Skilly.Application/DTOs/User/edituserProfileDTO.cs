@@ -10,6 +10,8 @@ namespace Skilly.Application.DTOs.User
 {
     public class edituserProfileDTO
     {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Governorate { get; set; }
         public string City { get; set; }
         public string StreetName { get; set; }

@@ -16,6 +16,6 @@ namespace Skilly.Application.DTOs.Emergency
         public decimal Price { get; set; }
         public double DistanceInKm { get; set; }
         public string EstimatedTimeFormatted { get; set; }
-        public string Review{ get; set; } 
+        public decimal Review{ get; set; } 
     }
 }

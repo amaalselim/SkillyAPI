@@ -15,11 +15,11 @@ namespace Skilly.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Review> modelBuilder)
         {
-            modelBuilder.ToTable("Review");
-            modelBuilder
-            .HasOne(r => r.ServiceProvider)
-            .WithMany(sp => sp.Reviews)
-            .HasForeignKey(r => r.ProviderId);
+            //modelBuilder.ToTable("Review");
+            //modelBuilder
+            //.HasOne(r => r.ServiceProvider)
+            //.WithMany(sp => sp.Reviews)
+            //.HasForeignKey(r => r.ProviderId);
 
         }
     }

@@ -72,8 +72,8 @@ namespace Skilly.Persistence.Implementation
             UserProfile.StreetName = UserProfileDTO.StreetName;
             UserProfile.Governorate = UserProfileDTO.Governorate;
             UserProfile.Gender= UserProfileDTO.Gender;
-            UserProfile.FirstName = user.FirstName;
-            UserProfile.LastName = user.LastName;
+            UserProfile.FirstName = UserProfileDTO.FirstName;
+            UserProfile.LastName = UserProfileDTO.LastName;
             UserProfile.Email = user.Email;
             UserProfile.PhoneNumber = user.PhoneNumber;
 

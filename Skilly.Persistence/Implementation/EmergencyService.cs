@@ -81,8 +81,8 @@ namespace Skilly.Persistence.Implementation
                         DistanceInKm = Math.Round(distance, 2),
                         EstimatedTimeFormatted = estimatedTimeFormatted,
                         Review = p.Reviews.Any() ?
-                            $"{p.Reviews.Average(r => r.Rating):0.0}":
-                            "0"
+                            p.Reviews.Average(r => r.Rating):0.0m
+                            
                     };
                 })
                 .OrderBy(p => p.DistanceInKm)

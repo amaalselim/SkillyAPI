@@ -28,7 +28,7 @@ namespace Skilly.Core.Entities
         [ForeignKey("ProviderServices")]
         public string? serviceId { get; set; }
         [JsonIgnore]
-        public virtual ServiceProvider? ServiceProvider { get; set; }
+        public virtual User? ServiceProvider { get; set; }
         [JsonIgnore]
         public virtual ProviderServices? ProviderServices { get; set; }
 

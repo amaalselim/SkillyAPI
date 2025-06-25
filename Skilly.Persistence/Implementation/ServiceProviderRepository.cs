@@ -89,8 +89,8 @@ namespace Skilly.Persistence.Implementation
             ServiceProvider.Gender= ServiceProviderDTO.Gender;
             ServiceProvider.NumberOfYearExperience = ServiceProviderDTO.NumberOfYearExperience;
             ServiceProvider.BriefSummary= ServiceProviderDTO.BriefSummary;
-            ServiceProvider.FirstName = user.FirstName;
-            ServiceProvider.LastName = user.LastName;
+            ServiceProvider.FirstName = ServiceProviderDTO.firstName;
+            ServiceProvider.LastName = ServiceProviderDTO.lastName;
             ServiceProvider.Email = user.Email;
             ServiceProvider.PhoneNumber = user.PhoneNumber;
 

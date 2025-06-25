@@ -46,14 +46,14 @@ namespace Skilly.Persistence.Implementation
                     .FirstOrDefaultAsync();
                 services.ServiceStatus = ServiceStatus.Delivered;
 
-                review.ProviderId = services.serviceProviderId;
+                review.ProviderId = services.uId;
             }
             else if (await _context.requestServices.AnyAsync(r => r.Id == id))
             {
                 review.requestId = id;
                 review.serviceId = null;
                 var services = await _context.requestServices
-                    .Where(s => s.Id == id)
+                    .Where(s => s.Id == review.requestId)
                     .FirstOrDefaultAsync();
 
                 services.ServiceStatus = ServiceStatus.Delivered;

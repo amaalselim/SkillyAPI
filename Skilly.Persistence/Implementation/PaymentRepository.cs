@@ -547,7 +547,6 @@ namespace Skilly.Persistence.Implementation
             };
         }
 
-
         public async Task<List<GroupedTransactionsDTO>> GetTransactionsGroupedByDate(string providerId)
         {
             var transactions = await _context.payments
@@ -570,14 +569,14 @@ namespace Skilly.Persistence.Implementation
                 CreatedAt = trans.CreatedAt,
                 UserName = trans.User?.FirstName + " " + trans.User?.LastName,
                 Amount = trans.Amount,
-                Message = $"لقد استلمت {trans.Amount} ج.م بنجاح مقابل خدمة " +
-                    (trans.ProviderService != null ? trans.ProviderService.Name :
-                     trans.RequestService != null ? trans.RequestService.Name :
-                     trans.EmergencyRequest != null ? trans.EmergencyRequest.ProblemDescription :
-                     "غير معروفة") + ".",
-                FormattedCreatedAt = trans.CreatedAt
-                    .ToString("dd MMMM yyyy - hh:mm tt", culture)
-                    .Replace("AM", "صباحًا").Replace("PM", "مساءً")
+                Message = $"لقد استلمت {trans.Amount * 0.9m:F2} ج.م بعد خصم 10% بنجاح مقابل خدمة " +
+                (trans.ProviderService != null ? trans.ProviderService.Name :
+                 trans.RequestService != null ? trans.RequestService.Name :
+                 trans.EmergencyRequest != null ? trans.EmergencyRequest.ProblemDescription :
+                 "غير معروفة") + ".",
+                            FormattedCreatedAt = trans.CreatedAt
+                .ToString("dd MMMM yyyy - hh:mm tt", culture)
+                .Replace("AM", "صباحًا").Replace("PM", "مساءً")
             }).ToList();
 
             var grouped = new List<GroupedTransactionsDTO>
