@@ -59,8 +59,7 @@ namespace Skilly.API
                     Credential = GoogleCredential.FromFile(firebasePath)
                 });
             }
-
-
+            
             var smtpSettings = builder.Configuration.GetSection("SMTP");
             builder.Services.AddSingleton<IEmailService>(new EmailService(
                 smtpSettings["Server"],
@@ -240,10 +239,8 @@ namespace Skilly.API
             app.UseCors("MyPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapHub<ChatHub>("/chatHub");
             app.MapControllers();
-
             app.Run();
         }
     }

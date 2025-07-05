@@ -16,35 +16,35 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
-            {
                 throw new UnauthorizedAccessException("User not authorized.");
-            }
             return userId;
         }
-     
 
         [HttpPost("AddServiceReview")]
-        public async Task<IActionResult> AddserviceReview([FromBody] ReviewServiceDTO reviewDTO)
+        public async Task<IActionResult> AddServiceReview([FromBody] ReviewServiceDTO reviewDTO)
         {
             if (reviewDTO == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid review data." });
-            }
+                return BadRequest(new { message = "Invalid review data." });
 
             try
             {
-                string userId = GetUserIdFromClaims();
+                var userId = GetUserIdFromClaims();
                 await _unitOfWork.reviewRepository.AddReviewserviceAsync(userId, reviewDTO);
 
-                return StatusCode(StatusCodes.Status200OK, new { message = "Review added successfully.", data = new { reviewDTO } });
+                return Ok(new { message = "Review added successfully.", data = reviewDTO });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -54,72 +54,72 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviews();
-                return StatusCode(StatusCodes.Status200OK, new { reviews });
+                if (reviews == null)
+                    return NotFound(new { message = "No reviews found." });
+
+                return Ok(new { reviews });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpGet("GetReviewsBy/{serviceId}")]
-        public async Task<IActionResult> GetAllReviewsByservice(string serviceId)
-        {
 
+        [HttpGet("GetReviewsBy/{serviceId}")]
+        public async Task<IActionResult> GetAllReviewsByService(string serviceId)
+        {
             try
             {
-                //var providerId = GetUserIdFromClaims();
-                //if (string.IsNullOrEmpty(providerId))
-                //{
-                //    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
-                //}
-
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByserviceIdAsync(serviceId);
-                return StatusCode(StatusCodes.Status200OK, new { reviews });
+                if (reviews == null)
+                    return NotFound(new { message = "No reviews found for this service." });
+
+                return Ok(new { reviews });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet("GetAllReviewsByproviderId")]
-        public async Task<IActionResult> GetAllReviewsByProvider()
+        public async Task<IActionResult> GetAllReviewsByLoggedInProvider()
         {
             try
             {
                 var providerId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(providerId))
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid provider ID." });
-                }
-
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByproviderIdAsync(providerId);
-                return StatusCode(StatusCodes.Status200OK, new { reviews });
+
+                if (reviews == null)
+                    return NotFound(new { message = "No reviews found for this provider." });
+
+                return Ok(new { reviews });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
-
-       
-
-
 
         [HttpGet("GetAllReviewsBy/{providerId}")]
         public async Task<IActionResult> GetAllReviewsByProvider(string providerId)
         {
-            
             try
             {
                 var reviews = await _unitOfWork.reviewRepository.GetAllReviewsByproviderIdAsync(providerId);
-                return StatusCode(StatusCodes.Status200OK, new { reviews });
+                if (reviews == null)
+                    return NotFound(new { message = "No reviews found for this provider." });
+
+                return Ok(new { reviews });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
-        
     }
 }

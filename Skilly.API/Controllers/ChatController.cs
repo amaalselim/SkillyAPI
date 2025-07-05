@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Skilly.Application.DTOs;
 using Skilly.Application.DTOs.chat;
-using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
-using Skilly.Persistence.Migrations;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers
@@ -33,142 +31,101 @@ namespace Skilly.API.Controllers
         [HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromForm] MessageDTO messageDTO)
         {
-            try
-            {
-                var senderId = GetUserId();
-                if (string.IsNullOrEmpty(senderId))
-                {
-                    return Unauthorized(new { status = "error", message = "User not authenticated" });
-                }
+            var senderId = GetUserId();
+            if (string.IsNullOrEmpty(senderId))
+                return Unauthorized(new { status = "error", message = "User not authenticated" });
 
-                if (string.IsNullOrWhiteSpace(messageDTO.content) && messageDTO.Img == null)
-                {
-                    return BadRequest(new { status = "error", message = "Please provide a message or an image." });
-                }
+            if (string.IsNullOrWhiteSpace(messageDTO.content) && messageDTO.Img == null)
+                return BadRequest(new { status = "error", message = "Please provide a message or an image." });
 
-                var message = await _chatService.SendMessageAsync(messageDTO);
-                if (message != null)
-                {
-                    await _hubContext.Clients.User(messageDTO.receiverId)
-                        .SendAsync("ReceiveMessage", senderId, message.Content, message.Img);
-
-                    await _hubContext.Clients.User(senderId)
-                        .SendAsync("ReceiveMessage", senderId, message.Content, message.Img);
-
-                    return StatusCode(201, new
-                    {
-                        status = "success",
-                        message = "Message sent successfully.",
-                        data = new
-                        {
-                            SenderId=senderId,
-                            ReceiverId = message.ReceiverId,
-                            Content = message.Content,
-                            Image = message.Img,
-                        }
-                    });
-                }
-
+            var message = await _chatService.SendMessageAsync(messageDTO);
+            if (message == null)
                 return BadRequest(new { status = "error", message = "Failed to send message." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message, details = ex.InnerException?.Message });
-            }
 
+            await _hubContext.Clients.User(messageDTO.receiverId)
+                .SendAsync("ReceiveMessage", senderId, message.Content, message.Img);
+
+            await _hubContext.Clients.User(senderId)
+                .SendAsync("ReceiveMessage", senderId, message.Content, message.Img);
+
+            return StatusCode(201, new
+            {
+                status = "success",
+                message = "Message sent successfully.",
+                data = new
+                {
+                    SenderId = senderId,
+                    ReceiverId = message.ReceiverId,
+                    Content = message.Content,
+                    Image = message.Img,
+                }
+            });
         }
+
         [HttpGet("GetChatsForUser")]
         public async Task<IActionResult> GetChatsForUser()
         {
-            try
-            {
-                var userId = GetUserId();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { status = "error", message = "User not authenticated" });
-                }
-                var chats = await _chatService.GetChatsForUserAsync(userId);
-                if (chats == null || !chats.Any())
-                {
-                    return NotFound(new { status = "error", message = "No chats found for this user." });
-                }
-                await _hubContext.Clients.User(userId)
-                    .SendAsync("ChatsUpdated", chats);
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { status = "error", message = "User not authenticated" });
 
-                return Ok(new { status = "success", data = chats });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message });
-            }
+            var chats = await _chatService.GetChatsForUserAsync(userId);
+
+            if (chats == null || !chats.Any())
+                return NotFound(new { status = "error", message = "No chats found for this user." });
+
+            await _hubContext.Clients.User(userId)
+                .SendAsync("ChatsUpdated", chats);
+
+            return Ok(new { status = "success", data = chats });
         }
 
         [HttpGet("GetMessagesForChatOfUser/{chatId}")]
         public async Task<IActionResult> GetMessagesForChat(string chatId)
         {
-            try
-            {
-                var userId = GetUserId();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { status = "error", message = "User not authenticated" });
-                }
-                var messages = await _chatService.GetMessagesForChatAsync(chatId, userId);
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { status = "error", message = "User not authenticated" });
 
-                await _hubContext.Clients.User(userId)
-                    .SendAsync("MessagesForChatUpdated", messages);
+            var messages = await _chatService.GetMessagesForChatAsync(chatId, userId);
 
-                return Ok(new { status = "success", data = messages });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message });
-            }
+            await _hubContext.Clients.User(userId)
+                .SendAsync("MessagesForChatUpdated", messages);
+
+            return Ok(new { status = "success", data = messages });
         }
 
         [HttpPost("MarkMessageAsRead")]
-        public async Task<IActionResult> MarkMessageAsRead([FromBody] MarksasReadDTO marksasReadDTO)
+        public async Task<IActionResult> MarkMessageAsRead([FromBody] MarksasReadDTO dto)
         {
-            if (string.IsNullOrEmpty(marksasReadDTO.MessageId))
-            {
+            if (string.IsNullOrEmpty(dto.MessageId))
                 return BadRequest(new { status = "error", message = "Message ID is required." });
-            }
 
-            try
-            {
-                var userId = GetUserId();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { status = "error", message = "User not authenticated" });
-                }
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { status = "error", message = "User not authenticated" });
 
-                var message = await _chatService.MarkChatMessagesAsReadAsync(marksasReadDTO.MessageId, userId);
+            var message = await _chatService.MarkChatMessagesAsReadAsync(dto.MessageId, userId);
 
-                if (message != null)
-                {
-                    await _hubContext.Clients.User(userId)
-                        .SendAsync("MessageRead", marksasReadDTO.MessageId);
-
-                    return Ok(new { status = "success", message = "Message marked as read." });
-                }
-
+            if (message == null)
                 return BadRequest(new { status = "error", message = "Failed to mark message as read." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message });
-            }
+
+            await _hubContext.Clients.User(userId)
+                .SendAsync("MessageRead", dto.MessageId);
+
+            return Ok(new { status = "success", message = "Message marked as read." });
         }
+
         [HttpGet("GetUnreadMessagesCount")]
         public async Task<IActionResult> GetUnreadMessagesCount()
         {
             var userId = GetUserId();
             if (string.IsNullOrEmpty(userId))
-            {
                 return Unauthorized(new { status = "error", message = "User not authenticated" });
-            }
+
             var count = await _chatService.GetUnreadMessagesCountAsync(userId);
-            return Ok(new { unreadMessages = count });
+
+            return Ok(new { status = "success", unreadMessages = count });
         }
     }
 }

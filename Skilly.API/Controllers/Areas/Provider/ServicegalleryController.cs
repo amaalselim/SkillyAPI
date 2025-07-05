@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs.ServiceProvider;
 using Skilly.Application.Exceptions;
-using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
 
@@ -23,9 +22,7 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
-            {
                 throw new UnauthorizedAccessException("User not authorized.");
-            }
             return userId;
         }
 
@@ -35,39 +32,54 @@ namespace Skilly.API.Controllers.Areas.Provider
             try
             {
                 var galleries = await _unitOfWork.servicegalleryRepository.GetAllServiceGallery();
-                if (galleries == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No service galleries found." });
-                }
+                if (galleries == null || !galleries.Any())
+                    return NotFound(new { message = "No service galleries found." });
 
-                return StatusCode(StatusCodes.Status200OK, new { galleries });
+                return Ok(new { galleries });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet("GetAllServicegalleryByproviderId")]
-        public async Task<IActionResult> GetservicesbyuserId()
+        public async Task<IActionResult> GetGalleriesByLoggedInProvider()
         {
-            string userId = GetUserIdFromClaims();
-            var servicesgallery = await _unitOfWork.servicegalleryRepository.GetAllgalleryByProviderId(userId);
-            if (servicesgallery == null)
+            try
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No galleries found for this provider." });
+                var userId = GetUserIdFromClaims();
+                var galleries = await _unitOfWork.servicegalleryRepository.GetAllgalleryByProviderId(userId);
+                if (galleries == null || !galleries.Any())
+                    return NotFound(new { message = "No galleries found for this provider." });
+
+                return Ok(new { galleries });
             }
-            return StatusCode(StatusCodes.Status200OK, new { servicesgallery });
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
         [HttpGet("GetAllServicegalleryBy/{providerId}")]
-        public async Task<IActionResult> GetservicesbyproviderId(string providerId)
+        public async Task<IActionResult> GetGalleriesByProviderId(string providerId)
         {
-            var servicesgallery = await _unitOfWork.servicegalleryRepository.GetAllgalleryByPProviderId(providerId);
-            if (servicesgallery == null)
+            try
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No galleries found for this provider." });
+                var galleries = await _unitOfWork.servicegalleryRepository.GetAllgalleryByPProviderId(providerId);
+                if (galleries == null || !galleries.Any())
+                    return NotFound(new { message = "No galleries found for this provider." });
+
+                return Ok(new { galleries });
             }
-            return StatusCode(StatusCodes.Status200OK, new { servicesgallery });
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("GetGalleryBy/{galleryId}")]
@@ -75,56 +87,64 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             try
             {
-                string userId = GetUserIdFromClaims();
+                var userId = GetUserIdFromClaims();
                 var gallery = await _unitOfWork.servicegalleryRepository.GetServiceGalleryByIdAsync(galleryId, userId);
 
-                return StatusCode(StatusCodes.Status200OK, new { gallery });
+                return Ok(new { gallery });
             }
             catch (ServiceGalleryNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPost("AddGallery")]
-        public async Task<IActionResult> AddServiceGallery([FromForm] servicegalleryDTO servicegalleryDTO)
+        public async Task<IActionResult> AddServiceGallery([FromForm] servicegalleryDTO dto)
         {
-            if (servicegalleryDTO == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service gallery data." });
-            }
+            if (dto == null)
+                return BadRequest(new { message = "Invalid service gallery data." });
 
             try
             {
-                string userId = GetUserIdFromClaims();
-                await _unitOfWork.servicegalleryRepository.AddServiceGallery(servicegalleryDTO, userId);
+                var userId = GetUserIdFromClaims();
+                await _unitOfWork.servicegalleryRepository.AddServiceGallery(dto, userId);
 
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service gallery added successfully.", data = servicegalleryDTO });
+                return Ok(new { message = "Service gallery added successfully.", data = dto });
             }
             catch (ServiceProviderNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPut("EditgalleryBy/{galleryId}")]
-        public async Task<IActionResult> EditServiceGallery([FromForm] editgalleryDTO servicegalleryDTO, [FromRoute] string galleryId)
+        public async Task<IActionResult> EditServiceGallery([FromForm] editgalleryDTO dto, [FromRoute] string galleryId)
         {
-            if (servicegalleryDTO == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service gallery data." });
-            }
+            if (dto == null)
+                return BadRequest(new { message = "Invalid service gallery data." });
 
             try
             {
-                string userId = GetUserIdFromClaims();
-                await _unitOfWork.servicegalleryRepository.EditServiceGallery(servicegalleryDTO, userId, galleryId);
+                var userId = GetUserIdFromClaims();
+                await _unitOfWork.servicegalleryRepository.EditServiceGallery(dto, userId, galleryId);
 
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service gallery updated successfully.", data = servicegalleryDTO });
+                return Ok(new { message = "Service gallery updated successfully.", data = dto });
             }
             catch (ServiceGalleryNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -133,14 +153,18 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             try
             {
-                string userId = GetUserIdFromClaims();
+                var userId = GetUserIdFromClaims();
                 await _unitOfWork.servicegalleryRepository.DeleteServiceGalleryAsync(galleryId, userId);
 
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service gallery deleted successfully." });
+                return Ok(new { message = "Service gallery deleted successfully." });
             }
             catch (ServiceGalleryNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

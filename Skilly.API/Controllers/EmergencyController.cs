@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs.Emergency;
-using Skilly.Core.Entities;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Skilly.API.Controllers
 {
@@ -21,138 +19,123 @@ namespace Skilly.API.Controllers
             _emergencyService = emergencyService;
             _unitOfWork = unitOfWork;
         }
+
         private string GetUserIdFromClaims()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
-            {
                 throw new UnauthorizedAccessException("User not authorized.");
-            }
             return userId;
         }
+
         [HttpPost("create-emergency-request")]
         [Authorize]
         public async Task<IActionResult> CreateEmergencyRequest([FromBody] EmergencyRequestDTO emergencyRequestDTO)
         {
             var userId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User is not authenticated.");
-            }
+
             if (emergencyRequestDTO == null)
-            {
-                return BadRequest("Emergency request data is required.");
-            }
+                return BadRequest(new { status = "error", message = "Emergency request data is required." });
+
             try
             {
-                
-              var requestId= await _emergencyService.CreateEmergencyRequestAsync(emergencyRequestDTO, userId);
+                var requestId = await _emergencyService.CreateEmergencyRequestAsync(emergencyRequestDTO, userId);
                 return Ok(new
                 {
+                    status = "success",
                     message = "Emergency request created successfully.",
-                    requestId = requestId
+                    data = new { requestId }
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new { status = "error", message = ex.Message });
             }
-
         }
+
         [HttpPost("SendAvailableproviders")]
-        public async Task<IActionResult> SendAvailableproviders(emergencyDashboardDTO request)
+        public async Task<IActionResult> SendAvailableproviders([FromBody] emergencyDashboardDTO request)
         {
             try
             {
                 await _emergencyService.SendEmergencyToDashboardbyId(request.emergencyId, request.price);
-                return Ok(new { message = "Emergency requests sent to dashboard successfully." });
+                return Ok(new { status = "success", message = "Emergency requests sent to dashboard successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
 
         [HttpGet("nearby-providers/{requestId}")]
         public async Task<IActionResult> GetNearbyProviders(string requestId)
         {
-            if (requestId == null)
-                return BadRequest("Invalid requestId");
+            if (string.IsNullOrEmpty(requestId))
+                return BadRequest(new { status = "error", message = "Invalid requestId" });
 
             var result = await _emergencyService.GetNearbyProvidersAsync(requestId);
 
             if (result == null || !result.Any())
-                return NotFound("No nearby providers found");
+                return NotFound(new { status = "error", message = "No nearby providers found" });
 
-
-
-            return Ok(new { result });
+            return Ok(new { status = "success", data = result });
         }
+
         [HttpPost("accept-offer")]
         [Authorize]
-        public async Task<IActionResult> AcceptEmergencyOffer([FromBody] EmergencyOfferDTO emergencyOfferDTO)
+        public async Task<IActionResult> AcceptEmergencyOffer([FromBody] EmergencyOfferDTO dto)
         {
             var userId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User is not authenticated.");
-            }
-            if (emergencyOfferDTO == null || string.IsNullOrEmpty(emergencyOfferDTO.ProviderId) || string.IsNullOrEmpty(emergencyOfferDTO.RequestId))
-            {
-                return BadRequest("Invalid offer data.");
-            }
-            var result = await _emergencyService.AcceptEmergencyOfferAsync(emergencyOfferDTO.ProviderId, emergencyOfferDTO.RequestId);
-            if (result)
-            {
-                return Ok(new { message = "Emergency offer accepted successfully." });
-            }
-            return NotFound("Emergency request not found or already accepted.");
+
+            if (dto == null || string.IsNullOrEmpty(dto.ProviderId) || string.IsNullOrEmpty(dto.RequestId))
+                return BadRequest(new { status = "error", message = "Invalid offer data." });
+
+            var result = await _emergencyService.AcceptEmergencyOfferAsync(dto.ProviderId, dto.RequestId);
+
+            if (!result)
+                return NotFound(new { status = "error", message = "Emergency request not found or already accepted." });
+
+            return Ok(new { status = "success", message = "Emergency offer accepted successfully." });
         }
+
         [HttpPost("reject-offer")]
         [Authorize]
-        public async Task<IActionResult> RejectEmergencyOffer([FromBody] EmergencyOfferDTO emergencyOfferDTO)
+        public async Task<IActionResult> RejectEmergencyOffer([FromBody] EmergencyOfferDTO dto)
         {
             var userId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User is not authenticated.");
-            }
-            if (emergencyOfferDTO == null || string.IsNullOrEmpty(emergencyOfferDTO.ProviderId) || string.IsNullOrEmpty(emergencyOfferDTO.RequestId))
-            {
-                return BadRequest("Invalid offer data.");
-            }
-            var result = await _emergencyService.RejectEmergencyOfferAsync(emergencyOfferDTO.ProviderId, emergencyOfferDTO.RequestId);
-            if (result)
-            {
-                return Ok(new { message = "Emergency offer rejected." });
-            }
-            return NotFound("Emergency request not found or already accepted.");
+
+            if (dto == null || string.IsNullOrEmpty(dto.ProviderId) || string.IsNullOrEmpty(dto.RequestId))
+                return BadRequest(new { status = "error", message = "Invalid offer data." });
+
+            var result = await _emergencyService.RejectEmergencyOfferAsync(dto.ProviderId, dto.RequestId);
+
+            if (!result)
+                return NotFound(new { status = "error", message = "Emergency request not found or already accepted." });
+
+            return Ok(new { status = "success", message = "Emergency offer rejected." });
         }
+
         [HttpGet("all-emergency-requests")]
         public async Task<IActionResult> GetAllEmergencyRequests()
         {
             var requests = await _emergencyService.GetAllEmergencyRequestsAsync();
             if (requests == null || !requests.Any())
-            {
-                return NotFound("No emergency requests found.");
-            }
-            return Ok(new { requests });
+                return NotFound(new { status = "error", message = "No emergency requests found." });
+
+            return Ok(new { status = "success", data = requests });
         }
+
         [HttpGet("emergency-request/{requestId}")]
         public async Task<IActionResult> GetEmergencyRequestById(string requestId)
         {
             if (string.IsNullOrEmpty(requestId))
-            {
-                return BadRequest("Request ID is required.");
-            }
+                return BadRequest(new { status = "error", message = "Request ID is required." });
+
             var request = await _emergencyService.GetEmergencyRequestByIdAsync(requestId);
             if (request == null)
-            {
-                return NotFound("Emergency request not found.");
-            }
-            return Ok(new { request });
+                return NotFound(new { status = "error", message = "Emergency request not found." });
 
-
+            return Ok(new { status = "success", data = request });
         }
     }
 }

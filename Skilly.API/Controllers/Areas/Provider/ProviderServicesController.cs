@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.DTOs.ServiceProvider;
 using Skilly.Application.Exceptions;
 using Skilly.Persistence.Abstract;
-using System.Globalization;
 using System.Security.Claims;
 
 namespace Skilly.API.Controllers.Areas.Provider
@@ -23,13 +22,10 @@ namespace Skilly.API.Controllers.Areas.Provider
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
-            {
                 throw new UnauthorizedAccessException("User not authorized.");
-            }
             return userId;
         }
 
-        
         [HttpGet("getAllServices")]
         public async Task<IActionResult> GetAllServices([FromQuery] string sortBy = "nearest")
         {
@@ -38,163 +34,172 @@ namespace Skilly.API.Controllers.Areas.Provider
                 var userId = GetUserIdFromClaims();
                 var user = await _unitOfWork.Users.GetByIdAsync(userId);
                 if (user == null || user.Latitude == null || user.Longitude == null)
-                    return BadRequest("User location not available.");
+                    return BadRequest(new { message = "User location not available." });
 
-                var userLat = user.Latitude.Value;
-                var userLon = user.Longitude.Value;
-                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, userLat, userLon,userId);
-                if (services == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
-                }
-                return StatusCode(StatusCodes.Status200OK, new { services });
+                var services = await _unitOfWork.providerServiceRepository.GetSortedProviderServicesAsync(sortBy, user.Latitude.Value, user.Longitude.Value, userId);
+                if (services == null || !services.Any())
+                    return NotFound(new { message = "No services found." });
+
+                return Ok(new { services });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpGet("getAllproviderServices")]
         public async Task<IActionResult> GetAllproviderServices()
         {
             try
             {
                 var services = await _unitOfWork.providerServiceRepository.GetAllProviderService();
-                if (services == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
-                }
-                return StatusCode(StatusCodes.Status200OK, new { services });
+                if (services == null || !services.Any())
+                    return NotFound(new { message = "No services found." });
+
+                return Ok(new { services });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet("GetAllServicesBy/{categoryId}")]
         public async Task<IActionResult> GetservicesbycategoryId(string categoryId, [FromQuery] string sortBy = "nearest")
         {
-            var userId = GetUserIdFromClaims();
-            var user = await _unitOfWork.Users.GetByIdAsync(userId);
-            if (user == null || user.Latitude == null || user.Longitude == null)
-                return BadRequest("User location not available.");
+            try
+            {
+                var userId = GetUserIdFromClaims();
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null || user.Latitude == null || user.Longitude == null)
+                    return BadRequest(new { message = "User location not available." });
 
-            var userLat = user.Latitude.Value;
-            var userLon = user.Longitude.Value;
-
-            var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(userId,categoryId, sortBy, userLat, userLon);
-           
-
-            return StatusCode(StatusCodes.Status200OK, new { service });
+                var service = await _unitOfWork.providerServiceRepository.GetAllservicesbyCategoryId(userId, categoryId, sortBy, user.Latitude.Value, user.Longitude.Value);
+                return Ok(new { service });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-
 
         [HttpGet("GetAllServicesByproviderId")]
         public async Task<IActionResult> GetservicesbyuserId()
         {
-            string userId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                throw new UnauthorizedAccessException("User not authorized.");
+                var userId = GetUserIdFromClaims();
+                var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
+                return Ok(new { service });
             }
-            var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(userId);
-           
-            return StatusCode(StatusCodes.Status200OK, new { service });
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-
 
         [HttpGet("GetAllServicesByAnother/{providerId}")]
         public async Task<IActionResult> GetservicesbyuserId(string providerId)
         {
-            
-            var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(providerId);
-          
-            return StatusCode(StatusCodes.Status200OK, new { service });
+            try
+            {
+                var service = await _unitOfWork.providerServiceRepository.GetAllServicesByproviderId(providerId);
+                return Ok(new { service });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-         
+
         [HttpGet("GetServiceBy/{serviceId}")]
-        public async Task<IActionResult> GetServiceById([FromRoute] string serviceId)
+        public async Task<IActionResult> GetServiceById(string serviceId)
         {
             try
             {
-                string userId = GetUserIdFromClaims();
-                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(userId,serviceId);
-                return StatusCode(StatusCodes.Status200OK, new { service });
+                var userId = GetUserIdFromClaims();
+                var service = await _unitOfWork.providerServiceRepository.GetProviderServiceByIdAsync(userId, serviceId);
+                return Ok(new { service });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPost("AddService")]
-        public async Task<IActionResult> AddService([FromForm] ProviderservicesDTO providerservicesDTO)
+        public async Task<IActionResult> AddService([FromForm] ProviderservicesDTO dto)
         {
-            if (providerservicesDTO == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
-            }
+            if (dto == null)
+                return BadRequest(new { message = "Invalid service data." });
+
             try
             {
-                string userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new UnauthorizedAccessException("User not authorized.");
-                }
-                await _unitOfWork.providerServiceRepository.AddProviderService(providerservicesDTO, userId);
-
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service added successfully.", data = providerservicesDTO });
+                var userId = GetUserIdFromClaims();
+                await _unitOfWork.providerServiceRepository.AddProviderService(dto, userId);
+                return Ok(new { message = "Service added successfully.", data = dto });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPut("EditServiceBy/{serviceId}")]
-
-        public async Task<IActionResult> EditService([FromForm] EditProviderServiceDTO providerservicesDTO, [FromRoute] string serviceId)
+        public async Task<IActionResult> EditService([FromForm] EditProviderServiceDTO dto, string serviceId)
         {
-            if (providerservicesDTO == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
-            }
+            if (dto == null)
+                return BadRequest(new { message = "Invalid service data." });
 
             try
             {
-                string userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new UnauthorizedAccessException("User not authorized.");
-                }
-                await _unitOfWork.providerServiceRepository.EditProviderService(providerservicesDTO, userId, serviceId);
-
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service updated successfully.", data = providerservicesDTO });
+                var userId = GetUserIdFromClaims();
+                await _unitOfWork.providerServiceRepository.EditProviderService(dto, userId, serviceId);
+                return Ok(new { message = "Service updated successfully.", data = dto });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpDelete("DeleteServiceBy/{serviceId}")]
-        public async Task<IActionResult> DeleteService([FromRoute] string serviceId)
+        public async Task<IActionResult> DeleteService(string serviceId)
         {
             try
             {
-                string userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new UnauthorizedAccessException("User not authorized.");
-                }
+                var userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.DeleteProviderServiceAsync(serviceId, userId);
-
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service deleted successfully." });
+                return Ok(new { message = "Service deleted successfully." });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -206,96 +211,76 @@ namespace Skilly.API.Controllers.Areas.Provider
                 var userId = GetUserIdFromClaims();
                 var user = await _unitOfWork.Users.GetByIdAsync(userId);
                 if (user == null || user.Latitude == null || user.Longitude == null)
-                    return BadRequest("User location not available.");
+                    return BadRequest(new { message = "User location not available." });
 
-                var userLat = user.Latitude.Value;
-                var userLon = user.Longitude.Value;
-                var services = await _unitOfWork.providerServiceRepository.GetAllProviderServiceDiscounted(userLat, userLon);
-                if (services == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, new { message = "No Services found." });
-                }
-                return StatusCode(StatusCodes.Status200OK, new { services });
+                var services = await _unitOfWork.providerServiceRepository.GetAllProviderServiceDiscounted(user.Latitude.Value, user.Longitude.Value);
+                if (services == null || !services.Any())
+                    return NotFound(new { message = "No services found." });
+
+                return Ok(new { services });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Internal server error: {ex.Message}" });
+                return BadRequest(new { message = ex.Message });
             }
         }
-
 
         [HttpPost("apply-Discount/{serviceId}")]
         public async Task<IActionResult> ApplyDiscount(string serviceId)
         {
-            if (serviceId == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
-            }
+            if (string.IsNullOrEmpty(serviceId))
+                return BadRequest(new { message = "Invalid service data." });
 
             try
             {
-                string userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new UnauthorizedAccessException("User not authorized.");
-                }
-
+                var userId = GetUserIdFromClaims();
                 await _unitOfWork.providerServiceRepository.UseServiceDiscount(serviceId, userId);
-
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service Discounted successfully.", serviceID = serviceId });
+                return Ok(new { message = "Service discounted successfully.", serviceId });
             }
             catch (ProviderServiceNotFoundException ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet("Get-Services-InProgress")]
         public async Task<IActionResult> GetservicesInProgress()
         {
-            string userId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                throw new UnauthorizedAccessException("User not authorized.");
+                var userId = GetUserIdFromClaims();
+                var service = await _unitOfWork.providerServiceRepository.GetAllServicesInProgress(userId);
+                if (service == null)
+                    return NotFound(new { message = "No services in progress found." });
+
+                return Ok(new { service });
             }
-            var service = await _unitOfWork.providerServiceRepository.GetAllServicesInProgress(userId);
-            if (service == null)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new { message = "No services found for this provider." });
+                return BadRequest(new { message = ex.Message });
             }
-            return StatusCode(StatusCodes.Status200OK, new { service });
         }
 
         [HttpPost("Complete-Service/{serviceId}")]
         public async Task<IActionResult> CompleteService(string serviceId)
         {
-            if (serviceId == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = "Invalid service data." });
-            }
+            if (string.IsNullOrEmpty(serviceId))
+                return BadRequest(new { message = "Invalid service data." });
 
             try
             {
-                string userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new UnauthorizedAccessException("User not authorized.");
-                }
-
-                await _unitOfWork.providerServiceRepository.CompleteAsync(serviceId,userId);
-
-                return StatusCode(StatusCodes.Status200OK, new { message = "Service Completed successfully."});
+                var userId = GetUserIdFromClaims();
+                await _unitOfWork.providerServiceRepository.CompleteAsync(serviceId, userId);
+                return Ok(new { message = "Service completed successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
-
-
     }
 }

@@ -26,72 +26,56 @@ namespace Skilly.API.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
-            {
                 throw new UnauthorizedAccessException("User not authorized.");
-            }
             return userId;
         }
 
         [HttpGet("GetUserNotifications")]
         public async Task<IActionResult> GetUserNotifications()
         {
-            try
-            {
-                var userId = GetUserIdFromClaims();
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized(new { status = "error", message = "User not authorized." });
+            var userId = GetUserIdFromClaims();
 
-                var notifications = await _context.notifications
-                    .Where(n => n.UserId == userId)
-                    .OrderByDescending(n => n.CreatedAt)
-                    .ToListAsync();
+            var notifications = await _context.notifications
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
 
-                return Ok(new { status = "success", notifications });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message });
-            }
+            if (notifications == null || !notifications.Any())
+                return NotFound(new { status = "fail", message = "No notifications found." });
+
+            return Ok(new { status = "success", data = notifications });
         }
 
         [HttpPut("mark-as-read-By/{notificationId}")]
         public async Task<IActionResult> MarkAsRead(string notificationId)
         {
-            try
-            {
-                var notification = await _context.notifications.FindAsync(notificationId);
-                if (notification == null)
-                    return NotFound(new { status = "error", message = "Notification not found." });
+            if (string.IsNullOrEmpty(notificationId))
+                return BadRequest(new { status = "fail", message = "Notification ID is required." });
 
-                notification.IsRead = true;
-                await _context.SaveChangesAsync();
+            var notification = await _context.notifications.FindAsync(notificationId);
+            if (notification == null)
+                return NotFound(new { status = "fail", message = "Notification not found." });
 
-                return Ok(new { status = "success", message = "Notification marked as read." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message });
-            }
+            notification.IsRead = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { status = "success", message = "Notification marked as read." });
         }
 
         [HttpDelete("Delete-Notification-By/{notificationId}")]
         public async Task<IActionResult> DeleteNotification(string notificationId)
         {
-            try
-            {
-                var notification = await _context.notifications.FindAsync(notificationId);
-                if (notification == null)
-                    return NotFound(new { status = "error", message = "Notification not found." });
+            if (string.IsNullOrEmpty(notificationId))
+                return BadRequest(new { status = "fail", message = "Notification ID is required." });
 
-                _context.notifications.Remove(notification);
-                await _context.SaveChangesAsync();
+            var notification = await _context.notifications.FindAsync(notificationId);
+            if (notification == null)
+                return NotFound(new { status = "fail", message = "Notification not found." });
 
-                return Ok(new { status = "success", message = "Notification deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { status = "error", message = ex.Message });
-            }
+            _context.notifications.Remove(notification);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { status = "success", message = "Notification deleted successfully." });
         }
     }
 }

@@ -1,15 +1,12 @@
-﻿using Azure.Core;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Skilly.Application.Abstract;
 using Skilly.Application.DTOs;
 using Skilly.Application.DTOs.Auth;
-using Skilly.Application.Implementation;
 using Skilly.Core.Entities;
-using Skilly.Core.Enums;
 using Skilly.Persistence.Abstract;
 using System.Security.Claims;
-using Vonage.Common;
 
 namespace Skilly.API.Controllers
 {
@@ -20,21 +17,26 @@ namespace Skilly.API.Controllers
         private readonly IAuthService _authService;
         private readonly IGenericRepository<User> _user;
 
-        public AuthController(IAuthService authService,IGenericRepository<User> user)
+        public AuthController(IAuthService authService, IGenericRepository<User> user)
         {
             _authService = authService;
             _user = user;
+        }
+
+        private string GetUserIdFromClaims()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("User not authorized.");
+            return userId;
         }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
             var result = await _authService.RegisterAsync(registerDTO);
-
             if (result.Succeeded)
-            {
-                return CreatedAtAction(nameof(Register), new { message = "User Registered Successfully. Please verify your email." });
-            }
+                return CreatedAtAction(nameof(Register), new { message = "User registered successfully. Please verify your email." });
 
             return BadRequest(new
             {
@@ -44,12 +46,10 @@ namespace Skilly.API.Controllers
             });
         }
 
-
         [HttpPost("verify-email")]
-        public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO verificationDTO)
+        public async Task<IActionResult> VerifyEmail([FromBody] VerficationCodeDTO dto)
         {
-            var token = await _authService.VerifyEmailCodeAsync(verificationDTO);
-
+            var token = await _authService.VerifyEmailCodeAsync(dto);
             if (token != null)
             {
                 return Ok(new
@@ -59,14 +59,13 @@ namespace Skilly.API.Controllers
                     Token = token
                 });
             }
+
             return BadRequest(new
             {
                 Success = false,
                 Message = "Invalid verification code."
             });
         }
-
-
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
@@ -76,19 +75,21 @@ namespace Skilly.API.Controllers
                 return BadRequest(new
                 {
                     Success = false,
-                    Message = "Invalid model",
+                    Message = "Invalid model.",
                     Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
                 });
             }
 
             var response = await _authService.LoginAsync(loginDTO);
-            return response != null ? Ok(response): BadRequest(new { Success = false, Message = "Invalid login attempt." });
+            return response != null
+                ? Ok(response)
+                : BadRequest(new { Success = false, Message = "Invalid login attempt." });
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordDTO forgetPasswordDTO)
+        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordDTO dto)
         {
-            var token = await _authService.GeneratePasswordResetTokenAsync(forgetPasswordDTO);
+            var token = await _authService.GeneratePasswordResetTokenAsync(dto);
             if (token == null)
             {
                 return BadRequest(new
@@ -97,9 +98,10 @@ namespace Skilly.API.Controllers
                     Message = "Failed to generate reset token."
                 });
             }
+
             try
             {
-                await _authService.SendResetPasswordEmailAsync(forgetPasswordDTO.Email);
+                await _authService.SendResetPasswordEmailAsync(dto.Email);
                 return Ok(new
                 {
                     Success = true,
@@ -108,7 +110,7 @@ namespace Skilly.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return Unauthorized(new
                 {
                     Success = false,
                     Message = $"Failed to send email: {ex.Message}"
@@ -117,19 +119,19 @@ namespace Skilly.API.Controllers
         }
 
         [HttpPost("verify-code")]
-        public async Task<IActionResult> VerifyCode([FromBody] VerficationCodeDTO verficationCodeDTO)
+        public async Task<IActionResult> VerifyCode([FromBody] VerficationCodeDTO dto)
         {
-            var user = await _authService.FindByEmailAsync(verficationCodeDTO.email);
+            var user = await _authService.FindByEmailAsync(dto.email);
             if (user == null)
             {
-                return BadRequest(new
+                return NotFound(new
                 {
                     Success = false,
                     Message = "User not found."
                 });
             }
 
-            if (user.verificationCode.ToString() != verficationCodeDTO.code)
+            if (user.verificationCode.ToString() != dto.code)
             {
                 return BadRequest(new
                 {
@@ -146,66 +148,40 @@ namespace Skilly.API.Controllers
         }
 
         [HttpPost("update-password")]
-        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDTO)
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
                 {
                     Success = false,
-                    Message = "Invalid data provided.",
+                    Message = "Invalid data.",
                     Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
                 });
             }
 
-            var result = await _authService.UpdatePasswordAsync(updatePasswordDTO);
-            if (result.Succeeded)
-            {
-                return Ok(new
-                {
-                    Success = true,
-                    Message = "Password updated successfully."
-                });
-            }
-            else
-            {
-                return BadRequest(new
-                {
-                    Success = false,
-                    Message = "Password update failed.",
-                    Errors = result.Errors
-                });
-            }
+            var result = await _authService.UpdatePasswordAsync(dto);
+            return result.Succeeded
+                ? Ok(new { Success = true, Message = "Password updated successfully." })
+                : BadRequest(new { Success = false, Message = "Password update failed.", Errors = result.Errors });
         }
-        private string GetUserIdFromClaims()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new UnauthorizedAccessException("User not authorized.");
-            }
-            return userId;
-        }
+
         [HttpPost("login-google")]
-        public async Task<IActionResult> LoginWithGoogle([FromBody] LoginGoogleDTO LogingoogleDTO)
+        public async Task<IActionResult> LoginWithGoogle([FromBody] LoginGoogleDTO dto)
         {
-            var result = await _authService.LoginWithGoogleAsync(LogingoogleDTO);
-            if (result != null)
-            {
-                return Ok(result);
-            }
-            return BadRequest(new { message = "Invalid Google login." });
+            var result = await _authService.LoginWithGoogleAsync(dto);
+            return result != null
+                ? Ok(result)
+                : BadRequest(new { message = "Invalid Google login." });
         }
-        [HttpPost("Addlocation")]
+
+        [HttpPost("AddLocation")]
         public async Task<IActionResult> SaveUserLocation([FromBody] LocationDTO location)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var userId = GetUserIdFromClaims();
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { status = "error", message = "User not authorized." });
-
             var user = await _user.GetByIdAsync(userId);
 
             if (user == null)
@@ -218,21 +194,23 @@ namespace Skilly.API.Controllers
 
             return Ok(new { message = "Location saved successfully." });
         }
+
         [HttpPost("CompleteGoogleData")]
-        public async Task<IActionResult> CompleteGoogleData([FromBody] CompleteGoogleDataDTO completeGoogleDataDTO)
+        public async Task<IActionResult> CompleteGoogleData([FromBody] CompleteGoogleDataDTO dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
                 {
                     Success = false,
-                    Message = "Invalid data provided.",
+                    Message = "Invalid data.",
                     Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
                 });
             }
+
             try
             {
-                await _authService.CompleteDataAsync(completeGoogleDataDTO);
+                await _authService.CompleteDataAsync(dto);
                 return Ok(new
                 {
                     Success = true,
@@ -241,10 +219,10 @@ namespace Skilly.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return BadRequest(new
                 {
                     Success = false,
-                    Message = $"An error occurred while completing Google data: {ex.Message}"
+                    Message = $"Error while completing Google data: {ex.Message}"
                 });
             }
         }
